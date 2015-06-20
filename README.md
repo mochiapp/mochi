@@ -177,7 +177,7 @@ Triple Licensed Zlib, MIT and Apache2. See LICENSE file
 ## Contributors
 
 Thanks to the following people who have contributed to GUN:
- [agborkowski](https://github.com/agborkowski)
+ - [agborkowski](https://github.com/agborkowski)
  - [alexlafroscia](https://github.com/alexlafroscia)
  - [anubiann00b](https://github.com/anubiann00b)
  - [bromagosa](https://github.com/bromagosa)
