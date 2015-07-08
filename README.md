@@ -72,7 +72,7 @@ node express.js 8080
 Then visit [http://localhost:8080](http://localhost:8080) in your browser.
 
 
-## API
+## [API](https://github.com/amark/gun/wiki/JS-API)
 
 Below is a really basic overview of how the gun API works. For a more detailed explanation with many more examples, [check out the wiki](https://github.com/amark/gun/wiki).
 
