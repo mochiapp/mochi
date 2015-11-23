@@ -998,6 +998,9 @@
 	}({}));
 	if(typeof window !== "undefined"){
 		window.Gun = Gun;
+		if(typeof module !== 'undefined' && module.exports){
+			module.exports = Gun;
+		}
 	} else {
 		module.exports = Gun;
 	}
