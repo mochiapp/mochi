@@ -60,7 +60,7 @@ Quick note: All active development is happening on `0.5` branch, which has the u
    ```
    Then visit [http://localhost:8080](http://localhost:8080) in your browser.
    
-### Hiroku
+### Heroku
    ```bash
    git clone https://github.com/amark/gun.git
    cd gun
