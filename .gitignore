@@ -3,6 +3,7 @@ npm-debug.log
 gun.min.js
 yarn.lock
 *data.json
+*data*
 *.db
 .idea/
 *.bak
