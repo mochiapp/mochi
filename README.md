@@ -2,6 +2,13 @@
 	<a href="http://gundb.io">
 		<img src='https://cldup.com/TEy9yGh45l.svg'
 			width='40%'
+			style='float:right;'
+			alt="gun" />
+	</a>
+	<img width='18%'>
+	<a href="http://gun.js.org">
+		<img src='http://gun.js.org/see/demo.gif'
+			width='40%'
 			alt="gun" />
 	</a>
 </h1>
@@ -18,8 +25,8 @@ GUN is a realtime, distributed, offline-first, graph database engine. Lightweigh
 
 ## Why?
 
- - **Realtime** - It may be trivial to get realtime updates with socket.io or something, but what you do not get is *state synchronization*. GUN does this for you out of the box, assuring that two users' simultaneous updates won't concurrently break each other.
- - **Distributed** - GUN is peer-to-peer by design, meaning you have no centralized database server to maintain or that could crash. This lets you sleep through the night without worrying about database DevOps - we call this "NoDB". From that, you can build decentralized, federated, or centralized apps.
+ - **Realtime** - You might use socketio for realtime updates, but what happens if you reload the page? GUN solves *state synchronization* for you, whether that be realtime updates across all your users, reloads, or even update conflicts. 
+ - **Distributed** - GUN is peer-to-peer by design, meaning you have no centralized database server to maintain or that could crash. This lets you sleep through the night without worrying about database DevOps - we call it "NoDB". From there, you can build decentralized, federated, or centralized apps.
  - **Offline-first** - GUN works even if your internet or cell reception doesn't. Users can still plug away and save data as normal, and then when the network comes back online GUN will automatically synchronize all the changes and handle any conflicts for you.
  - **Graph** - Most databases force you to bend over backwards to match their storage constraints. But graphs are different, they let you have any data structure you want. Whether that be traditional tables with relations, document oriented trees, or tons of circular references. You choose.
 
