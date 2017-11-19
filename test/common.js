@@ -854,11 +854,2902 @@ describe('Gun', function(){
 				expect(err).to.not.be.ok();
 				done();
 			});
+<<<<<<< HEAD
 		});
 		
 		it('put node then value', function(done){
 			var ref = gun.put({hello: "world"});
 			
+=======
+
+			it('kitty puppy', function(done){
+				var g3 = gun.put({hey: 'kitty'}).key('timeywimey/kitty/puppy');
+
+				var g4 = gun.put({hi: 'puppy'}).key('timeywimey/kitty/puppy');
+
+				var g5 = gun.get('timeywimey/kitty/puppy').on(function(val){
+					//delete val._;
+					//console.log("puppy?", val);
+					expect(val.hey).to.be('kitty');
+					expect(val.hi).to.be('puppy');
+					if(done.c){ return }
+					done(); done.c = 1;
+				});
+			});
+
+			it('hello', function(done){
+				gun.get('timeywimey/hello').on(function(val){
+					//delete val._;
+					//console.log("hello?", val);
+					expect(val.hello).to.be('world');
+					if(done.c){ return }
+					done(); done.c = 1;
+				});
+
+				gun.put({hello: 'world'}).key('timeywimey/hello');
+			});
+
+			it('hello foo', function(done){
+				gun.get('timeywimey/hello/foo').on(function(val){
+					//delete val._;
+					expect(val.hello).to.be('world');
+					if(val.foo){
+						expect(val.foo).to.be('bar');
+						if(done.c){ return }
+						done(); done.c = 1;
+					}
+				});
+
+				gun.put({hello: 'world'}).key('timeywimey/hello/foo');
+
+				gun.put({foo: 'bar'}).key('timeywimey/hello/foo');
+			});
+
+			it('all', function(done){
+				gun.put({hey: 'kitty'}).key('timeywimey/all');
+
+				gun.put({hi: 'puppy'}).key('timeywimey/all');
+
+				gun.get('timeywimey/all').on(function(val){
+					// console.log('all', done.c, val);
+					expect(val.hey).to.be('kitty');
+					expect(val.hi).to.be('puppy');
+					if(val.hello){
+						expect(val.hello).to.be('world');
+						done.hello = true;
+					}
+					if(val.foo){
+						expect(val.foo).to.be('bar');
+						if(done.c || !done.hello){ return }
+						done(); done.c = 1;
+					}
+				});
+
+				gun.put({hello: 'world'}).key('timeywimey/all');
+
+				gun.put({foo: 'bar'}).key('timeywimey/all');
+			});
+
+		});
+
+		describe('plural chains', function(){
+			this.timeout(5000);
+			it('uncached synchronous map on', function(done){
+				/*
+					Biggest challenges so far:
+					 - Unsubscribe individual mapped next. !
+					 - Performance deduplication on asking relation's next. !
+					 - Replying immediately to parent cached contexts.
+					 - Performant read lock on write contexts.
+					 - Proxying event across maps.
+				*/
+				var s = Gun.state.map();s.soul = 'u/m';
+				gun.on('put', {gun: gun, put: Gun.graph.ify({
+					alice: {
+						age: 26,
+						name: "Alice",
+						pet: {a:1, name: "Fluffy"}
+					},
+					bob: {
+						age: 29,
+						name: "Bob!",
+						pet: {b:2, name: "Frisky"}
+					}
+				}, s)});
+				var check = {}, count = {};
+				gun.get('u/m').map().on(function(v,f){
+					check[f] = v;
+					count[f] = (count[f] || 0) + 1;
+					//console.log("***********", f, v);
+					if(check.alice && check.bob){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.alice.age).to.be(26);
+							expect(check.alice.name).to.be('Alice');
+							expect(Gun.val.rel.is(check.alice.pet)).to.be.ok();
+							//expect(count.alice).to.be(1);
+							expect(check.bob.age).to.be(29);
+							expect(check.bob.name).to.be('Bob!');
+							expect(Gun.val.rel.is(check.bob.pet)).to.be.ok();
+							//expect(count.bob).to.be(1);
+							done();
+						},10);
+					}
+				});
+			});
+
+			it('uncached synchronous map get on', function(done){
+				var s = Gun.state.map();s.soul = 'u/m/p';
+				gun.on('put', {gun: gun, put: Gun.graph.ify({
+					alice: {
+						age: 26,
+						name: "alice",
+						pet: {a:1, name: "Fluffy"}
+					},
+					bob: {
+						age: 29,
+						name: "bob",
+						pet: {b:2, name: "Frisky"}
+					}
+				}, s)});
+				var check = {}, count = {};
+				gun.get('u/m/p').map().get('name').on(function(v,f){
+					//console.log("*****************", f, v);
+					check[v] = f;
+					count[v] = (count[v] || 0) + 1;
+					if(check.alice && check.bob){
+						clearTimeout(done.to);
+							done.to = setTimeout(function(){
+							expect(check.alice).to.be('name');
+							expect(check.bob).to.be('name');
+							//expect(count.alice).to.be(1);
+							//expect(count.bob).to.be(1);
+							done();
+						},10);
+					}
+				});
+			});
+
+			it('uncached synchronous map get on node', function(done){
+				var s = Gun.state.map();s.soul = 'u/m/p/n';
+				gun.on('put', {gun: gun, put: Gun.graph.ify({
+					alice: {
+						age: 26,
+						name: "alice",
+						pet: {a:1, name: "Fluffy"}
+					},
+					bob: {
+						age: 29,
+						name: "bob",
+						pet: {b:2, name: "Frisky"}
+					}
+				}, s)});
+				var check = {}, count = {};
+				gun.get('u/m/p/n').map().get('pet').on(function(v,f){
+					//console.log("********************", f,v);
+					check[v.name] = v;
+					count[v.name] = (count[v.name] || 0) + 1;
+					if(check.Fluffy && check.Frisky){
+						clearTimeout(done.to);
+							done.to = setTimeout(function(){
+							expect(check.Fluffy.a).to.be(1);
+							expect(check.Frisky.b).to.be(2);
+							//expect(count.Fluffy).to.be(1);
+							//expect(count.Frisky).to.be(1);
+							//expect(count['undefined']).to.not.be.ok();
+							if(done.c){return}done.c=1;
+							done();
+						},10);
+					}
+				});
+			});
+
+			it('uncached synchronous map get on node get', function(done){
+				var gun = Gun();
+				var s = Gun.state.map();s.soul = 'u/m/p/n/p';
+				gun.on('put', {gun: gun, put: Gun.graph.ify({
+					alice: {
+						age: 26,
+						name: "alice",
+						pet: {a:1, name: "Fluffy"}
+					},
+					bob: {
+						age: 29,
+						name: "bob",
+						pet: {b:2, name: "Frisky"}
+					}
+				}, s)});
+				var check = {}, count = {};
+				//console.debug.i=1;console.log('-------------------');
+				gun.get('u/m/p/n/p').map().get('pet').get('name').on(function(v,f){
+					check[v] = f;
+					count[v] = (count[v] || 0) + 1;
+					//console.log("*****************", f, v);
+					if(check.Fluffy && check.Frisky){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.Fluffy).to.be('name');
+							expect(check.Frisky).to.be('name');
+							//console.log("????", gun._.graph);
+							Gun.obj.map(gun._.graph, function(n,s){
+								if('u/m/p/n/p' === s){ return }
+								var a = Gun.obj.map(n, function(v,f,t){t(v)});
+								expect(a.length).to.be(2); // make sure that ONLY the selected properties were loaded, not the whole node.
+							});
+							//expect(count.Fluffy).to.be(1);
+							//expect(count.Frisky).to.be(1);
+							done();
+						},10);
+					}
+				});
+			});
+
+			it('uncached synchronous map on mutate', function(done){
+				var s = Gun.state.map();s.soul = 'u/m/mutate';
+				gun.on('put', {gun: gun, put: Gun.graph.ify({
+					alice: {
+						age: 26,
+						name: "Alice",
+						pet: {a:1, name: "Fluffy"}
+					},
+					bob: {
+						age: 29,
+						name: "Bob",
+						pet: {b:2, name: "Frisky"}
+					}
+				}, s)});
+				var check = {}, count = {};
+				gun.get('u/m/mutate').map().get('name').get(function(at,ev){
+					var e = at.err, v = at.put, f = at.get;
+					//console.log("****************", f,v);
+					check[v] = f;
+					count[v] = (count[v] || 0) + 1;
+					if(check.Alice && check.Bob && check['undefined']){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							//expect(count.Alice).to.be(1);
+							//expect(count.Bob).to.be(1);
+							//expect(count['undefined']).to.be(1);
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('u/m/mutate').get('alice').put(7);
+				}, 300);
+			});
+
+			it('uncached synchronous map on mutate node', function(done){
+				var s = Gun.state.map();s.soul = 'u/m/mutate/n';
+				gun.on('put', {gun: gun, put: Gun.graph.ify({
+					alice: {_:{'#':'umaliceo'},
+						age: 26,
+						name: "Alice",
+						pet: {a:1, name: "Fluffy"}
+					},
+					bob: {
+						age: 29,
+						name: "Bob",
+						pet: {b:2, name: "Frisky"}
+					}
+				}, s)});
+				var check = {}, count = {};
+				gun.get('u/m/mutate/n').map().get('name').get(function(at,ev){
+					var e = at.err, v = at.put, f = at.get;
+					check[v] = f;
+					count[v] = (count[v] || 0) + 1;
+					//console.log("************", f,v);
+					if(check.Alice && check.Bob && check['undefined'] && check['Alice Zzxyz']){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(done.last).to.be.ok();
+							expect(check['Alice Aabca']).to.not.be.ok();
+							//expect(count.Alice).to.be(1);
+							//expect(count.Bob).to.be(1);
+							//expect(count['undefined']).to.be(1);
+							//expect(count['Alice Zzxyz']).to.be(1);
+							done();
+						},200);
+					}
+				});
+				setTimeout(function(){
+					gun.get('u/m/mutate/n').get('alice').put({
+						_:{'#':'u/m/m/n/soul'},
+						name: 'Alice Zzxyz'
+					});
+					setTimeout(function(){
+						gun.get('umaliceo').put({
+							name: 'Alice Aabca'
+						});
+						done.last = true;
+					}, 10);
+				}, 300);
+			});
+
+			it('uncached synchronous map on mutate node uncached', function(done){
+				var s = Gun.state.map();s.soul = 'u/m/mutate/n/u';
+				gun.on('put', {gun: gun, put: Gun.graph.ify({
+					alice: {_:{'#':'umaliceo1'},
+						age: 26,
+						name: "Alice",
+						pet: {a:1, name: "Fluffy"}
+					},
+					bob: {
+						age: 29,
+						name: "Bob",
+						pet: {b:2, name: "Frisky"}
+					}
+				}, s)});
+				var check = {}, count = {};
+				gun.get('u/m/mutate/n/u').map().on(function(v,f){
+					check[v.name] = f;
+					count[v.name] = (count[v.name] || 0) + 1;
+					//console.log("*****************", f,v);
+					if(check.Alice && check.Bob && check['Alice Zzxyz']){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(done.last).to.be.ok();
+							//expect(check['Alice Aabca']).to.not.be.ok();
+							//expect(count['Alice']).to.be(1);
+							//expect(count['Bob']).to.be(1);
+							//expect(count['Alice Zzxyz']).to.be(1);
+							if(done.c){ return } done.c = 1;
+							done();
+						},200);
+					}
+				});
+				setTimeout(function(){
+					var s = Gun.state.map();s.soul = 'u/m/m/n/u/soul';
+					gun.on('put', {gun: gun, put: Gun.graph.ify({
+						name: 'Alice Zzxyz'
+					}, s)});
+					//console.debug.i=1;console.log("---------------");
+					gun.get('u/m/mutate/n/u').put({
+						alice: {'#':'u/m/m/n/u/soul'},
+					});
+					/*
+						{
+							users: {_:#users
+								alice: {#newalice}
+							}
+						}
+					*/
+					setTimeout(function(){
+						gun.get('umaliceo1').put({
+							name: 'Alice Aabca'
+						});
+						done.last = true;
+					}, 10);
+				}, 300);
+			});
+
+			it('uncached synchronous map on get mutate node uncached', function(done){
+				var s = Gun.state.map();s.soul = 'u/m/p/mutate/n/u';
+				gun.on('put', {gun: gun, put: Gun.graph.ify({
+					alice: {_:{'#':'umaliceo2'},
+						age: 26,
+						name: "Alice",
+						pet: {a:1, name: "Fluffy"}
+					},
+					bob: {
+						age: 29,
+						name: "Bob",
+						pet: {b:2, name: "Frisky"}
+					}
+				}, s)});
+				var check = {}, count = {};
+				gun.get('u/m/p/mutate/n/u').map().get('name').on(function(v,f){
+					check[v] = f;
+					count[v] = (count[v] || 0) + 1;
+					//console.log("*************", f,v);
+					if(check.Alice && check.Bob && check['Alice Zzxyz']){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							var a = Gun.obj.map(gun._.graph['u/m/p/m/n/u/soul'], function(v,f,t){t(v)});
+							expect(a.length).to.be(2);
+							expect(done.last).to.be.ok();
+							expect(check['Alice Aabca']).to.not.be.ok();
+							//expect(count.Alice).to.be(1);
+							//expect(count.Bob).to.be(1);
+							//expect(count['Alice Zzxyz']).to.be(1);
+							done();
+						},200);
+					}
+				});
+				setTimeout(function(){
+					var s = Gun.state.map();s.soul = 'u/m/p/m/n/u/soul';
+					gun.on('put', {gun: gun, put: Gun.graph.ify({
+						name: 'Alice Zzxyz', age: 34
+					}, s)});
+					gun.get('u/m/p/mutate/n/u').put({
+						alice: {'#':'u/m/p/m/n/u/soul'},
+					});
+					setTimeout(function(){
+						gun.get('umaliceo2').put({
+							name: 'Alice Aabca'
+						});
+						done.last = true;
+					}, 10);
+				}, 300);
+			});
+
+			it('uncached synchronous map on get node mutate node uncached', function(done){
+				var s = Gun.state.map();s.soul = 'u/m/p/n/mutate/n/u';
+				gun.on('put', {gun: gun, put: Gun.graph.ify({
+					alice: {_:{'#':'umaliceo3'},
+						age: 26,
+						name: "Alice",
+						pet: {_:{'#':'sflufso'},a:1, name: "Fluffy"}
+					},
+					bob: {
+						age: 29,
+						name: "Bob",
+						pet: {b:2, name: "Frisky"}
+					}
+				}, s)});
+				var check = {}, count = {};
+				gun.get('u/m/p/n/mutate/n/u').map().get('pet').on(function(v,f){
+					check[v.name] = f;
+					count[v.name] = (count[v.name] || 0) + 1;
+					//console.log("*****************", f,v);
+					if(check.Fluffy && check.Frisky && check.Fuzzball){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(done.last).to.be.ok();
+							expect(check['Fluffs']).to.not.be.ok();
+							//expect(count.Fluffy).to.be(1);
+							//expect(count.Frisky).to.be(1);
+							//expect(count.Fuzzball).to.be(1);
+							done();
+						},200);
+					}
+				});
+				setTimeout(function(){
+					var s = Gun.state.map();s.soul = 'alice/fuzz/soul';
+					gun.on('put', {gun: gun, put: Gun.graph.ify({
+						name: 'Alice Zzxyz', age: 34,
+						pet: {c:3, name: "Fuzzball"}
+					}, s)});
+					gun.get('u/m/p/n/mutate/n/u').put({
+						alice: {'#':'alice/fuzz/soul'},
+					});
+					setTimeout(function(){
+						gun.get('sflufso').put({
+							name: 'Fluffs'
+						});
+						done.last = true;
+					}, 10);
+				}, 300);
+			});
+
+			it("get before put in memory", function(done){
+				var gun = Gun();
+				var check = {};
+				var count = {};
+				gun.get('g/n/m/f/l/n/r').map().on(function(v,f){
+					//console.log("***********", f,v);
+					check[f] = v;
+					count[f] = (count[f] || 0) + 1;
+					if(check.alice && check.bob && check.alice.PhD){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.alice.age).to.be(24);
+							expect(check.bob.age).to.be(26);
+							expect(check.alice.PhD).to.be(true);
+							//expect(count.alice).to.be(2);
+							//expect(count.bob).to.be(1);
+							if(done.c){return}
+							done();done.c=1;
+						},50);
+					}
+				});
+				gun.put({_:{'#':'g/n/m/f/l/n/r'},
+					alice: {_:{'#':'GALICE1'},
+						name: "alice",
+						age: 24,
+						spouse: {
+							name: "carl",
+							age: 25,
+							work: {
+								name: "GUN INC"
+							}
+						},
+						bout: {huh:1}
+					},
+					bob: {
+						name: "bob",
+						age: 26,
+						spouse: {
+							name: "diana",
+							age: 27,
+							work: {
+								name: "ACME INC"
+							}
+						}
+					}
+				});
+				setTimeout(function(){
+					gun.get('GALICE1').put({PhD: true});
+				},300);
+			});
+
+			it("in memory get after", function(done){
+				var gun = Gun();
+				gun.put({_:{'#':'g/n/m/f/l/n'},
+						alice: {_:{'#':'GALICE2'},
+							name: "alice",
+							age: 24,
+							spouse: {
+								name: "carl",
+								age: 25,
+								work: {
+									name: "GUN INC"
+								}
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							spouse: {
+								name: "diana",
+								age: 27,
+								work: {
+									name: "ACME INC"
+								}
+							}
+						}
+				});
+				var check = {};
+				//gun.get('g/n/m/f/l/n').get('bob.spouse.work').on(function(v,f){ console.log("!!!!!!!!!", f, v);});return;
+				gun.get('g/n/m/f/l/n').map().on(function(v,f){
+					check[f] = v;
+					//console.log("*******************", f, v);
+					if(check.alice && check.bob && check.alice.PhD){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.alice.age).to.be(24);
+							expect(check.bob.age).to.be(26);
+							expect(check.alice.PhD).to.be(true);
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('GALICE2').put({PhD: true});
+				},300);
+			});
+
+			it("in memory get before map get", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/p').map().get('name').on(function(v,f){
+					check[v] = f;
+					//console.log("****************", f,v);
+					if(check.alice && check.bob && check.Alice){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.alice).to.be('name');
+							expect(check.bob).to.be('name');
+							expect(check.Alice).to.be('name');
+							if(done.c){return}done.c=1;
+							done();
+						},10);
+					}
+				});
+				gun.put({_:{'#':'g/n/m/f/l/n/b/p'},
+						alice: {_:{'#':'GALICE3'},
+							name: "alice",
+							age: 24,
+							spouse: {
+								name: "carl",
+								age: 25,
+								work: {
+									name: "GUN INC"
+								}
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							spouse: {
+								name: "diana",
+								age: 27,
+								work: {
+									name: "ACME INC"
+								}
+							}
+						}
+				});
+				setTimeout(function(){
+					gun.get('GALICE3').put({name: 'Alice'});
+				},300);
+			});
+
+			it("in memory get after map get", function(done){
+				var gun = Gun();
+				gun.put({_:{'#':'g/n/m/f/l/n/m/p'},
+						alice: {_:{'#':'GALICE4'},
+							name: "alice",
+							age: 24,
+							spouse: {
+								name: "carl",
+								age: 25,
+								work: {
+									name: "GUN INC"
+								}
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							spouse: {
+								name: "diana",
+								age: 27,
+								work: {
+									name: "ACME INC"
+								}
+							}
+						}
+				});
+				var check = {};
+				gun.get('g/n/m/f/l/n/m/p').map().get('name').on(function(v,f){
+					check[v] = f;
+					//console.log("*****************", f,v);
+					if(check.alice && check.bob && check.Alice){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.alice).to.be('name');
+							expect(check.bob).to.be('name');
+							expect(check.Alice).to.be('name');
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('GALICE4').put({name: 'Alice'});
+				},300);
+			});
+
+			it("in memory get before map get get", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/p/p/p').map().get('spouse').get('work').on(function(v,f){
+					check[v.name] = f;
+					if(check['GUN INC'] && check['ACME INC'] && check['ACME INC.']){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check['GUN INC']).to.be('work');
+							expect(check['ACME INC']).to.be('work');
+							expect(check['ACME INC.']).to.be('work');
+							if(done.c){return}done.c=1;
+							done();
+						},10);
+					}
+				});
+				gun.put({_:{'#':'g/n/m/f/l/n/b/p/p/p'},
+						alice: {
+							name: "alice",
+							age: 24,
+							spouse: {
+								name: "carl",
+								age: 25,
+								work: {
+									name: "GUN INC"
+								}
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							spouse: {
+								name: "diana",
+								age: 27,
+								work: {_:{'#':'CCINEMA1'},
+									name: "ACME INC"
+								}
+							}
+						}
+				});
+				setTimeout(function(){
+					gun.get('CCINEMA1').put({name: 'ACME INC.'});
+				},300);
+			});
+
+			it("in memory get after map get get", function(done){
+				var gun = Gun();
+				gun.put({_:{'#':'g/n/m/f/l/n/b/p/p/p/a'},
+						alice: {
+							name: "alice",
+							age: 24,
+							spouse: {
+								name: "carl",
+								age: 25,
+								work: {
+									name: "GUN INC"
+								}
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							spouse: {
+								name: "diana",
+								age: 27,
+								work: {_:{'#':'CCINEMA2'},
+									name: "ACME INC"
+								}
+							}
+						}
+				});
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/p/p/p/a').map().get('spouse').get('work').on(function(v,f){
+					check[v.name] = f;
+					if(check['GUN INC'] && check['ACME INC'] && check['ACME INC.']){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check['GUN INC']).to.be('work');
+							expect(check['ACME INC']).to.be('work');
+							expect(check['ACME INC.']).to.be('work');
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('CCINEMA2').put({name: 'ACME INC.'});
+				},300);
+			});
+
+			it("in memory get before map map", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/a/m/m').map().map().on(function(v,f){
+					check[f] = v;
+					//console.log("****************", f,v);
+					if(check.alice && check.bob && check.GUN && check.ACME && check.ACME.corp){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.alice.name).to.be('alice');
+							expect(check.alice.age).to.be(24);
+							expect(Gun.val.rel.is(check.alice.spouse)).to.be.ok();
+							expect(check.bob.name).to.be('bob');
+							expect(check.bob.age).to.be(26);
+							expect(Gun.val.rel.is(check.bob.spouse)).to.be.ok();
+							expect(check.GUN.name).to.be('GUN');
+							expect(check.ACME.name).to.be('ACME');
+							expect(check.ACME.corp).to.be('C');
+							if(done.c){return}done.c=1;
+							done();
+						},10);
+					}
+				});
+				//console.debug.i=1;console.log("------------------------");
+				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN"
+							},
+							ACME: {_:{'#':"CCINEMA3"},
+								name: "ACME"
+							}
+						}
+				});
+				setTimeout(function(){
+					gun.get('CCINEMA3').put({corp: "C"});
+				},300);
+			});
+
+			it("in memory get after map map", function(done){
+				var gun = Gun();
+				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN"
+							},
+							ACME: {_:{'#':"CCINEMA4"},
+								name: "ACME"
+							}
+						}
+				});
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/m/m').map().map().on(function(v,f){
+					check[f] = v;
+					//console.log("***************", f,v);
+					if(check.alice && check.bob && check.GUN && check.ACME && check.ACME.corp){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.alice.name).to.be('alice');
+							expect(check.alice.age).to.be(24);
+							expect(Gun.val.rel.is(check.alice.spouse)).to.be.ok();
+							expect(check.bob.name).to.be('bob');
+							expect(check.bob.age).to.be(26);
+							expect(Gun.val.rel.is(check.bob.spouse)).to.be.ok();
+							expect(check.GUN.name).to.be('GUN');
+							expect(check.ACME.name).to.be('ACME');
+							expect(check.ACME.corp).to.be('C');
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('CCINEMA4').put({corp: "C"});
+				},300);
+			});
+
+			it("in memory get before map map get", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/m/m/p').map().map().get('name').on(function(v,f){
+					check[v] = f;
+					//console.log("***********", f,v);
+					if(check.alice && check.bob && check.GUN && check.ACME && check.ACMEINC){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.alice).to.be('name');
+							expect(check.bob).to.be('name');
+							expect(check.GUN).to.be('name');
+							expect(check.ACME).to.be('name');
+							expect(check.ACMEINC).to.be('name');
+							if(done.c){return}done.c=1;
+							done();
+						},10);
+					}
+				});
+				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m/p'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN"
+							},
+							ACME: {_:{'#':"CCINEMA5"},
+								name: "ACME"
+							}
+						}
+				});
+				setTimeout(function(){
+					gun.get('CCINEMA5').put({name: "ACMEINC"});
+				},300);
+			});
+
+			it("in memory get after map map get", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN"
+							},
+							ACME: {_:{'#':'CCINEMA6'},
+								name: "ACME"
+							}
+						}
+				});
+				gun.get('g/n/m/f/l/n/b/a/m/m/p').map().map().get('name').on(function(v,f){
+					check[v] = f;
+					//console.log("************", f,v);
+					if(check.alice && check.bob && check.GUN && check.ACME && check.ACMEINC){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.alice).to.be('name');
+							expect(check.bob).to.be('name');
+							expect(check.GUN).to.be('name');
+							expect(check.ACME).to.be('name');
+							expect(check.ACMEINC).to.be('name');
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('CCINEMA6').put({name: "ACMEINC"});
+				},300);
+			});
+
+			it("in memory get before map map get get", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/m/m/p/p').map().map().get('address').get('state').on(function(v,f){
+					check[v] = f;
+					if(check.QR && check.NY && check.CA && check.TX && check.MA){
+						clearTimeout(done.to);
+							done.to = setTimeout(function(){
+							expect(check.QR).to.be('state');
+							expect(check.NY).to.be('state');
+							expect(check.CA).to.be('state');
+							expect(check.TX).to.be('state');
+							expect(check.MA).to.be('state');
+							if(done.c){return}done.c=1;
+							done();
+						},10);
+					}
+				});
+				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m/p/p'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								address: {_:{'#':'QUANGO'},
+									state: "MA"
+								},
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								address: {
+									state: "TX"
+								},
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN",
+								address: {
+									state: "CA"
+								}
+							},
+							ACME: {
+								name: "ACME",
+								address: {
+									state: "NY"
+								}
+							}
+						}
+				});
+				setTimeout(function(){
+					gun.get('QUANGO').put({state: 'QR'});
+				},300);
+			});
+
+			it("in memory get after map map get get", function(done){
+				var gun = Gun();
+				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p/p'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								address: {_:{'#':'QUANGO1'},
+									state: "MA"
+								},
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								address: {
+									state: "TX"
+								},
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN",
+								address: {
+									state: "CA"
+								}
+							},
+							ACME: {
+								name: "ACME",
+								address: {
+									state: "NY"
+								}
+							}
+						}
+				});
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/a/m/m/p/p').map().map().get('address').get('state').on(function(v,f){
+					check[v] = f;
+					if(check.QR && check.NY && check.CA && check.TX && check.MA){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.QR).to.be('state');
+							expect(check.NY).to.be('state');
+							expect(check.CA).to.be('state');
+							expect(check.TX).to.be('state');
+							expect(check.MA).to.be('state');
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('QUANGO1').put({state: 'QR'});
+				},300);
+			});
+
+			it("in memory get before map map get get get", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/m/m/p/p/p').map().map().get('address').get('state')
+					.get('code')
+					.on(function(v,f){
+					check[v] = f;
+					if(check.QR && check.NY && check.CA && check.TX && check.MA){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.QR).to.be('code');
+							expect(check.NY).to.be('code');
+							expect(check.CA).to.be('code');
+							expect(check.TX).to.be('code');
+							expect(check.MA).to.be('code');
+							if(done.c){return}done.c=1;
+							done();
+						},10);
+					}
+				});
+				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m/p/p/p'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								address: {
+									state: {_:{'#':'HIPPOM'},
+										code: "MA",
+										county: {
+											MA1: "First"
+										}
+									}
+								},
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								address: {
+									state: {
+										code: "TX",
+										county: {
+											TX1: "First"
+										}
+									}
+								},
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN",
+								address: {
+									state: {
+										code: "CA",
+										county: {
+											CA1: "First"
+										}
+									}
+								}
+							},
+							ACME: {
+								name: "ACME",
+								address: {
+									state: {
+										code: "NY",
+										county: {
+											NY1: "First"
+										}
+									}
+								}
+							}
+						}
+				});
+				setTimeout(function(){
+					gun.get('HIPPOM').put({code: 'QR'});
+				},300);
+			});
+
+			it("in memory get before after map map get get get", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p/p/p'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								address: {
+									state: {_:{'#':'HIPPOM1'},
+										code: "MA",
+										county: {
+											MA1: "First"
+										}
+									}
+								},
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								address: {
+									state: {
+										code: "TX",
+										county: {
+											TX1: "First"
+										}
+									}
+								},
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN",
+								address: {
+									state: {
+										code: "CA",
+										county: {
+											CA1: "First"
+										}
+									}
+								}
+							},
+							ACME: {
+								name: "ACME",
+								address: {
+									state: {
+										code: "NY",
+										county: {
+											NY1: "First"
+										}
+									}
+								}
+							}
+						}
+				});
+				gun.get('g/n/m/f/l/n/b/a/m/m/p/p/p').map().map().get('address').get('state')
+					.get('code')
+					.on(function(v,f){
+					check[v] = f;
+					//console.log("***********", f,v);
+					if(check.QR && check.NY && check.CA && check.TX && check.MA){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.QR).to.be('code');
+							expect(check.NY).to.be('code');
+							expect(check.CA).to.be('code');
+							expect(check.TX).to.be('code');
+							expect(check.MA).to.be('code');
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('HIPPOM1').put({code: 'QR'});
+				},300);
+			});
+
+			it("in memory get before map map get get node", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.get('g/n/m/f/l/n/b/m/m/p/p/n').map().map().get('address').get('state').on(function(v,f){
+					check[v.code] = f;
+					//console.log("************", f, v);
+					if(check.QR && check.NY && check.CA && check.TX && check.MA){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.QR).to.be('state');
+							expect(check.NY).to.be('state');
+							expect(check.CA).to.be('state');
+							expect(check.TX).to.be('state');
+							expect(check.MA).to.be('state');
+							if(done.c){return}done.c=1;
+							done();
+						},10);
+					}
+				});
+				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m/p/p/n'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								address: {
+									state: {_:{'#':'HIPPOM3'},
+										code: "MA",
+										county: {
+											MA1: "First"
+										}
+									}
+								},
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								address: {
+									state: {
+										code: "TX",
+										county: {
+											TX1: "First"
+										}
+									}
+								},
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN",
+								address: {
+									state: {
+										code: "CA",
+										county: {
+											CA1: "First"
+										}
+									}
+								}
+							},
+							ACME: {
+								name: "ACME",
+								address: {
+									state: {
+										code: "NY",
+										county: {
+											NY1: "First"
+										}
+									}
+								}
+							}
+						}
+				});
+				setTimeout(function(){
+					gun.get('HIPPOM3').put({code: 'QR'});
+				},300);
+			});
+
+			it("in memory get before after map map get get node", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p/p/n'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								address: {
+									state: {_:{'#':'HIPPOM4'},
+										code: "MA",
+										county: {
+											MA1: "First"
+										}
+									}
+								},
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								address: {
+									state: {
+										code: "TX",
+										county: {
+											TX1: "First"
+										}
+									}
+								},
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN",
+								address: {
+									state: {
+										code: "CA",
+										county: {
+											CA1: "First"
+										}
+									}
+								}
+							},
+							ACME: {
+								name: "ACME",
+								address: {
+									state: {
+										code: "NY",
+										county: {
+											NY1: "First"
+										}
+									}
+								}
+							}
+						}
+				});
+				gun.get('g/n/m/f/l/n/b/a/m/m/p/p/n').map().map().get('address').get('state').on(function(v,f){
+					check[v.code] = f;
+					//console.log("**********", f, v);
+					if(check.QR && check.NY && check.CA && check.TX && check.MA){
+						clearTimeout(done.to);
+						done.to = setTimeout(function(){
+							expect(check.QR).to.be('state');
+							expect(check.NY).to.be('state');
+							expect(check.CA).to.be('state');
+							expect(check.TX).to.be('state');
+							expect(check.MA).to.be('state');
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('HIPPOM4').put({code: 'QR'});
+				},300);
+			});
+
+			it("in memory get after map map get get get map", function(done){
+				var gun = Gun();
+				var check = {};
+				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p/p/p/n'},
+						users: {
+							alice: {
+								name: "alice",
+								age: 24,
+								address: {
+									state: {
+										code: "MA",
+										county: {
+											MA1: "First"
+											,MA2: "Second"
+										}
+									}
+								},
+								spouse: {
+									name: "carl",
+									age: 25
+								},
+								bout: {huh:1}
+							},
+							bob: {
+								name: "bob",
+								age: 26,
+								address: {
+									state: {
+										code: "TX",
+										county: {
+											TX1: "First"
+											,TX2: "Second"
+										}
+									}
+								},
+								spouse: {
+									name: "diana",
+									age: 27
+								}
+							}
+						},
+						companies: {
+							GUN: {
+								name: "GUN",
+								address: {
+									state: {
+										code: "CA",
+										county: {
+											CA1: "First"
+											,CA2: "Second"
+										}
+									}
+								}
+							},
+							ACME: {
+								name: "ACME",
+								address: {
+									state: {
+										code: "NY",
+										county: {_:{'#':'NYCOUNT'},
+											NY1: "First"
+											,NY2: "Second"
+										}
+									}
+								}
+							}
+						}
+				});
+				gun.get('g/n/m/f/l/n/b/a/m/m/p/p/p/n').map().map().get('address').get('state').get('county').map().on(function(v,f){
+					check[f] = v;
+					//console.log("****************", f,v);
+					if(check.MA1 && check.MA2 && check.TX1 && check.TX2 && check.CA1 && check.CA2 && check.NY1 && check.NY2 && check.NY3){
+						clearTimeout(done.to);
+							done.to = setTimeout(function(){
+							expect(check.MA1).to.be('First');
+							expect(check.TX1).to.be('First');
+							expect(check.CA1).to.be('First');
+							expect(check.NY1).to.be('First');
+							expect(check.MA2).to.be('Second');
+							expect(check.TX2).to.be('Second');
+							expect(check.CA2).to.be('Second');
+							expect(check.NY2).to.be('Second');
+							expect(check.NY3).to.be('Third');
+							done();
+						},10);
+					}
+				});
+				setTimeout(function(){
+					gun.get('NYCOUNT').put({NY3: "Third"});
+				},300);
+			});
+		});
+
+		it('get node after recursive field', function(done){
+			var s = Gun.state.map();s.soul = 'node/circle';
+			var bob = {age: 29, name: "Bob!"};
+			var cat = {name: "Fluffy", species: "kitty"};
+			var user = {bob: bob};
+			bob.pet = cat;
+			cat.slave = bob;
+			gun.on('put', {gun: gun, put: Gun.graph.ify(user, s)});
+			gun.get(s.soul).get('bob').get('pet').get('slave').val(function(data){
+				//clearTimeout(done.to);
+				//setTimeout(function(){
+					//console.log("*****************", data);
+					expect(data.age).to.be(29);
+					expect(data.name).to.be("Bob!");
+					expect(Gun.val.rel.is(data.pet)).to.ok();
+					done();
+				//},300);
+			});
+		});
+
+		it('recursive put', function(done){
+			//localStorage.clear();
+			var gun = Gun();
+
+			var parent = gun.get('parent');
+			var child = gun.get('child');
+			
+			child.put({
+				way: 'down'
+			});
+			
+			parent.get('sub').put(child);
+			
+			parent.get('sub').on(function(data){
+				//console.log("sub", data);
+				done.sub = data;
+			});
+			child.on(function(data){
+				done.child = data;
+				//console.log("child", data);
+			});
+			parent.on(function(data){
+				done.parent = data;
+				//console.log("parent", data);
+				if(done.c){ return } done.c = 1;
+				done(); // TODO: Add more meaningful checks!
+			});
+		});
+
+		it('empty val followed', function(done){
+			var gun = Gun();
+
+			gun.get('val/follow').val(function(data){
+				//console.log("val", data);
+			}).get(function(at){
+				//console.log("?????", at);
+				if(done.c){ return } done.c = 1;
+				done();
+			});
+
+		});
+
+		it('map val get put', function(done){
+			var gun = Gun().get('chat/asdf');
+
+			var check = {}, count = {};
+			gun.map().val(function(v,f){
+				check[f] = v;
+				count[f] = (count[f] || 0) + 1;
+				//	console.log("**************", f, v);
+				if(check['1-1'] && check['2-2']){
+					clearTimeout(done.to);
+					done.to = setTimeout(function(){
+						expect(check['1-1'].what).to.be('hi');
+						expect(check['2-2'].what).to.be('you.');
+						expect(count['1-1']).to.be(1);
+						expect(count['2-2']).to.be(1);
+						done();
+					},50);
+				}
+			});
+			setTimeout(function(){
+				gun.get('1-1').put({what: "hi"});
+				setTimeout(function(){
+					gun.get('2-2').put({what: "you."});
+				},40);
+			},40);
+		});
+
+		it('get list set map val', function(done){
+
+			var gun = Gun();
+
+			var list = gun.get('list');
+
+			list.set(gun.get('alice').put({name: "Alice", group: "awesome", married: true}));
+			list.set(gun.get('bob').put({name: "Bob", group: "cool", married: true}));
+			list.set(gun.get('carl').put({name: "Carl", group: "cool", married: false}));
+			list.set(gun.get('dave').put({name: "Dave", group: "awesome", married: true}));
+
+			var check = {}, count = {};
+			list.map().val(function(data, id){
+				//console.log("***************", id, data);
+				check[id] = data;
+				count[id] = (count[id] || 0) + 1;
+				if(check.alice && check.bob && check.carl && check.dave){
+					clearTimeout(done.to);
+					done.to = setTimeout(function(){
+						expect(count.alice).to.be(1);
+						expect(check.alice.name).to.be('Alice');
+						expect(check.alice.group).to.be('awesome');
+						expect(check.alice.married).to.be(true);
+						expect(count.bob).to.be(1);
+						expect(check.bob.name).to.be('Bob');
+						expect(check.bob.group).to.be('cool');
+						expect(check.bob.married).to.be(true);
+						expect(count.carl).to.be(1);
+						expect(check.carl.name).to.be('Carl');
+						expect(check.carl.group).to.be('cool');
+						expect(check.carl.married).to.be(false);
+						expect(count.dave).to.be(1);
+						expect(check.dave.name).to.be('Dave');
+						expect(check.dave.group).to.be('awesome');
+						expect(check.dave.married).to.be(true);
+						done();
+					},50);
+				}
+			});
+			/*
+				Have we asked for this yet? No.
+				Do we have it cached? No.
+				Is its parent cached? Yes.
+				Reply immediately with that cache for map to process.
+			*/
+
+			/*
+				chain has a root // all
+				an ID // all
+				a back // all
+				inputs // all
+				and outputs // all
+				acks // any
+				echo // any
+				next // any
+				cache or map of many ones // only a one can have a cache, only a map can have many, and they must be ones. However any chain might have neither. By default a chain is a many, unless it is designated as a one.
+
+				gun.get('alice').also('bob').path('name').on(cb);
+				gun.get('users').map().path('friends').map().on(cb);
+
+				friends is a map, it has an echo
+				{name: "alice", friends: []}
+					{name: "xavier"}
+					{name: "yara"}
+					{name: "zack"}
+				{name: "bob", friends: []}
+					{name: "xavier"}
+					{name: "yara"}
+					{name: "zack"}
+				{name: "carl", friends: []}
+					{name: "xavier"}
+					{name: "yara"}
+					{name: "zack"}
+			*/
+		});
+
+		it('get get get set root get put', function(done){
+			var gun = Gun().get('app');
+			gun.get('alias').get('mark').set(
+				gun.back(-1).get('pub').put({
+					alias: 'mark',
+					auth: 'encrypt', // oops
+					born: 1,
+					pub: 'pub',
+					salt: 'random'
+				})
+			);
+			//return;
+			setTimeout(function(){
+				gun.get(function(at){
+					//console.log('*', at.put);
+					done.app = done.app || at.put.alias;
+				});
+				gun.back(-1).get('pub').get(function(at){
+					//console.log("**", at.put);
+					done.pub = done.pub || at.put.auth;
+				});
+				gun.get('alias').get(function(at){
+					//console.log("***", at.put);
+					done.alias = done.alias || at.put.mark;
+					//!console.debug.i&&(console.debug.i=1)&&console.log("---------------------");
+				}).get('mark').get(function(at){
+					//console.log("************", at.put);//return;
+					setTimeout(function(){
+						done.mark = done.mark || at.put.pub;
+						expect(Gun.val.rel.is(done.mark)).to.be('pub');
+						expect(done.app).to.be.ok();
+						expect(done.pub).to.be.ok();
+						expect(done.alias).to.be.ok();
+						if(done.c){ return } done.c = 1;
+						done();
+					},100);
+				})
+			},100);
+		});
+
+		it('get put get get put reload get get then get', function(done){
+			this.timeout(6000);
+			var gun = Gun();
+
+			gun.get('stef').put({name:'Stef'});
+			var address = {
+			  country: 'Netherlands',
+			  zip:'999999'
+			};
+			gun.get('stef').get('address').put(address);
+
+			// reload
+			setTimeout(function(){
+				var gun2 = Gun();
+				//console.log(require('fs').readFileSync('./radata/!').toString());
+				gun2.get('stef').get('address').val(function(data){ // Object {_: Object, country: "Netherlands", zip: "1766KP"} "adress"
+					//console.log("******", data);
+					done.a = true;
+					expect(data.country).to.be('Netherlands');
+					expect(data.zip).to.be('999999');
+					if(!done.s){ return }
+					if(done.c){ return } done.c = 1;
+					done();
+				});
+				gun2.get('stef').val(function(data){ //Object {_: Object, address: Object} "stef"
+					//console.log("**************", data);
+					//return;
+					done.s = true;
+					expect(data.name).to.be('Stef');
+					expect(data.address).to.be.ok();
+					if(!done.a){ return }
+					if(done.c){ return } done.c = 1;
+					done();
+				});
+			},5000);
+		});
+
+		it('get get get any parallel', function(done){
+			var s = Gun.state.map();s.soul = 'parallel';
+			gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {
+					age: 29,
+					name: "Bob!"
+				}
+			}, s)});
+			gun.get('parallel').get('bob').get('age').get(function(at, ev){
+				var err = at.err, data = at.put, field = at.get;
+				//console.log("***** age", data, at.gun._.ack);//return;
+				expect(data).to.be(29);
+				expect(field).to.be('age');
+				done.age = true;
+			});
+			gun.get('parallel').get('bob').get('name').get(function(at, ev){
+				var err = at.err, data = at.put, field = at.get;
+				//console.log("*********** name", data, at.gun._.ack);//return;
+				expect(data).to.be('Bob!');
+				expect(field).to.be('name');
+				done.name = true;
+				expect(done.age).to.be.ok();
+				if(done.c){ return } done.c = 1;
+				done();
+			});
+		});
+
+		it('get get get any later', function(done){
+			var s = Gun.state.map();s.soul = 'parallel/later';
+			gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {_:{'#':'ddfsa'},
+					age: 29,
+					name: "Bob!"
+				}
+			}, s)});
+			gun.get('parallel/later').get('bob').get('age').get(function(at, ev){
+				var err = at.err, data = at.put, field = at.get;
+				//console.log("***** age", data);
+				expect(data).to.be(29);
+				expect(field).to.be('age');
+				done.age = true;
+			});
+			setTimeout(function(){
+				gun.get('parallel/later').get('bob').get('name').get(function(at, ev){
+					var err = at.err, data = at.put, field = at.get;
+					//console.log("*********** name", data);
+					expect(data).to.be('Bob!');
+					expect(field).to.be('name');
+					done.name = true;
+					expect(done.age).to.be.ok();
+					if(done.c){ return } done.c = 1;
+					done();
+				});
+			},400);
+		});
+
+		it('get get get any not', function(done){
+			gun.get('parallel/not').get('bob').get('age').get(function(at, ev){
+				var err = at.err, data = at.put, field = at.get;
+				//console.log("***** age", data);
+				expect(data).to.be(undefined);
+				expect(field).to.be('age');
+				done.age = true;
+			});
+			gun.get('parallel/not').get('bob').get('name').get(function(at, ev){
+				var err = at.err, data = at.put, field = at.get;
+				//console.log("*********** name", data);
+				expect(data).to.be(undefined);
+				expect(field).to.be('name');
+				done.name = true;
+				expect(done.age).to.be.ok();
+				if(done.c){return}done.c=1;
+				done();
+			});
+		});
+
+		it('get get get any not later', function(done){
+			gun.get('parallel/not/later').get('bob').get('age').get(function(at, ev){
+				var err = at.err, data = at.put, field = at.get;
+				//console.log("***** age", data);
+				expect(data).to.be(undefined);
+				expect(field).to.be('age');
+				done.age = true;
+			});
+			setTimeout(function(){
+				//console.debug.i=1;console.log('---------------');
+				gun.get('parallel/not/later').get('bob').get('name').get(function(at, ev){
+					var err = at.err, data = at.put, field = at.get;
+					//console.log("*********** name", field, data);
+					expect(data).to.be(undefined);
+					expect(field).to.be('name');
+					done.name = true;
+					expect(done.age).to.be.ok();
+					if(done.c){ return } done.c = 1;
+					done();
+				});
+			},400);
+		});
+
+		it('get any any', function(done){
+			var s = Gun.state.map();s.soul = 'full';
+			gun.on('put', {gun: gun, put: Gun.graph.ify({
+				hello: 'world',
+				goodbye: 'mars'
+			}, s)});
+			gun.get('full').get(function(at, ev){
+				var err = at.err, data = at.gun._.put || at.put, field = at.get;
+				//console.log("*****1", data);
+				expect(data.hello).to.be('world');
+				expect(data.goodbye).to.be('mars');
+			});
+			gun.get('full').get(function(at, ev){
+				var err = at.err, data = at.gun._.put || at.put, field = at.get;
+				//console.log("*****1", data);
+				expect(data.hello).to.be('world');
+				expect(data.goodbye).to.be('mars');
+				if(done.c){ return } done.c = 1;
+				done();
+			});
+		});
+
+		it('get any any later', function(done){
+			var s = Gun.state.map();s.soul = 'full/later';
+			gun.on('put', {gun: gun, put: Gun.graph.ify({
+				hello: 'world',
+				goodbye: 'mars'
+			}, s)});
+			gun.get('full/later').get(function(at, ev){
+				var err = at.err, data = at.gun._.put || at.put, field = at.get;
+				//console.log("*****", data);
+				expect(data.hello).to.be('world');
+				expect(data.goodbye).to.be('mars');
+			});
+			setTimeout(function(){
+				gun.get('full/later').get(function(at, ev){
+					var err = at.err, data = at.gun._.put || at.put, field = at.get;
+					//console.log("*****2", field, data);
+					expect(data.hello).to.be('world');
+					expect(data.goodbye).to.be('mars');
+					if(done.c){ return } done.c = 1;
+					done();
+				});
+			},400);
+		});
+
+		it('multiple times', function(done){
+			var gun = Gun();
+			var app = gun.get('mult/times');
+
+			app.get('alias').get('mark').set(gun.get('ASDF').put({
+				pub: 'ASDF',
+				alias: 'mark',
+				born: 1
+			}));
+
+			app.get('alias').map().map().get('pub').on(function(data){
+				done.one = data;
+				//console.log("pub 1!", data);
+			});
+
+			setTimeout(function(){
+				app.get('alias').map().map().get('alias').on(function(data){
+					done.two = data;
+					//console.log("alias 2!", data);
+					expect(done.one).to.be("ASDF");
+					expect(done.two).to.be("mark");
+					if(done.c){ return } done.c = 1;
+					done();
+				});
+			},100);
+		});
+
+		it('multiple times partial', function(done){
+			var gun = Gun();
+
+			var s = Gun.state.map();s.soul = 'mult/times/part';
+			gun.on('put', {gun: gun, put: Gun.graph.ify({
+				alias: {
+					mark: {
+						pub: {_:{'#':'PUB'},
+							pub: 'asdf',
+							alias: 'mark',
+							born: 1
+						}
+					}
+				}
+			}, s)});
+
+			var app = gun.get(s.soul);
+			
+			//console.debug.i=1;console.log("===================");
+			app.get('alias').get('mark').map().val(function(alias){
+				//console.log("***", alias);
+				done.alias = alias;
+			});
+
+			setTimeout(function(){
+				app.get('alias').map().map().get('born').on(function(data){
+					//console.log("*******", data);
+					expect(data).to.be(1);
+					expect(done.alias.pub).to.be("asdf");
+					expect(done.alias.alias).to.be("mark");
+					expect(done.alias.born).to.be(1);
+					if(done.c){ return } done.c = 1;
+					done();
+				});
+			},400);
+		});
+
+		it('put on a put', function(done){
+			var gun = Gun();
+			var foo = gun.get('put/on/put').get('a').get('b');
+			var bar = gun.get('put/on/put/ok').get('a').get('b');
+
+			bar.put({a:1})
+
+			bar.on(function(data){
+				if(1 === data.a && 3 === data.c){
+					if(done.c){ return } done.c = 1;
+					done();
+				}
+			});
+
+			foo.on(function(ack){
+				bar.put({c:3});
+			});
+
+			foo.put({b:2});
+
+		});
+
+		it('map with map function', function(done){
+			var gun = Gun(), s = 'map/mapfunc', u;
+			var app = gun.get(s);
+			var list = app.get('list');
+
+			var check = {};
+			list.map(function(user){ return user.age === 27? user.name + "thezombie" : u }).on(function(data){
+				//console.log('data:', data);
+				check[data] = true;
+				if(check.alicethezombie && check.bobthezombie){
+					if(done.c){return}done.c=1;
+					done();
+				}
+			});
+			list.set({name: 'alice', age: 27}); // on put, table-scan flag doesn't get set, but is needed for initial!??
+			list.set({name: 'bob', age: 27});
+			list.set({name: 'carl', age: 29});
+			list.set({name: 'dave', age: 25});
+		});
+
+		it('val and then map', function(done){
+			var gun = Gun(), s = 'val/then/map', u;
+			var list = gun.get(s);
+
+			list.set(gun.get('alice').put({name: 'alice', age: 27}));
+			list.set(gun.get('bob').put({name: 'bob', age: 27}));
+			list.set(gun.get('carl').put({name: 'carl', age: 29}));
+			list.set(gun.get('dave').put({name: 'dave', age: 25}));
+
+			var check = {};
+			list.val().map().on(function(data, key){
+				check[key] = data;
+				clearTimeout(done.to);
+				done.to = setTimeout(function(){
+					if(check.alice && check.bob && check.carl && check.dave && done.last){
+						expect(check.alice.age).to.be(27);
+						expect(check.bob.age).to.be(28);
+						expect(check.carl.age).to.be(29);
+						expect(check.dave.age).to.be(25);
+						expect(check.eve).to.not.be.ok();
+						if(done.c){return}done.c=1;
+						done();
+					}
+				},600);
+			});
+			setTimeout(function(){
+				list.set(gun.get('eve').put({name: 'eve', age: 30}));
+				gun.get('bob').get('age').put(28);
+				done.last = true;
+			},300);
+		});
+
+		it('check null on map', function(done){
+			var list = gun.get('myList');
+			list.map(function(value, id){
+				if("hello world" === value){
+					done.one = true;
+				}
+				if(null === value){
+					done.two = true;
+				}
+				if(done.one && done.two){
+					if(done.c){ return } done.c = 1;
+					done();
+				}
+			});
+			list.get('message').put('hello world'); // outputs "message: hello world"
+			list.get('message').put(null); // throws Uncaught TypeError: Cannot read property '#' of null
+		});
+
+		it('Check multi instance message passing', function(done){
+			try{ require('fs').unlinkSync('bdata') }catch(e){}
+			try{ require('fs').unlinkSync('ddata') }catch(e){}
+			Gun.on('opt', function(ctx){
+				ctx.on('out', function(msg){
+					this.to.next(msg);
+					var onGun = ctx;
+					if(onGun.gun === b) {
+						if(d){
+							//console.log("b can send to d....", Gun.obj.copy(msg));
+							d.on("in", msg);
+						}
+					} else if(onGun.gun === d){
+						//console.log("d sends to b....", Gun.obj.copy(msg));
+						b.on("in", msg);
+					}
+				});
+			});
+
+			var b = Gun({file: "bdata"});
+			var d = null;
+
+			var bb = b.get("key");
+			bb.put({msg: "hello"});
+				
+			d = Gun({file: "ddata"});
+			var db = d.get("key");
+			db.map().on(function(val,field){
+				expect(val).to.be('hello');
+				if(done.c){ return } done.c = 1;
+				setTimeout(function(){
+					done();
+				},1700);
+			});
+		});
+
+		it('val should now get called if no data is found', function(done){
+			var gun = Gun();
+
+			gun.get('nv/foo').get('bar').get('baz').val(function(val, key){
+				//console.log('*******', key, val);
+				expect(val).to.be(undefined);
+				done.fbb = true;
+			});
+
+			gun.get('nv/totesnothing').val(function(val, key){
+				//console.log('***********', key, val);
+				expect(val).to.be(undefined);
+				done.t = true;
+			});
+
+			gun.get('nv/bz').get('lul').val(function(val, key){
+				//console.log('*****************', key, val);
+				expect(val).to.be(undefined);
+				done.bzl = true;
+				if(done.fbb && done.t && done.bzl){
+					if(done.c){ return } done.c = 1;
+					done();
+				}
+			});
+		});
+
+		it('Callbacks should have database safe data copies', function(done){
+			var gun = Gun();
+
+			gun.get('ds/safe').put({a: 1});
+			
+			gun.get('ds/safe').on(function(data){
+				data.b = 2;
+			});
+			
+			gun.get('ds/safe').val(function(data){
+				expect(gun._.root._.graph['ds/safe'].b).to.not.be.ok();
+				if(done.c){ return } done.c = 1;
+				done();
+			});
+		});
+
+		it('If chain cannot be called, ack', function(done){
+			var gun = Gun(), u;
+
+			gun.on('put', {gun: gun, put: Gun.graph.ify({
+				wat: 1,
+				a: true
+			}, 'nl/app')});
+
+			var app = gun.get('nl/app');
+
+			app.get(function(d){
+				expect(d.put.wat).to.be(1);
+				expect(d.put.a).to.be(true);
+				done.a = 1;
+			});
+
+			app.get('a').get('b').get(function(d){
+				expect(d.put).to.be(u);
+				expect(done.a).to.be.ok();
+				if(done.c){ return }
+				done(); done.c = 1;
+			});
+		});
+
+		it('Chain on known nested object should ack', function(done){
+			var gun = Gun(), u;
+
+			gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bar: {
+					wat: 1
+				}
+			}, 'nl/app')});
+
+			var app = gun.get('nl/app').get('bar');
+
+			app.get(function(d){
+				//console.log("!!", d.put);
+				if(!d || !d.put || !d.put.wat){ return }
+				expect(d.put.wat).to.be(1);
+				done.a = 1;
+			});
+
+			app.get('a').get('b').get(function(d){
+				//console.log("????", d.put);
+				expect(d.put).to.be(u);
+				expect(done.a).to.be.ok();
+				if(done.c){ return }
+				done(); done.c = 1;
+			});
+		});
+		return;
+		it('Nested listener should be called', function(done){
+			
+			var gun = Gun();
+			/*
+			var app = gun.get('nl/app').get('bar');
+
+			app.on(function(d){
+				console.log("!!", d);
+			})
+
+			app.put({wat: 1});
+
+			console.debug.i=1;console.log("------------");
+			console.log(gun._.now);
+			app.put({a: {b:2}});
+			console.log('_______________________');
+			return;*/
+
+			var app = gun.get('nl/app');
+			var node = app.get('watcher/1').put({"stats":{"num":3},"name":"trex"});
+
+			app.get('watcher/1').get('stats').on(function (v, k) {
+			  console.log('v:', k, v);
+			});
+
+			setTimeout(function(){
+			  
+			  console.log("Huh?");
+			  app.get('watcher/1').put({"stats":{"num":4},"name":"trexxx"});
+			  
+			},100);
+		});
+		return;
+		it.only('Memory management', function(done){
+			this.timeout(9999999);
+			var gun = Gun(), c = 100000, big = "big";
+			while(--c){big += "big"}
+			c = 0;
+			setInterval(function(){
+				var key = Gun.text.random(5);
+				gun.get(key).put({data: big});
+				setTimeout(function(){
+					gun.get(key).off();
+				},10);
+				if(typeof process === 'undefined'){ return }
+				var mem = process.memoryUsage();
+				console.log(((mem.heapUsed / mem.heapTotal) * 100).toFixed(0) + '% memory');
+				console.log(Object.keys(gun._.graph).length, 'item in memory graph:', Object.keys(gun._.graph));
+			},25);
+		});
+
+		return;
+		it.only('Custom extensions are chainable', function(done){
+			Gun.chain.filter = function(filter){
+			  var chain = this.chain();
+			  var context = this;
+			  var _tags;
+			  context.val(function(obj, key){
+			    if(!obj.tags){
+			      console.warn('Not tagged to anything!');
+			      context._.valid = false;
+			      chain._.on('in', {get: key, gun: this});
+			      return false;
+			    } else { 
+			     _tags = Gun.obj.ify(obj.tags);
+			      if(Array.isArray(filter)){
+			        context._.valid = filter.every(function(f){ return ( _tags[f] && _tags[f]==1) });
+			        if(context._.valid){
+			          chain._.on('in', {get: key, put: obj, gun: this});
+			          return context;
+			        } else {
+			          console.log("that was wrong");
+			          chain._.on('in', {get: key, put: undefined, gun: this});
+			        }
+			        return false;
+			      } else {
+			        console.warn('filter should be an Array');
+			        return false;
+			      }
+			    }
+			  });
+			  return chain;
+			}
+
+			var gun = Gun();
+
+			var fake1 = gun.get('fake1').put({name:'faker1',tags:JSON.stringify({a:1,b:0,c:1})});
+			var fake2 = gun.get('fake2').put({name:'faker2',tags:JSON.stringify({a:1,b:1,c:1})});
+			var list = gun.get('list');
+			list.set(fake1);
+			list.set(fake2);
+
+			gun.get('fake1')//.map()
+			      .filter(['a','b'])  // Gun.chain.filter = function(tags){ .... }
+			      .get(function(no){console.log("NO!", no)})
+			      .val(function(yes){console.log("YES!", yes)})
+		});
+
+		it.only('Check that events are called with multiple instances', function(done){
+			var gunA = Gun( { file : "A.json" } );
+			var gunB = Gun( { file : "B.json" });
+			var gunC = Gun( { file : "C.json" });
+
+			gunA.get( "some path A" ).map(function(v,f){ console.log( "event on A: ", f, v ) } );
+			gunB.get( "some path B" ).map(function(v,f){ console.log( "event on B: ", f, v ) } );
+			gunC.get( "some path C" ).map(function(v,f){ console.log( "event on C: ", f, v ) } );
+
+			gunA.get( "some path A" ).put( { simple:"message" } );
+			gunB.get( "some path B" ).put( { simple:"message" } );
+			gunC.get( "some path C" ).put( { simple:"message" } );
+		});
+
+		it.only('Make sure circular contexts are not copied', function(done){
+			/* let's define an appropriate deep default database... */
+			var dfltSansUsers = { 1: { name : "org1", sites : { 1: {name : "site1"} } } };
+
+			var alice =  {name: "alice" }
+
+			var gun = Gun();
+
+			var root = gun.get( "root" );
+			root.put( dfltSansUsers );
+
+			var alice = gun.get( "alice" ).put( { name: "alice" } );
+			console.log( "Failed after this" );
+			root.path( "1.sites.1.users" ).put( { 1: alice } );
+			console.log( "Failed before this" );
+		});
+
+		it.only('get any any none', function(done){
+			gun.get('full/none').get(function(at, ev){
+				var err = at.err, data = at.put, field = at.get;
+				console.log("*****", data);
+				expect(data).to.be(undefined);
+			});
+			gun.get('full/none').get(function(at, ev){
+				var err = at.err, data = at.put, field = at.get;
+				console.log("*****2", data);
+				expect(data).to.be(undefined);
+				done();
+			});
+		});
+
+		it('get any any none later', function(done){
+			gun.get('full/none/later').get(function(at, ev){
+				var err = at.err, data = at.put, field = at.get;
+				//console.log("*****", data);
+				expect(data).to.be(undefined);
+			});
+			setTimeout(function(){
+				gun.get('full/none/later').get(function(at, ev){
+					var err = at.err, data = at.put, field = at.get;
+					//console.log("*****2", data);
+					expect(data).to.be(undefined);
+					done();
+				});
+			},400);
+		});return;
+
+		it('get get any parallel', function(done){
+			var s = Gun.state.map();s.soul = 'parallel/get/get';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {
+					age: 29,
+					name: "Bob!"
+				}
+			}, s)});
+			gun.get('parallel/get/get').path('bob').any(function(err, data, field, at, ev){
+				//console.log("***** 1", data);
+				expect(data.age).to.be(29);
+				expect(data.name).to.be('Bob!');
+			});
+			gun.get('parallel/get/get').path('bob').any(function(err, data, field, at, ev){
+				//console.log("***** 2", data);
+				expect(data.age).to.be(29);
+				expect(data.name).to.be('Bob!');
+				done();
+			});
+		});
+
+		it('get get any parallel later', function(done){
+			var s = Gun.state.map();s.soul = 'parallel/get/get/later';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {
+					age: 29,
+					name: "Bob!"
+				}
+			}, s)});
+			gun.get('parallel/get/get/later').path('bob').any(function(err, data, field, at, ev){
+				//console.log("***** 1", data);
+				expect(data.age).to.be(29);
+				expect(data.name).to.be('Bob!');
+			});
+			setTimeout(function(){
+				gun.get('parallel/get/get/later').path('bob').any(function(err, data, field, at, ev){
+					//console.log("***** 2", data);
+					expect(data.age).to.be(29);
+					expect(data.name).to.be('Bob!');
+					done();
+				});
+			},400);
+		});
+
+		it('get get any none', function(done){
+			var s = Gun.state.map();s.soul = 'get/get/none';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				alice: {
+					age: 31,
+					name: "alice"
+				}
+			}, s)});
+			var c = 0, s = 0;
+			gun.get('get/get/none').path('bob').any(function(err, data, field, at, ev){
+				//console.log("***** 1", data);
+				c++;
+				s = 0;
+				expect(data).to.be(undefined);
+			});
+			s = 1;
+			gun.get('get/get/none').path('bob').any(function(err, data, field, at, ev){
+				//console.log("***** 2", data);
+				c++;
+				//if(s){ c++ } // TODO: Talk to Jesse about this.
+				expect(data).to.be(undefined);
+				if(2 === c){ // We want 2 replies for each `any`, once from LS replying with the soul (but not the field), and once from WSP replying that the soul couldn't be found.
+					// Wrong! I think we've changed this, such that lS handles it alone and not WSP.
+					done();
+				}
+			});
+		});
+
+		it('get get any none later', function(done){
+			var s = Gun.state.map();s.soul = 'get/get/none/later';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				alice: {
+					age: 31,
+					name: "alice"
+				}
+			}, s)});
+			var c = 0;
+			gun.get('get/get/none/later').path('bob').any(function(err, data, field, at, ev){
+				//console.log("***** 1", data);
+				c++;
+				expect(data).to.be(undefined);
+			});
+			setTimeout(function(){
+				gun.get('get/get/none/later').path('bob').any(function(err, data, field, at, ev){
+					//console.log("***** 2", data);
+					c++;
+					expect(data).to.be(undefined);
+					//if(3 === c){ // Because we already have active listeners cached waiting for data to pipe in, BUT we have already received multiple responses that the data isn't found, the "not found" is cached and so we get an immediate response just from cache. If later data does get piped in, this will still get called.
+						done();
+					//}
+				});
+			},400);
+		});
+
+		it('get get primitive get any', function(done){
+			var s = Gun.state.map();s.soul = 'get/get/prim';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: "is awesome"
+			}, s)});
+			gun.get('get/get/prim').path('bob').path('age').any(function(err, data, field, at, ev){
+				//console.log("***** 1", data);
+				expect(data).to.be(undefined);
+			});
+			gun.get('get/get/prim').path('bob').path('age').any(function(err, data, field, at, ev){
+				//console.log("***** 2", data);
+				expect(data).to.be(undefined);
+				done();
+			});
+		});
+
+		it('get put any', function(done){
+			var s = Gun.state.map();s.soul = 'get/put/any';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				here: "we go"
+			}, s)});
+			console.debug.i=1;console.log("---------------");
+			gun.get('get/put/any')
+				.put({})
+				.any(function(err, data, field, at, ev){
+					console.log("***** 1", data);
+					done();
+			});
+		});
+		return;
+		it('get any, get put any', function(done){
+			var s = Gun.state.map();s.soul = 'get/any/get/put/any';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				here: "we go"
+			}, s)});
+			gun.get('get/any/get/put/any')
+				.any(function(err, data, field, at, ev){
+					if(done.first){ return } // it is okay for `any` to get called multiple times.
+					//console.log("***** 1", data);
+					expect(data.here).to.be('we go');
+					if(done.first){
+						expect(data.yes).to.be('please');
+					}
+					done.first=1;
+			});
+			setTimeout(function(){
+				gun.get('get/any/get/put/any')
+					.put({yes: 'please'})
+					.any(function(err, data, field, at, ev){
+						if(done.second){ return } // it is okay for `any` to get called multiple times.
+						//console.log("***** 2", data);
+						expect(data.here).to.be('we go');
+						expect(data.yes).to.be('please');
+						done();
+						done.second = 1;
+				});
+			},400);
+		});
+
+		it('mutate pointer to primitive deep on', function(done){
+			var s = Gun.state.map();s.soul = 'change/pointer';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {
+					age: 29,
+					name: "Bob!",
+					pet: {
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			}, s)});
+			gun.get('change/pointer').path('bob').path('pet').any(function(err, data, f, at, ev){
+				//console.log("***", data);return setTimeout(function(){asdf},500);
+				if(done.c){
+					expect(data).to.be(undefined);
+					return;
+				}
+				expect(data.name).to.be('Fluffy');
+				expect(data.species).to.be('kitty');
+				done.c = 1;
+			});
+			setTimeout(function(){
+				gun.get('change/pointer').put({
+					bob: null
+				});
+				setTimeout(function(){
+					gun.get('change/pointer').put({
+						bob: "hello!"
+					});
+				},400);
+			},400);
+			gun.get('change/pointer').any(function(err, data){
+				//console.log("****************", data);
+				if(2 <= done.e && data.bob){
+					expect(data.bob).to.be('hello!');
+					done();
+					return;
+				}
+				if(1 <= done.e){
+					expect(data.bob).to.be(null);
+					done.e = 2;
+					return;
+				}
+				expect(Gun.val.rel.is(data.bob)).to.be.ok();
+				done.e = 1;
+			});
+		});
+
+		it('get only soul', function(done){
+			var s = Gun.state.map();s.soul = 'only/soul';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {
+					age: 29,
+					name: "Bob!",
+					pet: {
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			}, s)});
+			gun.get('only/soul')/*.path('bob')*/.any(function(err, data){
+				expect(Gun.obj.empty(data, '_')).to.be.ok();
+				done();
+			}, {'.': null});
+		});
+
+		it('get path only soul', function(done){
+			var s = Gun.state.map();s.soul = 'only/p/soul';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {
+					age: 29,
+					name: "Bob!",
+					pet: {
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			}, s)});
+			gun.get('only/p/soul').path('bob').any(function(err, data){
+				//console.log("*********", err, data);
+				expect(Gun.val.rel.is(data)).to.be.ok();
+				//expect(Gun.obj.empty(data, '_')).to.be.ok();
+				done();
+			}, {'.': null});
+		});
+
+		it('mutate pointer to self', function(done){
+			var s = Gun.state.map();s.soul = 'change/pointer/point';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {
+					age: 29,
+					name: "Bob!",
+					pet: {
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			}, s)});
+			gun.get('change/pointer/point').path('bob').any(function(err, data){
+				if(done.c){
+					expect(data.age).to.be(30);
+					expect(data.name).to.be('Bob!');
+					expect(Gun.val.rel.is(data.pet)).to.be.ok();
+					expect(done.c).to.be(1);
+					done();
+					done.c = 2;
+					return;
+				}
+				expect(data.age).to.be(29);
+				expect(data.name).to.be('Bob!');
+				expect(Gun.val.rel.is(data.pet)).to.be.ok();
+				done.c=1;
+			});
+			setTimeout(function(){
+				gun.get('change/pointer/point').path('bob').put({age: 30});
+			},400);
+		});
+		it('mutate pointer to self deep', function(done){
+			var s = Gun.state.map();s.soul = 'change/pointer/point/deep';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {
+					age: 29,
+					name: "Bob!",
+					pet: {
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			}, s)});
+			gun.get('change/pointer/point/deep').path('bob').any(function(err, data){
+				//console.log("***", data);
+				if(done.c){
+					expect(data.age).to.be(30);
+					expect(data.name).to.be('Bob!');
+					expect(Gun.val.rel.is(data.pet)).to.be.ok();
+					done();
+					return;
+				}
+				expect(data.age).to.be(29);
+				expect(data.name).to.be('Bob!');
+				expect(Gun.val.rel.is(data.pet)).to.be.ok();
+				done.c=1;
+			});
+			setTimeout(function(){
+				gun.get('change/pointer/point/deep').path('bob').path('age').put(30);
+			},400);
+		});
+
+		it('mutate pointer to primitive after any', function(done){
+			var s = Gun.state.map();s.soul = 'change/pointer/to/prime';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {_: {'#': 'asdffdsa'},
+					age: 29,
+					name: "Bob!",
+					pet: {
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			}, s)});
+			var bob = gun.get('asdffdsa').any(function(err, data){
+				//console.log("***", data);
+			});
+			gun.get('change/pointer/to/prime').path('bob').any(function(err, data, f, at){
+				//console.log("***********", data);
+				if(!Gun.obj.is(data)){
+					expect(data).to.be(3);
+					if(done.c){return}
+					done();done.c=1;
+					return;
+				}
+				expect(data.age).to.be(29);
+				expect(data.name).to.be('Bob!');
+				expect(Gun.val.rel.is(data.pet)).to.be.ok();
+			});
+			setTimeout(function(){
+				gun.get('change/pointer/to/prime').path('bob').put(3);
+				setTimeout(function(){
+					bob.put({age: 30});
+				},100);
+			},400);
+		});
+
+		it('mutate pointer to primitive after any deep', function(done){
+			var s = Gun.state.map();s.soul = 'change/pointer/to/prime/deep';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {
+					age: 29,
+					name: "Bob!",
+					pet: {_: {'#': 'sadffads'},
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			}, s)});
+			var cat = gun.get('sadffads').any(function(err, data){
+				//console.log("***", data);
+			});
+			gun.get('change/pointer/to/prime/deep').path('bob').path('pet').any(function(err, data){
+				//console.log("*********", data);
+				if(!Gun.obj.is(data)){
+					expect(data).to.be(undefined);
+					if(done.c){return}
+					done();done.c=1;
+					return;
+				}
+				expect(data.species).to.be('kitty');
+				expect(data.name).to.be('Fluffy');
+			});
+			setTimeout(function(){
+				gun.get('change/pointer/to/prime/deep').path('bob').put(3);
+				setTimeout(function(){
+					cat.put({laser_eyes: true});
+				},100);
+			},400);
+		});
+		return;
+		it.only('mutate pointer to another pointer after any', function(done){
+			var s = Gun.state.map();s.soul = 'change/pointer/to/pointer';
+			Gun.on('put', {gun: gun, put: Gun.graph.ify({
+				bob: {_: {'#': 'dafssfad'},
+					age: 29,
+					name: "Bob!",
+					pet: {
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			}, s)});
+			var bob = gun.get('dafssfad').any(function(err, data){
+				console.log("***", data);
+			});
+			console.debug.i=1;console.log("--------------------");
+			gun.get('change/pointer/to/pointer').path('bob').any(function(err, data){
+				console.log("*********", data);return;
+				if(done.soul && done.soul !== Gun.node.soul(data)){
+					expect(Gun.node.soul(data)).to.be('fsdaadsf');
+					expect(data.cat).to.be(true);
+					expect(data.age).to.not.be.ok();
+					expect(data.name).to.not.be.ok();
+					expect(data.pet).to.not.be.ok();
+					if(done.c){return}
+					done();done.c=1;
+					return;
+				}
+				expect(done.soul = Gun.node.soul(data)).to.be('dafssfad');
+				expect(data.age).to.be(29);
+				expect(data.name).to.be('Bob!');
+				expect(Gun.val.rel.is(data.pet)).to.be.ok();
+			});
+			return;
+			setTimeout(function(){
+				gun.get('change/pointer/to/pointer').path('bob').put(Gun.node.ify({cat: true}, 'fsdaadsf'));
+				setTimeout(function(){
+					bob.put({age: 30});
+				},100);
+			},400);
+		});
+		return;
+		it.only('deep freeze put', function(done){
+			gun.get('deep/freeze').put({
+				bob: {
+					age: 29,
+					name: "Bob!",
+					pet: {
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			});
+			gun.get('deep/freeze').path('bob').path('pet').any(function(err, data){
+				console.log("********************", data);
+				expect(data.name).to.be('Fluffy');
+				expect(data.species).to.be('kitty');
+				setTimeout(function(){
+					done();
+				},100);
+			});
+		});
+
+		it('deep freezing put', function(done){
+			gun.get('deep/freeze/ing').put({
+				bob: {
+					age: 29,
+					name: "Bob!",
+					pet: {
+						name: "Fluffy",
+						species: "kitty"
+					}
+				}
+			});
+			gun.get('deep/freeze/ing').path('bob').path('pet').any(function(err, data){
+				//console.log("******** bob's pet", data);
+				if(done.c){
+					expect(data).to.be(undefined);
+					return;
+				}
+				expect(data.name).to.be('Fluffy');
+				expect(data.species).to.be('kitty');
+				done.c=1;
+			});
+			gun.get('deep/freeze/ing').put({bob: 'lol'});
+			gun.get('deep/freeze/ing').path('bob').path('pet').any(function(err, data){
+				//console.log("********* 2 bob's pet", data);return;
+				expect(data).to.be(undefined);
+				done();
+			});
+		});
+		return;
+		it('put put put put', function(){
+			var gun = Gun();
+			var get = gun.get('put/put/put/put');
+			get.put({});
+			get.put({
+				all: {
+					the: {
+						way: 'down'
+					}
+				}
+			});
+			get.put({foo: 'bar'});
+			get.any(function(err,data){
+				//console.log("data", data);
+				expect(Gun.val.rel.is(data.all)).to.be.ok();
+				expect(data.foo).to.be('bar');
+			});
+		});
+
+		it('perf put', function(done){
+			var gun = Gun();
+			var hey = gun.get('heylo');
+			hey.put({hello: "world"});
+			hey.any(function(err, data){
+				expect(data.hello).to.be('world');
+				done();
+			});
+		});
+
+		it('put', function(done){
+			gun.put("hello", function(err, ok){
+				expect(err).to.be.ok();
+				done();
+			});
+		});
+
+		it('put NaN', function(done){
+			gun.put({num: NaN}, function(err, ok){
+				expect(err).to.be.ok();
+				done();
+			});
+		});
+
+		it('put date', function(done){
+			gun.put({date: new Date()}, function(err, ok){
+				expect(err).to.be.ok();
+				done();
+			});
+		});
+
+		it('put regex', function(done){
+			gun.put({reg: /regex/i}, function(err, ok){
+				expect(err).to.be.ok();
+				done();
+			});
+		});
+
+		it('put node', function(done){
+			gun.put({hello: "world"}, function(err, ok){
+				expect(err).to.not.be.ok();
+				done();
+			});
+		});
+
+		it('put node then value', function(done){
+			var ref = gun.put({hello: "world"});
+			//console.log("---------");
+>>>>>>> 95280b8... v0.9.x ! Try S3 again?
 			ref.put('hello', function(err, ok){
 				expect(err).to.be.ok();
 				done();

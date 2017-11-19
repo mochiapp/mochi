@@ -458,6 +458,7 @@
 					console.Log("Warning! You have no all hook!");
 					return cb.call(gun), next();
 				}
+<<<<<<< HEAD
 			});
 			return gun;
 		}
@@ -499,6 +500,53 @@
 						src._.at('null').emit({soul: $.soul, field: field, gun: chain, PATH: 'NULL'});
 					}
 					return;
+=======
+				at.opt.peers = at.opt.peers || {};
+				obj_to(opt, at.opt); // copies options on to `at.opt` only if not already taken.
+				Gun.on('opt', at);
+				return gun;
+			}
+		}());
+
+		var list_is = Gun.list.is;
+		var text = Gun.text, text_is = text.is, text_rand = text.random;
+		var obj = Gun.obj, obj_is = obj.is, obj_has = obj.has, obj_to = obj.to, obj_map = obj.map, obj_copy = obj.copy;
+		var state = Gun.state, _soul = Gun._.soul, _field = Gun._.field, node_ = Gun._.node, rel_is = Gun.val.rel.is;
+		var empty = {}, u;
+
+		console.debug = function(i, s){ return (console.debug.i && i === console.debug.i && console.debug.i++) && (console.log.apply(console, arguments) || s) };
+
+		Gun.log = function(){ return (!Gun.log.off && console.log.apply(console, arguments)), [].slice.call(arguments).join(' ') }
+		Gun.log.once = function(w,s,o){ return (o = Gun.log.once)[w] = o[w] || 0, o[w]++ || Gun.log(s) }
+
+		;"Please do not remove these messages unless you are paying for a monthly sponsorship, thanks!";
+		Gun.log.once("welcome", "Hello wonderful person! :) Thanks for using GUN, feel free to ask for help on https://gitter.im/amark/gun and ask StackOverflow questions tagged with 'gun'!");
+		;"Please do not remove these messages unless you are paying for a monthly sponsorship, thanks!";
+		
+		if(typeof window !== "undefined"){ window.Gun = Gun }
+		if(typeof common !== "undefined"){ common.exports = Gun }
+		module.exports = Gun;
+	})(require, './root');
+
+	;require(function(module){
+		var Gun = require('./root');
+		Gun.chain.back = function(n, opt){ var tmp;
+			n = n || 1;
+			if(-1 === n || Infinity === n){
+				return this._.root;
+			} else
+			if(1 === n){
+				return this._.back || this;
+			}
+			var gun = this, at = gun._;
+			if(typeof n === 'string'){
+				n = n.split('.');
+			}
+			if(n instanceof Array){
+				var i = 0, l = n.length, tmp = at;
+				for(i; i < l; i++){
+					tmp = (tmp||empty)[n[i]];
+>>>>>>> 95280b8... v0.9.x ! Try S3 again?
 				}
 				if(soul){
 					//root.console.log('how many times?', Gun.log.debug, opt.path || path);
