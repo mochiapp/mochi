@@ -1,16 +1,24 @@
 {
   "name": "gun",
 <<<<<<< HEAD
+<<<<<<< HEAD
   "version": "0.3.9991",
 =======
   "version": "0.9.0",
 >>>>>>> 95280b8... v0.9.x ! Try S3 again?
+=======
+  "version": "0.9.2",
+>>>>>>> b3bba28... fix for @sergibondarenko
   "description": "Graph engine",
   "main": "index.js",
   "browser": "gun.js",
   "scripts": {
     "start": "node examples/http.js 8080",
+<<<<<<< HEAD
     "prepublish": "npm run unbuild && uglifyjs gun.js -o gun.min.js -c -m",
+=======
+    "prepublishOnly": "npm run unbuild",
+>>>>>>> b3bba28... fix for @sergibondarenko
     "test": "mocha",
     "testsea": "mocha test/sea.js",
     "e2e": "mocha e2e/distributed.js",
@@ -61,8 +69,12 @@
   },
   "dependencies": {
     "aws-sdk": ">=2.153.0",
+<<<<<<< HEAD
     "ws": "~>2.2.3"
 >>>>>>> 95280b8... v0.9.x ! Try S3 again?
+=======
+    "ws": "~>3.3.2"
+>>>>>>> b3bba28... fix for @sergibondarenko
   },
   "devDependencies": {
     "express": "~>4.13.4",

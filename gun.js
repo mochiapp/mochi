@@ -267,11 +267,62 @@
 			}());
 			return On;
 		}());
+<<<<<<< HEAD
 		Gun.roulette = function(l, c){
 			var gun = Gun.is(this)? this : {};
 			if(gun._ && gun.__.opt && gun.__.opt.uuid){
 				if(Gun.fns.is(gun.__.opt.uuid)){
 					return gun.__.opt.uuid(l, c);
+=======
+		var fn_is = Type.fn.is;
+		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_has = obj.has, obj_empty = obj.empty, obj_put = obj.put, obj_map = obj.map, obj_copy = obj.copy;
+		var u;
+		module.exports = Graph;
+	})(require, './graph');
+
+	;require(function(module){
+		// request / response module, for asking and acking messages.
+		require('./onto'); // depends upon onto!
+		module.exports = function ask(cb, as){
+			if(!this.on){ return }
+			if(!(cb instanceof Function)){
+				if(!cb || !as){ return }
+				var id = cb['#'] || cb, tmp = (this.tag||empty)[id];
+				if(!tmp){ return }
+				tmp = this.on(id, as);
+				clearTimeout(tmp.err);
+				return true;
+			}
+			var id = (as && as['#']) || Math.random().toString(36).slice(2);
+			if(!cb){ return id }
+			var to = this.on(id, cb, as);
+			to.err = to.err || setTimeout(function(){
+				to.next({err: "Error: No ACK received yet."});
+				to.off();
+			}, (this.opt||{}).lack || 9000);
+			return id;
+		}
+	})(require, './ask');
+
+	;require(function(module){
+		var Type = require('./type');
+		function Dup(opt){
+			var dup = {s:{}};
+			opt = opt || {max: 1000, age: 1000 * 9};//1000 * 60 * 2};
+			dup.check = function(id){
+				return dup.s[id]? dup.track(id) : false;
+			}
+			dup.track = function(id){
+				dup.s[id] = time_is();
+				if(!dup.to){
+					dup.to = setTimeout(function(){
+						Type.obj.map(dup.s, function(time, id){
+							if(opt.age > (time_is() - time)){ return }
+							Type.obj.del(dup.s, id);
+						});
+						dup.to = null;
+					}, opt.age);
+>>>>>>> b3bba28... fix for @sergibondarenko
 				}
 				l = l || gun.__.opt.uuid.length;
 			}
