@@ -2840,7 +2840,7 @@ describe('Gun', function(){
 			var foo = gun.get('put/on/put').get('a').get('b');
 			var bar = gun.get('put/on/put/ok').get('a').get('b');
 
-			bar.put({a:1})
+			bar.put({a:1});
 
 			bar.on(function(data){
 				if(1 === data.a && 3 === data.c){
@@ -2852,7 +2852,6 @@ describe('Gun', function(){
 			foo.on(function(ack){
 				bar.put({c:3});
 			});
-
 			foo.put({b:2});
 
 		});
