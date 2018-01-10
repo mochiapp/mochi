@@ -2876,6 +2876,7 @@ describe('Gun', function(){
 		});
 
 		it('put on a put', function(done){
+			try{
 			var gun = Gun();
 			var foo = gun.get('put/on/put').get('a').get('b');
 			var bar = gun.get('put/on/put/ok').get('a').get('b');
@@ -2893,7 +2894,7 @@ describe('Gun', function(){
 				bar.put({c:3});
 			});
 			foo.put({b:2});
-
+			}catch(e){ console.log("!!!!!!!!!!!", e)}
 		});
 
 		it('map with map function', function(done){
@@ -2910,11 +2911,8 @@ describe('Gun', function(){
 					done();
 				}
 			});
-			//console.debug.i=1;console.log("----------------");
 			list.set({name: 'alice', age: 27}); // on put, table-scan flag doesn't get set, but is needed for initial!??
 			list.set({name: 'bob', age: 27});
-			//console.log("vvvvvvvvvvv");
-			//return;
 			list.set({name: 'carl', age: 29});
 			list.set({name: 'dave', age: 25});
 		});
@@ -3087,14 +3085,20 @@ describe('Gun', function(){
 				if(!d || !d.put || !d.put.wat){ return }
 				expect(d.put.wat).to.be(1);
 				done.a = 1;
+				if(!done.u){ return }
+				expect(done.u).to.be.ok();
+				if(done.c){ return } done.c = 1;
+				done();
 			});
 
 			app.get('a').get('b').get(function(d){
 				//console.log("????", d.put);
 				expect(d.put).to.be(u);
+				done.u = true;
+				if(!done.a){ return }
 				expect(done.a).to.be.ok();
-				if(done.c){ return }
-				done(); done.c = 1;
+				if(done.c){ return } done.c = 1;
+				done();
 			});
 		});
 
