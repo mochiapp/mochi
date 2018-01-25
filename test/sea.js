@@ -9,23 +9,14 @@ var root;
   root = env.window ? env.window : global;
 }(this));
 
-if(typeof Buffer === 'undefined'){
-  var Buffer = require('buffer').Buffer;
-}
+const Buffer = Gun.SEA.Buffer
+
+const seaIndexedDb = new Gun.SEA.EasyIndexedDB('SEA', 'GunDB', 1)
 
 const checkIndexedDB = (key, prop, resolve_) => {
-  const doIt = (resolve, reject) => {
-    try {
-      Gun.SEA._callonstore_((store) => new Promise((reslv) => {
-        const getData = store.get(key)
-        getData.onsuccess = () => {
-          reslv(getData.result && getData.result[prop])
-        }
-      })).then(resolve)
-    } catch (e) {
-      reject(e)
-    }
-  }
+  const doIt = (resolve, reject) => seaIndexedDb.get(key, prop)
+  .then(resolve).catch(reject)
+
   if (resolve_) {
     doIt(resolve_, (e) => { throw e })
   } else {
@@ -33,12 +24,15 @@ const checkIndexedDB = (key, prop, resolve_) => {
   }
 }
 
-function setIndexedDB(key, prop, resolve_){
-  Gun.SEA._callonstore_(function(store){
-    store.put({id: key, auth: prop});
-  }, function(){
-    resolve_();
-  });
+const setIndexedDB = (key, auth, resolve_) => {
+  const doIt = (resolve, reject) => seaIndexedDb.put(key, { auth })
+  .then(resolve).catch(reject)
+
+  if (resolve_) {
+    doIt(resolve_, (e) => { throw e })
+  } else {
+    return new Promise(doIt)
+  }
 }
 
 Gun.SEA && describe('SEA', function(){
@@ -267,7 +261,7 @@ Gun().user && describe('Gun', function(){
     var user = gun.user();
     Gun.log.off = true;  // Supress all console logging
 
-    var throwOutUser = function(wipeStorageData){
+    const throwOutUser = (wipeStorageData, done) => {
       // Get rid of authenticated Gun user
       var user = gun.back(-1)._.user;
       // TODO: is this correct way to 'logout' user from Gun.User ?
@@ -280,20 +274,20 @@ Gun().user && describe('Gun', function(){
         // ... and persisted session
         sessionStorage.removeItem('remember');
         sessionStorage.removeItem('alias');
-        Gun.SEA._callonstore_(function(store) {
-          var act = store.clear();  // Wipes whole IndexedDB
-          act.onsuccess = function(){};
-        });
+        if (typeof done === 'function') {
+          seaIndexedDb.wipe().then(done)
+          return
+        } else {
+          return seaIndexedDb.wipe()
+        }
       }
-    };
+      return Promise.resolve()
+    }
 
     ['callback', 'Promise'].forEach(function(type){
       describe(type+':', function(){
-        beforeEach(function(done){
-          // Simulate browser reload
-          throwOutUser(true);
-          done();
-        });
+        // Simulate browser reload
+        beforeEach((done) => { throwOutUser(true, done) })
 
         describe('create', function(){
 
@@ -662,7 +656,7 @@ Gun().user && describe('Gun', function(){
             expect(usr).to.have.key('_');
             expect(usr._).to.have.keys(['pub', 'sea']);
             // ... to validate 'remember' data
-            pin = pin && new Buffer(pin, 'utf8').toString('base64');
+            pin = pin && Buffer.from(pin, 'utf8').toString('base64');
             return !pin ? Promise.resolve(sessionStorage.getItem('remember'))
             : new Promise(function(resolve){
               checkIndexedDB(usr._.alias, 'auth', resolve);
@@ -769,7 +763,7 @@ Gun().user && describe('Gun', function(){
                 user.recall(12 * 60).then(
                   doCheck(function(ack){
                     expect(ack).to.have.key('err');
-                    expect(ack.err.toLowerCase().indexOf('no authentication')).to.not.be(-1);
+                    expect(ack.err.toLowerCase().indexOf('no session')).to.not.be(-1);
                       checkIndexedDB(alias+type, 'auth', function(auth){
                         expect((typeof auth !== 'undefined' && auth !== null && auth !== ''))
                         .to.not.eql(true);
@@ -832,12 +826,13 @@ Gun().user && describe('Gun', function(){
           });
 
           it('valid session bootstrap using alias & PIN', function(done){
+            let sRemember
             user.recall(12 * 60).then(function(){
               return user.auth(alias+type, pass+' new', {pin: 'PIN'});
             }).then(doCheck(function(ack){
               // Let's save remember props
               var sUser = root.sessionStorage.getItem('user');
-              var sRemember = root.sessionStorage.getItem('remember');
+              sRemember = root.sessionStorage.getItem('remember')
               var iAuth = ack.auth;
               return new Promise(function(resolve){
                 checkIndexedDB(sUser, 'auth', function(auth){
@@ -873,6 +868,7 @@ Gun().user && describe('Gun', function(){
                   expect(props.err.toLowerCase()
                   .indexOf('missing pin')).not.to.be(-1);
                 }catch(e){ done(e); return }
+                root.sessionStorage.setItem('remember', sRemember)
                 // Ok, time to try auth with alias & PIN
                 return user.auth(alias+type, undefined, {pin: 'PIN'});
               });
@@ -947,21 +943,18 @@ Gun().user && describe('Gun', function(){
                 var ret = Object.assign({}, props, {iat: props.iat - 65 - props.exp});
                 return ret;
               }, pin);
-            })).then(function(){
-              // Simulate browser reload
-              throwOutUser();
-              user.recall(60).then(function(ack){
-                expect(ack).to.not.be(undefined);
-                expect(ack).to.not.be('');
-                expect(ack).to.not.have.keys([ 'pub', 'sea' ]);
-                expect(ack).to.have.key('err');
-                expect(ack.err).to.not.be(undefined);
-                expect(ack.err).to.not.be('');
-                expect(ack.err.toLowerCase()
-                .indexOf('no authentication session')).not.to.be(-1);
-                done();
-              }).catch(done);
-            }).catch(done);
+            })).then(() => throwOutUser(false)) // Simulate browser reload
+            .then(() => user.recall(60).then((ack) => {
+              expect(ack).to.not.be(undefined)
+              expect(ack).to.not.be('')
+              expect(ack).to.not.have.keys([ 'pub', 'sea' ])
+              expect(ack).to.have.key('err')
+              expect(ack.err).to.not.be(undefined)
+              expect(ack.err).to.not.be('')
+              expect(ack.err.toLowerCase()
+              .indexOf('no session')).not.to.be(-1)
+              done()
+            })).catch(done)
           });
 
           it('changed password', function(done){
@@ -995,14 +988,12 @@ Gun().user && describe('Gun', function(){
 
                 return user.auth(alias+type, pass+' new', {newpass: pass, pin: pin})
                 .then(function(usr){ expect(usr).to.not.have.key('err') });
-              }).then(function(){
-                return user.leave().then(function(ack){
-                  try{
-                    expect(ack).to.have.key('ok');
-                  }catch(e){ done(e); return }
-                  throwOutUser();
-                });
-              }).then(function(){
+              }).then(() => user.leave().then((ack) => {
+                try {
+                  expect(ack).to.have.key('ok')
+                } catch (e) { done(e); return }
+                return throwOutUser(false)
+              })).then(function(){
                 // Simulate browser reload
                 // Call back pre-update remember...
                 root.sessionStorage.setItem('user', sUser);
@@ -1019,7 +1010,7 @@ Gun().user && describe('Gun', function(){
                   expect(props.err).to.not.be(undefined);
                   expect(props.err).to.not.be('');
                   expect(props.err.toLowerCase()
-                  .indexOf('no authentication session')).not.to.be(-1);
+                  .indexOf('no session')).not.to.be(-1);
                   done();
                 }).catch(done);
               }).catch(done);
