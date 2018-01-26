@@ -9,9 +9,9 @@ var root;
   root = env.window ? env.window : global;
 }(this));
 
-const Buffer = root.Gun.SEA.Buffer
+const Buffer = Gun.SEA.Buffer || require('buffer')
 
-const seaIndexedDb = new root.Gun.SEA.EasyIndexedDB('SEA', 'GunDB', 1)
+const seaIndexedDb = new Gun.SEA.EasyIndexedDB('SEA', 'GunDB', 1)
 
 const checkIndexedDB = (key, prop, resolve_) => {
   const doIt = (resolve, reject) => seaIndexedDb.get(key, prop)
