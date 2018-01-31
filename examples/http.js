@@ -9,9 +9,10 @@ var Gun = require('gun');
 var gun = Gun({
 	file: 'data.json',
 	s3: {
-		key: '', // AWS Access Key
-		secret: '', // AWS Secret Token
-		bucket: '' // The bucket you want to save into
+		key: process.env.AWS_ACCESS_KEY_ID, // Use environment variables
+		secret: process.env.AWS_SECRET_ACCESS_KEY, // so your keys are not
+		bucket: process.env.AWS_S3_BUCKET // hard coded into your app!
+		// https://devcenter.heroku.com/articles/config-vars
 	}
 });
 
