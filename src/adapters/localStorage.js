@@ -35,12 +35,12 @@ Gun.on('opt', function(ctx){
 		this.to.next(at);
 		var gun = at.gun, lex = at.get, soul, data, opt, u;
 		//setTimeout(function(){
-		if(!lex || !(soul = lex[Gun._.soul])){ return }
+		if(!lex || !(soul = lex['#'])){ return }
 		//if(0 >= at.cap){ return }
-		var field = lex['.'];
+		var has = lex['.'];
 		data = disk[soul] || u;
-		if(data && field){
-			data = Gun.state.to(data, field);
+		if(data && has){
+			data = Gun.state.to(data, has);
 		}
 		if(!data && !Gun.obj.empty(gun.back('opt.peers'))){ // if data not found, don't ack if there are peers.
 			return; // Hmm, what if we have peers but we are disconnected?
