@@ -1,29 +1,17 @@
 {
   "name": "gun",
-<<<<<<< HEAD
-<<<<<<< HEAD
-  "version": "0.3.9991",
-=======
-  "version": "0.9.0",
->>>>>>> 95280b8... v0.9.x ! Try S3 again?
-=======
-  "version": "0.9.2",
->>>>>>> b3bba28... fix for @sergibondarenko
-  "description": "Graph engine",
+  "version": "0.9.992",
+  "description": "A realtime, decentralized, offline-first, graph data synchronization engine.",
   "main": "index.js",
-  "browser": "gun.js",
+  "browser": "gun.min.js",
   "scripts": {
     "start": "node examples/http.js 8080",
-<<<<<<< HEAD
-    "prepublish": "npm run unbuild && uglifyjs gun.js -o gun.min.js -c -m",
-=======
     "prepublishOnly": "npm run unbuild",
->>>>>>> b3bba28... fix for @sergibondarenko
     "test": "mocha",
     "testsea": "mocha test/sea.js",
     "e2e": "mocha e2e/distributed.js",
     "docker": "hooks/build",
-    "unbuild": "node lib/unbuild.js"
+    "unbuild": "node lib/unbuild.js && uglifyjs gun.js -o gun.min.js -c -m"
   },
   "repository": {
     "type": "git",
@@ -57,28 +45,27 @@
   },
   "homepage": "https://github.com/amark/gun#readme",
   "engines": {
-<<<<<<< HEAD
-    "node": ">=6.3.1"
-  },
-  "dependencies": {
-    "aws-sdk": "~>2.0.0",
-    "formidable": "~>1.0.15",
-    "ws": "~>1.0.1"
-=======
     "node": ">=0.8.4"
   },
   "dependencies": {
-    "aws-sdk": ">=2.153.0",
-<<<<<<< HEAD
-    "ws": "~>2.2.3"
->>>>>>> 95280b8... v0.9.x ! Try S3 again?
-=======
-    "ws": "~>3.3.2"
->>>>>>> b3bba28... fix for @sergibondarenko
+    "ws": "~>4.0.0"
   },
   "devDependencies": {
-    "express": "~>4.13.4",
-    "mocha": "~>1.9.0",
-    "uglify-js": "~>2.2.0"
+    "@std/esm": "^0.8.3",
+    "@trust/webcrypto": "^0.7.1",
+    "aws-sdk": ">=2.153.0",
+    "express": ">=4.15.2",
+    "fake-indexeddb": "^2.0.3",
+    "hapi": "^17.2.0",
+    "inert": "^5.1.0",
+    "ip": "^1.1.5",
+    "mocha": ">=3.2.0",
+    "node-localstorage": "^1.3.0",
+    "node-webcrypto-ossl": "^1.0.36",
+    "panic-manager": "^1.2.0",
+    "panic-server": "^1.1.1",
+    "text-encoding": "^0.6.4",
+    "uglify-js": ">=2.8.22",
+    "uws": "~>0.14.1"
   }
 }
