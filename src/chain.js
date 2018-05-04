@@ -3,235 +3,195 @@
 // is complicated and was extremely hard to build. If you port GUN to another
 // language, consider implementing an easier API to build.
 var Gun = require('./root');
-Gun.chain.chain = function(){
-	var at = this._, chain = new this.constructor(this), cat = chain._, root;
+Gun.chain.chain = function(sub){
+	var gun = this, at = gun._, chain = new (sub || gun).constructor(gun), cat = chain._, root;
 	cat.root = root = at.root;
-	cat.id = ++root._.once;
-	cat.back = this;
+	cat.id = ++root.once;
+	cat.back = gun._;
 	cat.on = Gun.on;
 	cat.on('in', input, cat); // For 'in' if I add my own listeners to each then I MUST do it before in gets called. If I listen globally for all incoming data instead though, regardless of individual listeners, I can transform the data there and then as well.
 	cat.on('out', output, cat); // However for output, there isn't really the global option. I must listen by adding my own listener individually BEFORE this one is ever called.
 	return chain;
 }
-function output(at){
-	var cat = this.as, gun = cat.gun, root = gun.back(-1), put, get, now, tmp;
-	if(!at.gun){
-		at.gun = gun;
-	}
-	this.to.next(at);
-	if(get = at.get){
-		if(tmp = get[_soul]){
-			tmp = (root.get(tmp)._);
-			if(obj_has(get, _field)){
-				if(obj_has(put = tmp.put, get = get[_field])){
-					tmp.on('in', {get: tmp.get, put: Gun.state.to(put, get), gun: tmp.gun}); // TODO: Ugly, clean up? Simplify all these if conditions (without ruining the whole chaining API)?
+
+function output(msg){
+	var put, get, at = this.as, back = at.back, root = at.root;
+	if(!msg.gun){ msg.gun = at.gun }
+	this.to.next(msg);
+	if(get = msg.get){
+		/*if(u !== at.put){
+			at.on('in', at);
+			return;
+		}*/
+		if(get['#'] || at.soul){
+			get['#'] = get['#'] || at.soul;
+			msg['#'] || (msg['#'] = text_rand(9));
+			back = (root.gun.get(get['#'])._);
+			if(!(get = get['.'])){
+				if(obj_has(back, 'put')){
+				//if(u !== back.put){
+					back.on('in', back);
 				}
+				if(back.ack){ return }
+				msg.gun = back.gun;
+				back.ack = -1;
 			} else
-			if(obj_has(tmp, 'put')){
-			//if(u !== tmp.put){
-				tmp.on('in', tmp);
+			if(obj_has(back.put, get)){
+				back.on('in', {
+					gun: back.gun,
+					put: Gun.state.to(back.put, get),
+					get: back.get
+				});
+				return;
 			}
-		} else {
-			if(obj_has(get, _field)){
-				get = get[_field];
-				var next = get? (gun.get(get)._) : cat;
-				// TODO: BUG! Handle plural chains by iterating over them.
-				//if(obj_has(next, 'put')){ // potentially incorrect? Maybe?
-				if(u !== next.put){ // potentially incorrect? Maybe?
-					//next.tag['in'].last.next(next);
-					next.on('in', next);
-					return;
-				}
-				if(obj_has(cat, 'put')){
-				//if(u !== cat.put){
-					var val = cat.put, rel;
-					if(rel = Gun.node.soul(val)){
-						val = Gun.val.rel.ify(rel);
-					}
-					if(rel = Gun.val.rel.is(val)){
-						if(!at.gun._){ return }
-						(at.gun._).on('out', {
-							get: tmp = {'#': rel, '.': get, gun: at.gun},
-							'#': root._.ask(ack, tmp),
-							gun: at.gun
-						});
-						return;
-					}
-					if(u === val || Gun.val.is(val)){
-						if(!at.gun._){ return }
-						(at.gun._).on('in', {
-							get: get,
-							gun: at.gun
-						});
-						return;
-					}
-				} else
-				if(cat.map){
-					obj_map(cat.map, function(proxy){
-						proxy.at.on('in', proxy.at);
-					});
-				};
-				if(cat.soul){
-					if(!at.gun._){ return }
-					(at.gun._).on('out', {
-						get: tmp = {'#': cat.soul, '.': get, gun: at.gun},
-						'#': root._.ask(ack, tmp),
-						gun: at.gun
-					});
-					return;
-				}
-				if(cat.get){
-					if(!cat.back._){ return }
-					(cat.back._).on('out', {
-						get: obj_put({}, _field, cat.get),
-						gun: gun
-					});
-					return;
-				}
-				at = obj_to(at, {get: {}});
-			} else {
-				if(obj_has(cat, 'put')){
-				//if(u !== cat.put){
-					cat.on('in', cat);
-				} else
-				if(cat.map){
-					obj_map(cat.map, function(proxy){
-						proxy.at.on('in', proxy.at);
-					});
-				}
-				if(cat.ack >= 0){
-					if(!obj_has(cat, 'put')){ // u !== cat.put instead?
-					//if(u !== cat.put){
-						return;
-					}
-				}
-				cat.ack = -1;
-				if(cat.soul){
-					cat.on('out', {
-						get: tmp = {'#': cat.soul, gun: cat.gun},
-						'#': root._.ask(ack, tmp),
-						gun: cat.gun
-					});
-					return;
-				}
-				if(cat.get){
-					if(!cat.back._){ return }
-					(cat.back._).on('out', {
-						get: obj_put({}, _field, cat.get),
-						gun: cat.gun
-					});
-					return;
-				}
+			root.ask(ack, msg);
+			return root.on('in', msg);
+		}
+		if(root.now){
+			root.now[at.id] = root.now[at.id] || true;
+		}
+		if(get['.']){
+			if(at.get){
+				msg = {get: {'.': at.get}, gun: at.gun};
+				(back.ask || (back.ask = {}))[at.get] = msg.gun._; // TODO: PERFORMANCE? More elegant way?
+				return back.on('out', msg);
 			}
+			msg = {get: {}, gun: at.gun};
+			return back.on('out', msg);
+		}
+		at.ack = at.ack || -1;
+		if(at.get){
+			msg.gun = at.gun;
+			get['.'] = at.get;
+			(back.ask || (back.ask = {}))[at.get] = msg.gun._; // TODO: PERFORMANCE? More elegant way?
+			return back.on('out', msg);
 		}
 	}
-	(cat.back._).on('out', at);
+	return back.on('out', msg);
 }
-function input(at){
-	at = at._ || at;
-	var ev = this, cat = this.as, gun = at.gun, coat = gun._, change = at.put, back = cat.back._ || empty, rel, tmp;
-	if(0 > cat.ack && !at.ack && !Gun.val.rel.is(change)){ // for better behavior?
-		cat.ack = 1;
+
+function input(msg){
+	var ev = this, cat = this.as, gun = msg.gun, at = gun._, change = msg.put, rel, tmp;
+	if(cat.get && msg.get !== cat.get){
+		msg = obj_to(msg, {get: cat.get});
 	}
-	if(cat.get && at.get !== cat.get){
-		at = obj_to(at, {get: cat.get});
-	}
-	if(cat.field && coat !== cat){
-		at = obj_to(at, {gun: cat.gun});
-		if(coat.ack){
-			cat.ack = cat.ack || coat.ack;
+	if(cat.has && at !== cat){
+		msg = obj_to(msg, {gun: cat.gun});
+		if(at.ack){
+			cat.ack = at.ack;
+			//cat.ack = cat.ack || at.ack;
 		}
+	}
+	if(node_ === cat.get && change && change['#']){
+		// TODO: Potential bug? What if (soul.has = pointer) gets changed to (soul.has = primitive), we still need to clear out / wipe /reset (soul.has._) to have _id = nothing, or puts might have false positives (revert back to old soul).
+		cat._id = change['#'];
 	}
 	if(u === change){
-		ev.to.next(at);
-		if(cat.soul){ return }
-		echo(cat, at, ev);
-		if(cat.field){
-			not(cat, at);
+		ev.to.next(msg);
+		if(cat.soul){ return } // TODO: BUG, I believe the fresh input refactor caught an edge case that a `gun.get('soul').get('key')` that points to a soul that doesn't exist will not trigger val/get etc.
+		echo(cat, msg, ev);
+		if(cat.has){
+			not(cat, msg);
 		}
-		obj_del(coat.echo, cat.id);
-		obj_del(cat.map, coat.id);
+		obj_del(at.echo, cat.id);
+		obj_del(cat.map, at.id);
 		return;
 	}
 	if(cat.soul){
-		if(cat.root._.now){ at = obj_to(at, {put: change = coat.put}) } // TODO: Ugly hack for uncached synchronous maps.
-		ev.to.next(at);
-		echo(cat, at, ev);
-		obj_map(change, map, {at: at, cat: cat});
+		ev.to.next(msg);
+		echo(cat, msg, ev);
+		obj_map(change, map, {at: msg, cat: cat});
 		return;
 	}
 	if(!(rel = Gun.val.rel.is(change))){
 		if(Gun.val.is(change)){
-			if(cat.field || cat.soul){
-				not(cat, at);
+			if(cat.has || cat.soul){
+				not(cat, msg);
 			} else
-			if(coat.field || coat.soul){
-				(coat.echo || (coat.echo = {}))[cat.id] = cat;
-				(cat.map || (cat.map = {}))[coat.id] = cat.map[coat.id] || {at: coat};
-				//if(u === coat.put){ return } // Not necessary but improves performance. If we have it but coat does not, that means we got things out of order and coat will get it. Once coat gets it, it will tell us again.
+			if(at.has || at.soul){
+				(at.echo || (at.echo = {}))[cat.id] = cat;
+				(cat.map || (cat.map = {}))[at.id] = cat.map[at.id] || {at: at};
+				//if(u === at.put){ return } // Not necessary but improves performance. If we have it but at does not, that means we got things out of order and at will get it. Once at gets it, it will tell us again.
 			}
-			ev.to.next(at);
-			echo(cat, at, ev);
+			ev.to.next(msg);
+			echo(cat, msg, ev);
 			return;
 		}
-		if(cat.field && coat !== cat && obj_has(coat, 'put')){
-			cat.put = coat.put;
+		if(cat.has && at !== cat && obj_has(at, 'put')){
+			cat.put = at.put;
 		};
-		if((rel = Gun.node.soul(change)) && coat.field){
-			coat.put = (cat.root.get(rel)._).put;
+		if((rel = Gun.node.soul(change)) && at.has){
+			at.put = (cat.root.gun.get(rel)._).put;
 		}
-		ev.to.next(at);
-		echo(cat, at, ev);
-		relate(cat, at, coat, rel);
-		obj_map(change, map, {at: at, cat: cat});
+		ev.to.next(msg);
+		echo(cat, msg, ev);
+		relate(cat, msg, at, rel);
+		obj_map(change, map, {at: msg, cat: cat});
 		return;
 	}
-	relate(cat, at, coat, rel);
-	ev.to.next(at);
-	echo(cat, at, ev);
+	relate(cat, msg, at, rel);
+	ev.to.next(msg);
+	echo(cat, msg, ev);
 }
-Gun.chain.chain.input = input;
-function relate(cat, at, coat, rel){
-	if(!rel || node_ === cat.get){ return }
-	var tmp = (cat.root.get(rel)._);
-	if(cat.field){
-		coat = tmp;
+
+function relate(at, msg, from, rel){
+	if(!rel || node_ === at.get){ return }
+	var tmp = (at.root.gun.get(rel)._);
+	if(at.has){
+		from = tmp;
 	} else 
-	if(coat.field){
-		relate(coat, at, coat, rel);
+	if(from.has){
+		relate(from, msg, from, rel);
 	}
-	if(coat === cat){ return }
-	(coat.echo || (coat.echo = {}))[cat.id] = cat;
-	if(cat.field && !(cat.map||empty)[coat.id]){
-		not(cat, at);
+	if(from === at){ return }
+	(from.echo || (from.echo = {}))[at.id] = at;
+	if(at.has && !(at.map||empty)[from.id]){ // if we haven't seen this before.
+		not(at, msg);
 	}
-	tmp = (cat.map || (cat.map = {}))[coat.id] = cat.map[coat.id] || {at: coat};
-	if(rel === tmp.rel){ return }
-	ask(cat, tmp.rel = rel);
+	tmp = (at.map || (at.map = {}))[from.id] = at.map[from.id] || {at: from};
+	var now = at.root.now;
+	//now = now || at.root.stop;
+	if(rel === tmp.rel){
+		// NOW is a hack to get synchronous replies to correctly call.
+		// and STOP is a hack to get async behavior to correctly call.
+		// neither of these are ideal, need to be fixed without hacks,
+		// but for now, this works for current tests. :/
+		if(!now){
+			return;
+			/*var stop = at.root.stop;
+			if(!stop){ return }
+			if(stop[at.id] === rel){ return }
+			stop[at.id] = rel;*/
+		} else {
+			if(u === now[at.id]){ return }
+			if((now._ || (now._ = {}))[at.id] === rel){ return }
+			now._[at.id] = rel;
+		}
+	}
+	ask(at, tmp.rel = rel);
 }
-function echo(cat, at, ev){
-	if(!cat.echo){ return } // || node_ === at.get ????
-	if(cat.field){ at = obj_to(at, {event: ev}) }
-	obj_map(cat.echo, reverb, at);
+function echo(at, msg, ev){
+	if(!at.echo){ return } // || node_ === at.get ?
+	if(at.has){ msg = obj_to(msg, {event: ev}) }
+	obj_map(at.echo, reverb, msg);
 }
-function reverb(cat){
-	cat.on('in', this);
+function reverb(to){
+	to.on('in', this);
 }
 function map(data, key){ // Map over only the changes on every update.
-	var cat = this.cat, next = cat.next || empty, via = this.at, gun, chain, at, tmp;
+	var cat = this.cat, next = cat.next || empty, via = this.at, chain, at, tmp;
 	if(node_ === key && !next[key]){ return }
-	if(!(gun = next[key])){
+	if(!(at = next[key])){
 		return;
 	}
-	at = (gun._);
-	//if(data && data[_soul] && (tmp = Gun.val.rel.is(data)) && (tmp = (cat.root.get(tmp)._)) && obj_has(tmp, 'put')){
+	//if(data && data[_soul] && (tmp = Gun.val.rel.is(data)) && (tmp = (cat.root.gun.get(tmp)._)) && obj_has(tmp, 'put')){
 	//	data = tmp.put;
 	//}
-	if(at.field){
+	if(at.has){
 		if(!(data && data[_soul] && Gun.val.rel.is(data) === Gun.node.soul(at.put))){
 			at.put = data;
 		}
-		chain = gun;
+		chain = at.gun;
 	} else {
 		chain = via.gun.get(key);
 	}
@@ -242,62 +202,70 @@ function map(data, key){ // Map over only the changes on every update.
 		via: via
 	});
 }
-function not(cat, at){
-	if(!(cat.field || cat.soul)){ return }
-	var tmp = cat.map;
-	cat.map = null;
-	if(null === tmp){ return }
-	if(u === tmp && cat.put !== u){ return } // TODO: Bug? Threw second condition in for a particular test, not sure if a counter example is tested though.
+function not(at, msg){
+	if(!(at.has || at.soul)){ return }
+	var tmp = at.map, root = at.root;
+	at.map = null;
+	if(!root.now || !root.now[at.id]){
+		if((!msg['@']) && null === tmp){ return }
+	}
+	if(u === tmp && Gun.val.rel.is(at.put)){ return } // TODO: Bug? Threw second condition in for a particular test, not sure if a counter example is tested though.
 	obj_map(tmp, function(proxy){
 		if(!(proxy = proxy.at)){ return }
-		obj_del(proxy.echo, cat.id);
+		obj_del(proxy.echo, at.id);
 	});
-	obj_map(cat.next, function(gun, key){
-		var coat = (gun._);
-		coat.put = u;
-		if(coat.ack){
-			coat.ack = -1;
+	obj_map(at.next, function(neat, key){
+		neat.put = u;
+		if(neat.ack){
+			neat.ack = -1;
 		}
-		coat.on('in', {
+		neat.on('in', {
 			get: key,
-			gun: gun,
+			gun: neat.gun,
 			put: u
 		});
 	});
 }
-function ask(cat, soul){
-	var tmp = (cat.root.get(soul)._);
-	if(cat.ack){
-		tmp.ack = tmp.ack || -1;
-		tmp.on('out', {
-			get: tmp = {'#': soul, gun: tmp.gun},
-			'#': cat.root._.ask(ack, tmp)
-		});
-		return;
+function ask(at, soul){
+	var tmp = (at.root.gun.get(soul)._);
+	if(at.ack){
+		tmp.on('out', {get: {'#': soul}});
+		if(!at.ask){ return } // TODO: PERFORMANCE? More elegant way?
 	}
-	obj_map(cat.next, function(gun, key){
-		(gun._).on('out', {
-			get: gun = {'#': soul, '.': key, gun: gun},
-			'#': cat.root._.ask(ack, gun)
-		});
+	obj_map(at.ask || at.next, function(neat, key){
+		//(tmp.gun.get(key)._).on('out', {get: {'#': soul, '.': key}});
+		//tmp.on('out', {get: {'#': soul, '.': key}});
+		neat.on('out', {get: {'#': soul, '.': key}});
+		//at.on('out', {get: {'#': soul, '.': key}});
 	});
+	Gun.obj.del(at, 'ask'); // TODO: PERFORMANCE? More elegant way?
 }
-function ack(at, ev){
-	var as = this.as, cat = as.gun._;
-	if(!at.put || (as['.'] && !obj_has(at.put[as['#']], cat.get))){
-		if(cat.put !== u){ return }
-		cat.on('in', {
-			get: cat.get,
-			put: cat.put = u,
-			gun: cat.gun,
+function ack(msg, ev){
+	var as = this.as, get = as.get || empty, at = as.gun._, tmp = (msg.put||empty)[get['#']];
+	if(at.ack){ at.ack = (at.ack + 1) || 1 }
+	if(!msg.put /*|| node_ == get['.']*/ || (get['.'] && !obj_has(tmp, at.get))){
+		if(at.put !== u){ return }
+		//at.ack = 0;
+		at.on('in', {
+			get: at.get,
+			put: at.put = u,
+			gun: at.gun,
+			'@': msg['@']
 		})
 		return;
 	}
-	at.gun = cat.root;
+	if(node_ == get['.']){ // is this a security concern?
+		at.on('in', {get: at.get, put: tmp[at.get], gun: at.gun, '@': msg['@']});
+		return;
+	}
+	//if(/*!msg.gun &&*/ !get['.'] && get['#']){ at.ack = (at.ack + 1) || 1 }
+	//msg = obj_to(msg);
+	msg.gun = at.root.gun;
 	//Gun.on('put', at);
-	Gun.on.put(at);
+	Gun.on.put(msg, at.root.gun);
 }
 var empty = {}, u;
 var obj = Gun.obj, obj_has = obj.has, obj_put = obj.put, obj_del = obj.del, obj_to = obj.to, obj_map = obj.map;
-var _soul = Gun._.soul, _field = Gun._.field, node_ = Gun.node._;
+var text_rand = Gun.text.random;
+var _soul = Gun.val.rel._, node_ = Gun.node._;
 	
