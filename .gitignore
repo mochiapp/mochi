@@ -1,0 +1,12 @@
+bower_components/
+build/
+!app4/build/
+node_modules/
+yarn.lock
+yarn-error.log
+cert.pem
+key.pem
+/gun/
+
+.vscode
+.vagrant
