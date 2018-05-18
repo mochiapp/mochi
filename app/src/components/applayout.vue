@@ -3,14 +3,14 @@
     <sidemenu></sidemenu>
     
     <div class="ob-content-wrapper">
-      <topbar :top-title="topTitle" :show-search="showSearch" :search-string="searchString"></topbar>
+      <topbar :top-title="topTitle" :show-search="showSearch" :search-string="searchString" :auth="auth"></topbar>
 
       <div class="ob-content">
         <slot></slot>
       </div>
 
       <v-footer :qqqfixed="'fixed'" qqqapp class="ob-footer">
-        <span>&copy; 2018 OpenBook</span>
+        <span>&copy; 2018 OpenBook (version: {{getAppVersion()}})</span>
       </v-footer>
     </div>
   </v-app>
@@ -66,6 +66,9 @@ export default {
   computed: {
     vApp: {
       get () { return this.$store.state.layout.vApp }
+    },
+    auth: {
+      get () { return this.$store.state.auth }
     }
   },
 
@@ -75,6 +78,12 @@ export default {
       document.getElementById('ob-app').style.height = window.innerHeight + 'px'
     }
     window.onresize()
+  },
+
+  methods: {
+    getAppVersion: function () {
+      return __glob_app_version_ === '==GLOBAPPVERSION==' ? 'dev' : __glob_app_version_
+    }
   }
 }
 </script>

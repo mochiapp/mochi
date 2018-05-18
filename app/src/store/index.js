@@ -5,7 +5,7 @@ import Vuex from 'vuex'
 import GunPlugin from './plugins/gun'
 
 import auth from './modules/auth'
-// import notes from './modules/notes'
+// import posts from './modules/posts'
 
 /*
 --------------------------------------------------------------------------
@@ -57,8 +57,6 @@ let drwr = parseInt(window.innerWidth) > 639
 
 const store = new Vuex.Store({
   state: {
-    test_count: 3,
-
     layout: {
       drawer: drwr,
       clipped: true,
@@ -72,15 +70,20 @@ const store = new Vuex.Store({
         icon: 'home',
         title: 'Home',
         routeName: 'home'
-      }, {
-        icon: 'dashboard',
-        title: 'Test',
-        routeName: 'test'
+      // }, {
+      //   icon: 'dashboard',
+      //   title: 'Test',
+      //   routeName: 'test'
       }, {
         // icon: 'question_answer',
         icon: 'note',
-        title: 'Notes',
-        routeName: 'notes'
+        title: 'My posts',
+        routeName: 'posts'
+      }, {
+        // icon: 'question_answer',
+        icon: 'face',
+        title: 'My profile',
+        routeName: 'profile'
       }, {
         icon: 'lock',
         title: 'Logout',
@@ -89,10 +92,6 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
-    test_increment (state) {
-      state.test_count++
-    },
-
     layout_drawer (state, v) {
       state.layout.drawer = v
     },
@@ -112,17 +111,13 @@ const store = new Vuex.Store({
     }
   },
   actions: {
-    test_init ({ commit }) {
-      commit('test_increment')
-    },
-
     route_changed ({ commit }) {
       commit('__route_changed')
     }
   },
   modules: {
     auth
-  //   notes
+  //   posts
   },
   // plugins: [vuexLocal.plugin]
   plugins: [GunPlugin]

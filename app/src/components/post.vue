@@ -1,28 +1,28 @@
 <template>
-  <app-layout top-title="Note">
-    <div class="ob-note-wrapper">
+  <app-layout top-title="Post">
+    <div class="ob-post-wrapper">
           <!-- route ID: {{ $route.params.id }}<br> -->
-          <template v-if="note">
-            <!-- id: {{ note._id }}<br> -->
-            <!-- content: {{ note.content }}<br> -->
-            <cceditor v-on:editChanged="onEditChanged" :content="note.content"></cceditor>
+          <template v-if="post">
+            <!-- id: {{ post._id }}<br> -->
+            <!-- content: {{ post.content }}<br> -->
+            <cceditor v-on:editChanged="onEditChanged" :content="post.content"></cceditor>
           </template>
           <template v-else>
-            Note not found.
+            Post not found.
           </template>
     </div>
   </app-layout>
 </template>
 
 <style>
-.ob-note-wrapper {
+.ob-post-wrapper {
   display: flex;
   height: 100%;
 }
 </style>
 
 <script>
-import '@/store/modules/notes'
+import '@/store/modules/posts'
 import '@/store/modules/words'
 import Editor from '@/components/editor'
 
@@ -30,12 +30,12 @@ let prevWords = null
 
 export default {
   beforeCreate () {
-    this.$store.dispatch('notes_get')
+    this.$store.dispatch('posts_get')
     this.$store.dispatch('words_get')
   },
 
   computed: {
-    note () { return this.$store.getters.getNoteById(this.$route.params.id) }
+    post () { return this.$store.getters.getPostById(this.$route.params.id) }
   },
 
   components: {
@@ -45,7 +45,7 @@ export default {
   methods: {
     onEditChanged (html) {
       // console.log('onEditChanged', html)
-      this.$store.dispatch('notes_change', {_id: this.note._id, content: html})
+      this.$store.dispatch('posts_change', {_id: this.post._id, content: html})
 
       let txt = html.replace(/<(?:.|\n)*?>/gm, ' ')
       txt = txt.replace(/\s\s+/g, ' ')
@@ -59,7 +59,7 @@ export default {
         let removedWords = prevWords.filter((i) => { return words.indexOf(i) < 0 })
         let addedWords = words.filter((i) => { return prevWords.indexOf(i) < 0 })
         prevWords = words
-        this.$store.dispatch('words_change', {removed: removedWords, added: addedWords, collection: 'notes', _id: this.note._id})
+        this.$store.dispatch('words_change', {removed: removedWords, added: addedWords, collection: 'posts', _id: this.post._id})
       }
     }
   }

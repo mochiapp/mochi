@@ -10,3 +10,7 @@ key.pem
 
 .vscode
 .vagrant
+
+dist/
+server/dist/
+app/dist/

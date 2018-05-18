@@ -13,6 +13,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder "../", "/vagrant"
 
+  config.ssh.forward_agent=true
+
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y nodejs
@@ -20,8 +22,9 @@ Vagrant.configure("2") do |config|
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
     sudo apt update
     sudo apt install yarn
+    sudo apt install python-minimal
     rsync -avzh /vagrant/ /_vagrant/
-    cd /_vagrant/docs/src
+    cd /_vagrant/app
     yarn
   SHELL
 

@@ -5,7 +5,7 @@
         <v-layout column align-center>
           <blockquote>
             <img src="../assets/logo.png" alt="Vuetify.js" class="mb-5">
-            &#8220;Test.3 = {{ msg }} = {{ test_count }}&#8221;
+            &#8220;Test.3 = {{ msg }}&#8221;
             <footer>
               <small>
                 <em>&mdash;Robert Heessels</em>
@@ -15,23 +15,11 @@
         </v-layout>
       </v-slide-y-transition>
 
-      <div class="fab-container">
-        <v-btn
-          dark
-          fab
-          bottom
-          right
-          color="pink"
-          v-on:click="clickAdd"
-        >
-          <v-icon>add</v-icon>
-        </v-btn>
-      </div>
 
 
       <div>Words:<br>
         <template v-for="(item, index) in words">
-          <div>{{item.word}} = {{JSON.stringify(item.notes)}}</div>
+          <div>{{item.word}} = {{JSON.stringify(item.posts)}}</div>
         </template>
       </div>
 
@@ -71,12 +59,10 @@ export default {
   },
 
   computed: mapState({
-    test_count: state => state.test_count,
     words: state => state.words.words
   }),
 
   beforeCreate () {
-    this.$store.dispatch('test_init')
     this.$store.dispatch('words_get')
   },
 
@@ -142,12 +128,6 @@ export default {
         })
       })
     })
-  },
-
-  methods: {
-    clickAdd: function (event) {
-      this.$store.commit('test_increment')
-    }
   }
 }
 </script>

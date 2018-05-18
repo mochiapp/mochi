@@ -1,0 +1,18 @@
+{
+  "name": "openbookserver",
+  "version": "0.0.1",
+  "description": "OpenBookServer",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node_modules/nodemon/bin/nodemon.js ./index.js"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "gun": "^0.9.98",
+    "ipfs": "^0.28.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.2"
+  }
+}

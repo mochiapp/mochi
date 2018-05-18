@@ -122,6 +122,7 @@ export function login (alias, pass) {
     //   return
     // }
     user.auth(data.alias, data.pass, function (ack) {
+      user.recall({sessionStorage: true})
       // console.log('GUN login user.auth', ack)
       if (ack.err) {
         reject(ack.err)
@@ -155,13 +156,15 @@ export function logout () {
 export function checkSession () {
   // console.log('GUN checkSession')
   return new Promise(function (resolve, reject) {
-    user.recall(12 * 60).then(function (props) {
+    login(window.sessionStorage.alias, window.sessionStorage.tmp)
+    /* user.recall(12 * 60) */.then(function (props) {
+    // user.recall({sessionStorage:true}).then(function (props) {
       // const { ok, err = ''} = props
       const {err = ''} = props
       if (err) {
         reject(err)
       } else if (props.pub) {
-        resolve({pub: props.pub, props})
+        resolve({pub: props.pub, alias: props.ack.alias, props})
       }
     })
   })

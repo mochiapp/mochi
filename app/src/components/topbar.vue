@@ -36,13 +36,18 @@
 
     <v-spacer></v-spacer>
 
-    <div v-if="showSearch" class="ob-topbar-search-wrapper">
+    <!-- <div v-if="showSearch" class="ob-topbar-search-wrapper">
       <div class="spacer">
         <v-text-field v-if="searchOpen || searchString + '' !== ''" label="Search" single-line v-model="searchString" ref="ccSearchInput"></v-text-field>
       </div>
       <v-btn icon v-on:click="clickSearchOpen()">
         <v-icon>search</v-icon>
       </v-btn>
+    </div> -->
+
+    <div class="ob-topmenu-user" v-on:click="clickUser()">
+      <v-icon color="white" light>account_circle</v-icon>
+      <span>{{auth && auth.alias}}</span>
     </div>
 
     <!-- <v-btn
@@ -96,9 +101,26 @@
   margin: 0;
   margin-right: -8px;
 }
+
+.ob-topmenu-user {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.ob-topmenu-user:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.ob-topmenu-user span {
+  margin-left: 4px;
+}
 </style>
 
 <script>
+import router from '../router'
+
 export default {
   data () {
     return {
@@ -109,7 +131,8 @@ export default {
   props: [
     'showSearch',
     'searchString',
-    'topTitle'
+    'topTitle',
+    'auth'
   ],
 
   computed: {
@@ -148,6 +171,11 @@ export default {
       if (!this.searchOpen) {
         this.searchString = ''
       }
+    },
+
+    clickUser () {
+      console.log('clickUser')
+      router.push('profile')
     }
   }
 }

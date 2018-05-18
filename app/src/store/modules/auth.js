@@ -4,7 +4,8 @@ const state = {
   loggedIn: false,
   successText: '',
   errorText: '',
-  pub: ''
+  pub: '',
+  alias: ''
 }
 
 const getters = {
@@ -50,7 +51,8 @@ const mutations = {
     state.loggedIn = false
     state.successText = 'Registration succesfull! Now please log in.'
     state.errorText = ''
-    state.pub = data.pub
+    state.pub = ''
+    state.alias = ''
   },
   auth_signup_fail (state, data) {
     state.loggedIn = false
@@ -61,36 +63,42 @@ const mutations = {
     }
     state.successText = ''
     state.pub = ''
+    state.alias = ''
   },
   auth_login_success (state, data) {
     state.loggedIn = true
     state.successText = 'Login succesfull!'
     state.errorText = ''
     state.pub = data.pub
+    state.alias = data.alias
   },
   auth_login_fail (state, data) {
     state.loggedIn = false
     state.errorText = 'Sorry, login failed. Please try again.'
     state.successText = ''
     state.pub = ''
+    state.alias = ''
   },
   auth_check_session_success (state, data) {
     state.loggedIn = true
     state.successText = 'Auto login succesfull!'
     state.errorText = ''
     state.pub = data.pub
+    state.alias = data.alias
   },
   auth_check_session_fail (state, data) {
     state.loggedIn = false
     state.errorText = ''
     state.successText = ''
     state.pub = ''
+    state.alias = ''
   },
   auth_logout_success (state, data) {
     state.loggedIn = false
     state.successText = 'Logout succesfull!'
     state.errorText = ''
     state.pub = ''
+    state.alias = ''
   },
   auth_logout_fail (state, data) {
     state.errorText = 'Sorry, logout failed. Please try again.'
