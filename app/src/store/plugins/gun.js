@@ -241,6 +241,26 @@ export function subscribeData (node, subscribeKey, pdat) {
 
 /*
 --------------------------------------------------------------------------
+*/
+
+export function getUserNodeByPub (pub) {
+  return gun.user(pub)
+}
+
+/*
+--------------------------------------------------------------------------
+*/
+
+export function getUserByPub (pub, pdat) {
+  getUserNodeByPub(pub).then(data => {
+    // console.log('getUserByPub', data)
+    let fn = pdat.fn
+    fn({data, ky: data && data.pub, pdat})
+  })
+}
+
+/*
+--------------------------------------------------------------------------
 --------------------------------------------------------------------------
 */
 

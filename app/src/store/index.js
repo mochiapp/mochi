@@ -65,24 +65,32 @@ const store = new Vuex.Store({
         light: true,
         dark: false
       },
-      menuItems: [{
-        // icon: 'bubble_chart',
-        icon: 'home',
-        title: 'Home',
-        routeName: 'home'
+      menuItems: [
+      {
+      //   // icon: 'bubble_chart',
+      //   icon: 'home',
+      //   title: 'Home',
+      //   routeName: 'home'
+      // // }, {
+      // //   icon: 'dashboard',
+      // //   title: 'Test',
+      // //   routeName: 'test'
       // }, {
-      //   icon: 'dashboard',
-      //   title: 'Test',
-      //   routeName: 'test'
+        icon: 'inbox',
+        title: 'Timeline',
+        routeName: 'feed'
       }, {
         // icon: 'question_answer',
-        icon: 'note',
-        title: 'My posts',
+        icon: 'description',
+        title: 'Posts',
         routeName: 'posts'
       }, {
-        // icon: 'question_answer',
+        icon: 'group',
+        title: 'Friends',
+        routeName: 'friends'
+      }, {
         icon: 'face',
-        title: 'My profile',
+        title: 'Profile',
         routeName: 'profile'
       }, {
         icon: 'lock',
