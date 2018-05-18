@@ -30,6 +30,7 @@
 <script>
 import { mapState } from 'vuex'
 import '@/store/modules/feed'
+import '@/store/modules/users'
 
 export default {
   computed: {
@@ -44,6 +45,7 @@ export default {
 
   beforeCreate () {
     this.$store.dispatch('feed_get', 'myself')
+    this.$store.dispatch('users_friends_get')
   },
 
   methods: {

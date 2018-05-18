@@ -1,5 +1,5 @@
 <template>
-  <app-layout top-title="Posts" show-search="true" :search-string="searchString">
+  <app-layout top-title="My own posts" show-search="true" :search-string="searchString">
     <v-container fluid fill-height class="fab-parent ob-posts-container">
       <v-list dense class="pt-0">
         <template v-for="(item, index) in postsFiltered">

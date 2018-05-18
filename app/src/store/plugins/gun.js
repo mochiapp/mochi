@@ -252,9 +252,17 @@ export function getUserNodeByPub (pub) {
 */
 
 export function getUserByPub (pub, pdat) {
-  getUserNodeByPub(pub).then(data => {
-    // console.log('getUserByPub', data)
+  getUserNodeByPub(pub).then(dat => {
+    // console.log('getUserByPub', dat)
     let fn = pdat.fn
+    let data = dat
+    if (typeof dat === 'object' && dat !== null) {
+      data = {...dat}
+      if (dat['_']) {
+        data._id = dat['_']['#']
+        delete data._
+      }
+    }
     fn({data, ky: data && data.pub, pdat})
   })
 }

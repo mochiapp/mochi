@@ -82,7 +82,7 @@ const store = new Vuex.Store({
       }, {
         // icon: 'question_answer',
         icon: 'description',
-        title: 'Posts',
+        title: 'My own posts',
         routeName: 'posts'
       }, {
         icon: 'group',
