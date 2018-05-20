@@ -1,16 +1,26 @@
 <template>
   <app-layout top-title="Profile">
     <div class="ob-profile">
-      Hi there! :-)<br><br>
-      <div class="ob-profile-kyt">Your alias:</div>
-      <div class="ob-profile-val">{{auth.alias}}</div>
-      <div class="ob-profile-kyt">Your public id:</div>
-      <div class="ob-profile-val">
-        {{auth.pub}}
-        <span ref="gncopy" class="js-copy"><v-icon light>file_copy</v-icon></span>
-        <br>
-        <span class="expl">You can copy this id (by clicking the icon) and send it to someone else so they can connect with you.</span>
-      </div>
+      <b>Hi there! :-)</b><br><br>
+      <v-card>
+        <v-card-title primary-title>
+          <div>
+            <div class="ob-profile-kyt">Your alias:</div>
+            <div class="ob-profile-val">{{auth.alias}}</div>
+          </div>
+        </v-card-title>
+      </v-card>
+      <v-card>
+        <v-card-title primary-title>
+          <div>
+            <div class="ob-profile-kyt">Your public id:<span ref="gncopy" class="js-copy"><v-icon color="grey lighten-2">file_copy</v-icon></span></div>
+            <div class="ob-profile-val">
+              {{auth.pub}}<br>
+              <div class="expl">You can copy this id (by clicking the icon) and send it to someone else so they can connect with you.</div>
+            </div>
+          </div>
+        </v-card-title>
+      </v-card>
     </div>
   </app-layout>
 </template>
@@ -21,18 +31,35 @@
   margin: 16px;
 }
 
+.card {
+  margin-bottom: 16px;
+}
+
+.card__title {
+  padding: 8px !important;
+}
+
+.ob-profile-kyt {
+  color: #888;
+}
+
 .ob-profile-val {
   font-weight: bold;
-  margin-bottom: 18px;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .expl {
   font-weight: normal;
+  margin-top: 4px;
 }
 
 .js-copy {
   cursor: pointer;
+  margin-left: 8px;
+}
+
+.js-copy i:hover {
+  color: grey !important;
 }
 </style>
 

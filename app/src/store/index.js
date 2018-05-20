@@ -79,11 +79,11 @@ const store = new Vuex.Store({
         icon: 'inbox',
         title: 'Timeline',
         routeName: 'feed'
-      }, {
-        // icon: 'question_answer',
-        icon: 'description',
-        title: 'My own posts',
-        routeName: 'posts'
+      // }, {
+      //   // icon: 'question_answer',
+      //   icon: 'description',
+      //   title: 'My own posts',
+      //   routeName: 'posts'
       }, {
         icon: 'group',
         title: 'Friends',

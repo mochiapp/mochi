@@ -174,6 +174,8 @@ export default {
     },
 
     logout: function (event) {
+      window.sessionStorage.removeItem('alias')
+      window.sessionStorage.removeItem('tmp')
       this.$store.dispatch('auth_logout')
     },
 

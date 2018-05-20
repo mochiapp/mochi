@@ -3,12 +3,13 @@
     <v-container fluid fill-height class="fab-parent ob-friends-container">
       <v-list dense class="pt-0">
         <template v-for="(item, index) in friendsFiltered">
-          <v-list-tile :key="item._id" :to="{name: 'post', params: {id: item._id}}" exact>
-            <v-list-tile-content>
-              <v-list-tile-title v-text="getFriendTitle(item)"></v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <!-- <v-divider v-if="index + 1 < friends.length" :key="index"></v-divider> -->
+          <v-card>
+            <v-card-title primary-title>
+              <div>
+                <div v-html="getFriendTitle(item)"></div>
+              </div>
+            </v-card-title>
+          </v-card>
         </template>
       </v-list>
     </v-container>
@@ -85,11 +86,20 @@
 
 .ob-friends-container {
   align-items: flex-start !important;
-  padding: 8px 0 !important;
+  padding: 16px !important;
 }
 
 .ob-friends-container > ul {
   width: 100%;
+  background-color: inherit !important;
+}
+
+.card {
+  margin-bottom: 16px;
+}
+
+.card__title {
+  padding: 8px !important;
 }
 </style>
 
