@@ -1,4 +1,4 @@
-import {subscribeData, addToSet, updateNode, getUserNode, getUserNodeByPub} from '@/store/plugins/gun'
+import {subscribeData, subscribeTimeData, addToSet, updateNode, getUserNode, getUserXNode, getUserNodeByPub, getUserXNodeByPub} from '@/store/plugins/gun'
 import store from '@/store'
 
 const state = {
@@ -21,10 +21,11 @@ const actions = {
     // }
 
     if (data === 'myself') {
-      subscribeData(getUserNode('ob/posts'), 'feed_ob/posts', {fn: commit.bind(this, '__feed_add_or_change')})
+      subscribeData(getUserNode('ob/posts'), 'feed_ob/posts', {fn: commit.bind(this, '__feed_add_or_change'), usrpub: data})
+      // subscribeTimeData(getUserXNode('ob/posts'), 'feed_ob/posts', {fn: commit.bind(this, '__feed_add_or_change'), usrpub: data})
     } else {
-      console.log('===', data)
-      subscribeData(getUserNodeByPub(data).get('ob/posts'), 'feed_ob/posts/' + data, {fn: commit.bind(this, '__feed_add_or_change')})
+      subscribeData(getUserNodeByPub(data).get('ob/posts'), 'feed_ob/posts/' + data, {fn: commit.bind(this, '__feed_add_or_change'), usrpub: data})
+      // subscribeTimeData(getUserXNodeByPub(data, 'ob/posts'), 'feed_ob/posts/' + data, {fn: commit.bind(this, '__feed_add_or_change'), usrpub: data})
     }
   }
 }

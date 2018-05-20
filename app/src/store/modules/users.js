@@ -6,11 +6,20 @@ const state = {
   searchFriendId: { src: '', res: 0 }
 }
 
+const getters = {
+  userByPub: (state) => (pub, users, me) => {
+    if (pub === 'myself') {
+      return me ? me : null
+    }
+    return users ? users.find(user => user.pub === pub) : null
+  }
+}
+
 let friendsSubscribed = false
 
 const actions = {
   users_friends_get ({dispatch, commit, state}) {
-    console.log('users_friends_get', /* dispatch, commit, */ state)
+    // console.log('users_friends_get', /* dispatch, commit, */ state)
 
     if (!state.friends) {
       // state.friends = []
@@ -25,7 +34,7 @@ const actions = {
   },
 
   __users_friends_pub_add_or_change ({dispatch, commit, state}, data) {
-    console.log('__users_friends_pub_add_or_change', /* dispatch, commit, */ state, data)
+    // console.log('__users_friends_pub_add_or_change', /* dispatch, commit, */ state, data)
     getUserByPub(data.data, {fn: commit.bind(this, '__users_friends_add_or_change')})
     dispatch('feed_get', data.data)
   },
@@ -44,7 +53,7 @@ const actions = {
 
 const mutations = {
   users_friends_delete_all (state) {
-    console.log('users_friends_delete_all')
+    // console.log('users_friends_delete_all')
     state.friends = []
   },
 
@@ -54,7 +63,7 @@ const mutations = {
     let friends2 = [...state.friends]
 
     var ix = state.friends.findIndex(obj => obj._id === data._id)
-    console.log('__users_friends_add_or_change', ix, data)
+    // console.log('__users_friends_add_or_change', ix, data)
     if (ix < 0) {
       friends2.push(data)
     } else {
@@ -84,6 +93,7 @@ const mutations = {
 let users = {
   // namespaced: true,
   state,
+  getters,
   actions,
   mutations
 }

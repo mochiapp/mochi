@@ -1,4 +1,4 @@
-import {subscribeData, addToSet, updateNode, getUserNode} from '@/store/plugins/gun'
+import {subscribeData, subscribeTimeData, addToSet, addToTimeSet, updateNode, getUserNode, getUserXNode} from '@/store/plugins/gun'
 import store from '@/store'
 
 const state = {
@@ -34,12 +34,15 @@ const actions = {
 
     if (!postsSubscribed) {
       subscribeData(getUserNode('ob/posts'), 'posts_ob/posts', {fn: commit.bind(this, '__posts_add_or_change')})
+      // subscribeTimeData(getUserXNode('ob/posts'), 'posts_ob/posts', {fn: commit.bind(this, '__posts_add_or_change')})
       postsSubscribed = true
     }
   },
 
   posts_add (state, data) {
+    data._time = (new Date).getTime()
     addToSet(getUserNode('ob/posts'), data)
+    // addToTimeSet(getUserXNode('ob/posts'), data)
   },
 
   posts_change ({dispatch, commit, state}, data) {

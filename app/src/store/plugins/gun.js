@@ -1,5 +1,6 @@
 import '../lib/gun/gun'
 import '../lib/gun/sea'
+import '../lib/gun/lib/time'
 
 /*
 --------------------------------------------------------------------------
@@ -43,33 +44,33 @@ Gun.chain.unset = function (node) {
 --------------------------------------------------------------------------
 */
 
-gun.on('auth', function (at) {
-  console.log('GUN on auth', at)
-  // if('sign' === c.hash){ c.hash = '' }
-  // as.route(c.hash || 'people');
-})
+// gun.on('auth', function (at) {
+//   console.log('GUN on auth', at)
+//   // if('sign' === c.hash){ c.hash = '' }
+//   // as.route(c.hash || 'people');
+// })
 
 /*
 --------------------------------------------------------------------------
 */
 
-gun.on('secure', function (at) {
-  /* enforce some rules about shared app level data */
+// gun.on('secure', function (at) {
+//   /* enforce some rules about shared app level data */
 
-  console.log('GUN on secure', at)
+//   console.log('GUN on secure', at)
 
-  // if (!at.put || !at.put.users) { return }
-  // var no
-  // Gun.node.is(at.put.users, function (val, key) {
-  //   Gun.SEA.read(val, false, function (val) {
-  //     if ('alias/' + key === Gun.val.rel.is(val)) { return }
-  //     no = true
-  //   })
-  //   if (no) { return no }
-  // })
-  // if (no) { return }
-  this.to.next(at)
-})
+//   // if (!at.put || !at.put.users) { return }
+//   // var no
+//   // Gun.node.is(at.put.users, function (val, key) {
+//   //   Gun.SEA.read(val, false, function (val) {
+//   //     if ('alias/' + key === Gun.val.rel.is(val)) { return }
+//   //     no = true
+//   //   })
+//   //   if (no) { return no }
+//   // })
+//   // if (no) { return }
+//   this.to.next(at)
+// })
 
 /*
 --------------------------------------------------------------------------
@@ -191,8 +192,24 @@ export function getUserNode (gunPath) {
 --------------------------------------------------------------------------
 */
 
+export function getUserXNode (gunPath) {
+  return gun.get('xusr/' + user.is.pub + '/' + gunPath)
+}
+
+/*
+--------------------------------------------------------------------------
+*/
+
 export function addToSet (node, obj) {
   node.set(obj)
+}
+
+/*
+--------------------------------------------------------------------------
+*/
+
+export function addToTimeSet (node, obj) {
+  node.time(obj)
 }
 
 /*
@@ -233,6 +250,9 @@ export function subscribeData (node, subscribeKey, pdat) {
           data._id = dat['_']['#']
           delete data._
         }
+        if (pdat.usrpub) {
+          data._usrpub = pdat.usrpub
+        }
       }
       fn({data, ky, pdat})
     })
@@ -243,8 +263,47 @@ export function subscribeData (node, subscribeKey, pdat) {
 --------------------------------------------------------------------------
 */
 
+export function subscribeTimeData (node, subscribeKey, pdat) {
+  if (subscriptions.indexOf(subscribeKey) < 0) {
+    subscriptions.push(subscribeKey)
+
+    let fn = pdat.fn
+    // console.log('subscribeTimeData', node, fn, pdat)
+    node.time(function(dat, ky, time) {
+      // console.log('subscribeTimeData time', dat, ky)
+      gun.get(dat['#']).on(function(dat) {
+        let data = dat
+        if (typeof dat === 'object' && dat !== null) {
+          data = {...dat}
+          if (dat['_']) {
+            data._id = dat['_']['#']
+            delete data._
+          }
+          data._time = time
+          if (pdat.usrpub) {
+            data._usrpub = pdat.usrpub
+          }
+        }
+        fn({data, ky, pdat})
+      })
+    }, 10)
+  }
+}
+
+/*
+--------------------------------------------------------------------------
+*/
+
 export function getUserNodeByPub (pub) {
   return gun.user(pub)
+}
+
+/*
+--------------------------------------------------------------------------
+*/
+
+export function getUserXNodeByPub (pub, gunPath) {
+  return gun.get('xusr/' + pub + '/' + gunPath)
 }
 
 /*
