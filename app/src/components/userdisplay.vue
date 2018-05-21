@@ -1,12 +1,11 @@
 <template>
-  <span>
+  <span class="primary--text">
     {{userAlias}}
   </span>
 </template>
 
 <style scoped>
 span {
-  color: blue;
   font-weight: 500;
 }
 </style>

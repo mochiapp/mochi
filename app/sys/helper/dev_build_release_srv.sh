@@ -1,6 +1,6 @@
 CMD1="
 git config --global core.sshCommand \"ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no\"
-secsepoch=\"$(date +"%y").$(date +%m).$(date +%d).$(date +%s)\"
+secsepoch=\"$(date +"%y").$(date +%m).$(date +%d).$(($(date +%-H)+10))$(date +%M)\"
 cd $1
 rm -Rf dist
 git clone $2 dist

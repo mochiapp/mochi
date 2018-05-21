@@ -9,9 +9,9 @@
         <slot></slot>
       </div>
 
-      <v-footer :qqqfixed="'fixed'" qqqapp class="ob-footer">
+      <!-- <v-footer :qqqfixed="'fixed'" qqqapp class="ob-footer">
         <span>&copy; 2018 OpenBook (version: {{getAppVersion()}})</span>
-      </v-footer>
+      </v-footer> -->
     </div>
   </v-app>
 </template>

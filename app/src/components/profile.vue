@@ -1,44 +1,34 @@
 <template>
   <app-layout top-title="Profile">
-    <div class="ob-profile">
-      <b>Hi there! :-)</b><br><br>
-      <v-card>
-        <v-card-title primary-title>
-          <div>
-            <div class="ob-profile-kyt">Your alias:</div>
-            <div class="ob-profile-val">{{auth.alias}}</div>
-          </div>
-        </v-card-title>
-      </v-card>
-      <v-card>
-        <v-card-title primary-title>
-          <div>
-            <div class="ob-profile-kyt">Your public id:<span ref="gncopy" class="js-copy"><v-icon color="grey lighten-2">file_copy</v-icon></span></div>
-            <div class="ob-profile-val">
-              {{auth.pub}}<br>
-              <div class="expl">You can copy this id (by clicking the icon) and send it to someone else so they can connect with you.</div>
+    <v-container fluid fill-height class="fab-parent ob-profile-container">
+      <v-list dense class="pt-0">
+        <b>Hi there! :-)</b><br><br>
+        <v-card>
+          <v-card-title primary-title>
+            <div>
+              <div class="ob-profile-kyt">Your alias:</div>
+              <div class="ob-profile-val">{{auth.alias}}</div>
             </div>
-          </div>
-        </v-card-title>
-      </v-card>
-    </div>
+          </v-card-title>
+        </v-card>
+        <v-card>
+          <v-card-title primary-title>
+            <div>
+              <div class="ob-profile-kyt">Your public id:<span ref="gncopy" class="js-copy"><v-icon color="grey lighten-2">file_copy</v-icon></span></div>
+              <div class="ob-profile-val">
+                {{auth.pub}}<br>
+                <div class="expl">You can copy this id (by clicking the icon) and send it to someone else so they can connect with you.</div>
+              </div>
+            </div>
+          </v-card-title>
+        </v-card>
+      </v-list>
+    </v-container>
   </app-layout>
 </template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.ob-profile {
-  margin: 16px;
-}
-
-.card {
-  margin-bottom: 16px;
-}
-
-.card__title {
-  padding: 8px !important;
-}
-
 .ob-profile-kyt {
   color: #888;
 }

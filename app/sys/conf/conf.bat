@@ -6,7 +6,7 @@ SET sys_dev_box_sys_dir=/vagrant/app/sys
 
 SET sys_dev_screen1_cmd=echo \"$(tput clear)\" ; ^
 echo \"===============================\" ; ^
-echo \"To re-run parcel dev server do:\" ; ^
+echo \"To re-run dev server do:\" ; ^
 echo \"$(tput setaf 3)# yarn dev$(tput sgr0)\" ; ^
 echo \"To visit the dev site:\" ; ^
 echo \"$(tput setaf 3)http://127.0.0.1:51075$(tput sgr0)\" ; ^

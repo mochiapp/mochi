@@ -16,18 +16,6 @@
           <div>OpenBook</div>
         </div>
     
-              <!-- <v-toolbar flat> -->
-          <!-- <v-list>
-            <v-list-tile>
-              <v-list-tile-title class="title">
-                OpenBook
-              </v-list-tile-title>
-            </v-list-tile>
-          </v-list> -->
-        <!-- </v-toolbar> -->
-
-        <!-- <v-divider></v-divider> -->
-
         <v-list dense class="pt-0">
           <v-list-tile v-for="item in menuItems" :key="item.title" :to="item.routeName ? {name: item.routeName} : null" exact :class="getLinkClass(item)" @click="click(item.click, $event)">
             <v-list-tile-action>
@@ -38,6 +26,11 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
+
+        <div class="ob-sidemenu-footer">
+          <div>&copy; 2018 OpenBook</div>
+          <div class="version">{{getAppVersion()}}</div>
+        </div>
       </div>
     </div>
 
@@ -45,6 +38,22 @@
   </div>
 </template>
 
+<style scoped>
+.list {
+  flex: 1 1 auto;
+}
+
+.ob-sidemenu-footer {
+  padding: 4px 16px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.version {
+  color: #aaa;
+  font-size: 10px !important;
+  margin: -4px 0 0 0;
+}
+</style>
 <style>
 .ob-sidemenu-wrapper {
   display: flex;
@@ -96,6 +105,9 @@
 
 .ob-sidemenu-inner {
   width: 220px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .ob-sidemenu ul {
@@ -187,6 +199,10 @@ export default {
       let style = 'width: ' + (this.drawer ? '220px' : '0') + ';'
       style += 'border-right-width: ' + (this.drawer ? '1px' : '0') + ';'
       return style
+    },
+
+    getAppVersion: function () {
+      return __glob_app_version_ === '==GLOBAPPVERSION==' ? 'dev' : __glob_app_version_
     }
   }
 }

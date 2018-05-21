@@ -23,8 +23,8 @@ Vagrant.configure("2") do |config|
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
     sudo apt update
-    sudo apt install yarn
-    sudo apt install python-minimal
+    sudo apt install -y yarn
+    sudo apt install -y python-minimal
     rsync -avzh /vagrant/ /_vagrant/
     cd /_vagrant/app
     yarn

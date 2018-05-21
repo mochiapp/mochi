@@ -14,7 +14,7 @@
           ></v-text-field>
             <div v-if="isTextInEditor" style="display: flex; justify-content: flex-end; width: 100%;">
               <v-btn @click.stop="newPostText=''">Cancel</v-btn>
-              <v-btn color="primary" @click="clickSendPost()">Send</v-btn>
+              <v-btn color="primary" @click="clickSendPost()">Post</v-btn>
             </div>
           </v-card-title>
         </v-card>
@@ -37,24 +37,6 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.ob-timeline-container {
-  align-items: flex-start !important;
-  padding: 16px !important;
-}
-
-.ob-timeline-container > ul {
-  width: 100%;
-  background-color: inherit !important;
-}
-
-.card {
-  margin-bottom: 16px;
-}
-
-.card__title {
-  padding: 8px !important;
-}
-
 .ob-time {
   color: #aaa;
   font-size: 11px;

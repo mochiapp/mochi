@@ -83,24 +83,6 @@
   position: relative;
   margin-top: auto;
 }
-
-.ob-friends-container {
-  align-items: flex-start !important;
-  padding: 16px !important;
-}
-
-.ob-friends-container > ul {
-  width: 100%;
-  background-color: inherit !important;
-}
-
-.card {
-  margin-bottom: 16px;
-}
-
-.card__title {
-  padding: 8px !important;
-}
 </style>
 
 <script>
