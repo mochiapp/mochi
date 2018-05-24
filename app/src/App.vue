@@ -44,33 +44,32 @@ html {
 </style>
 
 <script>
-  import { mapState } from 'vuex'
-  import auth from '@/components/auth.vue'
+import auth from '@/components/auth.vue'
+import store from '@/store/stores/auth'
 
-  export default {
-    name: 'app',
+export default {
+  name: 'app',
 
-    components: { auth },
+  components: { auth },
 
-    data () {
-      return {
-        fixed: false,
-        right: true,
-        rightDrawer: false
-      }
-    },
+  data () {
+    return {
+      fixed: false,
+      right: true,
+      rightDrawer: false
+    }
+  },
 
-    computed: mapState({
-      loggedIn: state => state.auth.loggedIn
-    }),
+  fromMobx: {
+    loggedIn () { return store.auth.loggedIn }
+  },
 
-    watch: {
-      $route: {
-        handler () {
-          this.$store.dispatch('route_changed')
-          // this.setPageTitle(this.$route.params.page, this.navigation)
-        }
+  watch: {
+    $route: {
+      handler () {
+        store.app.routeChanged()
       }
     }
   }
+}
 </script>

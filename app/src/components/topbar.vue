@@ -120,6 +120,7 @@
 
 <script>
 import router from '../router'
+import store from '@/store/stores/app'
 
 export default {
   data () {
@@ -135,20 +136,18 @@ export default {
     'auth'
   ],
 
-  computed: {
+  fromMobx: {
     drawer: {
-      get () { return this.$store.state.layout.drawer },
-      set (value) { this.$store.commit('layout_drawer', value) }
+      get() { return store.app.drawer },
+      set(v) { store.app.setDrawer(v) }
     },
-
     clipped: {
-      get () { return this.$store.state.layout.clipped },
-      set (value) { this.$store.commit('layout_clipped', value) }
+      get() { return store.app.clipped },
+      set(v) { store.app.setClipped(v) }
     },
-
     miniVariant: {
-      get () { return this.$store.state.layout.miniVariant },
-      set (value) { this.$store.commit('layout_miniVariant', value) }
+      get() { return store.app.miniVariant },
+      set(v) { store.app.setMiniVariant(v) }
     }
   },
 
@@ -174,7 +173,6 @@ export default {
     },
 
     clickUser () {
-      console.log('clickUser')
       router.push('profile')
     }
   }

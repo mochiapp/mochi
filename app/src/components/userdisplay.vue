@@ -11,7 +11,7 @@ span {
 </style>
 
 <script>
-import '@/store/modules/users'
+import store from '@/store/stores/users'
 
 export default {
   props: [
@@ -20,7 +20,7 @@ export default {
 
   computed: {
     userAlias () {
-      var user = this.$store.getters.userByPub(this.pub, this.$store.state.users.friends, this.$store.state.auth)
+      var user = store.users.getUserByPub(this.pub, store.auth)
       if (user) {
         return user.alias
       }
@@ -29,7 +29,7 @@ export default {
   },
 
   beforeCreate () {
-    this.$store.dispatch('users_friends_get')
+    store.users.loadFriends()
   }
 }
 </script>

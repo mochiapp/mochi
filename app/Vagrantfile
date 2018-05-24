@@ -25,6 +25,7 @@ Vagrant.configure("2") do |config|
     sudo apt update
     sudo apt install -y yarn
     sudo apt install -y python-minimal
+    sudo apt install -y build-essential
     rsync -avzh /vagrant/ /_vagrant/
     cd /_vagrant/app
     yarn

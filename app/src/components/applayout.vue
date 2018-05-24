@@ -50,6 +50,8 @@
 <script>
 import SideMenu from '@/components/sidemenu'
 import TopBar from '@/components/topbar'
+import store from '@/store/stores/app'
+import '@/store/stores/users'
 
 export default {
   components: {
@@ -63,13 +65,9 @@ export default {
     'topTitle'
   ],
 
-  computed: {
-    vApp: {
-      get () { return this.$store.state.layout.vApp }
-    },
-    auth: {
-      get () { return this.$store.state.auth }
-    }
+  fromMobx: {
+    vApp () { return store.app.vApp },
+    auth () { return store.auth }
   },
 
   mounted () {

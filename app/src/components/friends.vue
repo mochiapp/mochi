@@ -2,8 +2,8 @@
   <app-layout top-title="Friends">
     <v-container fluid fill-height class="fab-parent ob-friends-container">
       <v-list dense class="pt-0">
-        <template v-for="(item, index) in friendsFiltered">
-          <v-card>
+        <template v-for="item in friends">
+          <v-card :key="item['_']['#']">
             <v-card-title primary-title>
               <div>
                 <div v-html="getFriendTitle(item)"></div>
@@ -58,7 +58,6 @@
   </app-layout>
 </template>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .dialog__content .card__title {
   font-size: 16px;
@@ -86,7 +85,7 @@
 </style>
 
 <script>
-import '@/store/modules/users'
+import store from '@/store/stores/users'
 
 export default {
   data () {
@@ -96,36 +95,22 @@ export default {
     }
   },
 
-  computed: {
-    friendsFiltered () {
-      return this.$store.state.users.friends
-    },
-
-    userFound () {
-      return typeof this.$store.state.users.searchFriendId.res === 'object'
-    },
-
-    userSearching () {
-      return this.$store.state.users.searchFriendId.res === 1
-    },
-
-    userSearchResult () {
-      return this.$store.state.users.searchFriendId.res
-    },
-
-    userSearchResultAlias () {
-      return this.$store.state.users.searchFriendId.res.alias
-    }
+  fromMobx: {
+    friends () { return [...store.users.friends] },
+    userFound () { return typeof store.users.searchFriendId.res === 'object' },
+    userSearching () { return store.users.searchFriendId.res === 1 },
+    userSearchResult () { return store.users.searchFriendId.res },
+    userSearchResultAlias () { return store.users.searchFriendId.res.alias }
   },
 
   watch: {
     searchFriendId: function (val) {
-      this.$store.dispatch('users_find', {pub: val})
+      store.users.find({pub: val})
     }
   },
 
   beforeCreate () {
-    this.$store.dispatch('users_friends_get')
+    store.users.loadFriends()
   },
 
   methods: {
@@ -138,9 +123,8 @@ export default {
     },
 
     clickAddFriend: function (event) {
-      console.log('clickAddFriend', this.$store.state.users.searchFriendId)
-      var friendData = this.$store.state.users.searchFriendId.res
-      this.$store.dispatch('users_friends_add', friendData.pub)
+      var friendData = store.users.searchFriendId.res
+      store.users.addFriend(friendData.pub)
     }
   }
 }

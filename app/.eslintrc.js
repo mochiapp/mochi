@@ -4,6 +4,10 @@ module.exports = {
   root: true,
   parser: 'babel-eslint',
   parserOptions: {
+    ecmaVersion: 2017,
+    ecmaFeatures: {
+      experimentalDecorators: true
+    },
     sourceType: 'module'
   },
   env: {

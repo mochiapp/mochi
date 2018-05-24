@@ -16,7 +16,7 @@
             <div>
               <div class="ob-profile-kyt">Your public id:<span ref="gncopy" class="js-copy"><v-icon color="grey lighten-2">file_copy</v-icon></span></div>
               <div class="ob-profile-val">
-                {{auth.pub}}<br>
+                <span class="pub">{{auth.pub}}</span><br>
                 <div class="expl">You can copy this id (by clicking the icon) and send it to someone else so they can connect with you.</div>
               </div>
             </div>
@@ -41,6 +41,8 @@
 .expl {
   font-weight: normal;
   margin-top: 4px;
+  font-style: italic;
+  color: #888;
 }
 
 .js-copy {
@@ -51,14 +53,19 @@
 .js-copy i:hover {
   color: grey !important;
 }
+
+.pub {
+  word-break: break-all;
+  display: inline-block;
+}
 </style>
 
 <script>
+import store from '@/store/stores/auth'
+
 export default {
-  computed: {
-    auth: {
-      get () { return this.$store.state.auth }
-    }
+  fromMobx: {
+    auth () { return store.auth }
   },
 
   mounted () {

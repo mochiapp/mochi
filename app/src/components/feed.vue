@@ -5,7 +5,7 @@
         <v-card>
           <v-card-title primary-title style="display: flex; flex-direction: column;">
             <v-text-field
-              :label="'What\'s on your heart, ' + this.$store.state.auth.alias + '?'"
+              :label="'What\'s on your heart, ' + alias + '?'"
               textarea
               rows=1
               auto-grow
@@ -20,10 +20,10 @@
         </v-card>
 
         <template v-for="(item, index) in timelineFiltered">
-          <v-card>
+          <v-card :key="index">
             <v-card-title primary-title>
               <div>
-                <div class="ob-username"><userdisplay :pub="item._usrpub" /></div>
+                <div class="ob-username"><userdisplay :pub="item['_'].meta.user" /></div>
                 <div class="ob-time"><timedisplay :time="item._time" /></div>
                 <div v-html="getFeedTitle(item)"></div>
               </div>
@@ -66,12 +66,10 @@
 </style>
 
 <script>
-import { mapState } from 'vuex'
-import '@/store/modules/feed'
-import '@/store/modules/users'
-import '@/store/modules/posts'
 import TimeDisplay from './timedisplay.vue'
 import UserDisplay from './userdisplay.vue'
+
+import store from '@/store/stores/posts'
 
 export default {
   components:{
@@ -85,28 +83,28 @@ export default {
     }
   },
 
-  computed: {
+  fromMobx: {
+    posts () { return [...store.posts.posts] },
+    alias () { return store.auth.alias },
     timelineFiltered () {
-      var ar = [...this.$store.state.feed.feed]
+      var ar = [...store.posts.posts]
       ar.sort(function(a,b) {
         return (a._time > b._time || (typeof a._time === 'number' && typeof b._time !== 'number'))
           ? -1 : ((b._time > a._time || (typeof b._time === 'number' && typeof a._time !== 'number')) ? 1 : 0)
       })
       return ar
-    },
+    }
+  },
 
+  computed: {
     isTextInEditor () {
       return this.newPostText !== ''
-    },
-
-    ...mapState({
-      feed: state => state.feed.feed
-    })
+    }
   },
 
   beforeCreate () {
-    this.$store.dispatch('feed_get', 'myself')
-    this.$store.dispatch('users_friends_get')
+    store.users.loadFriends()
+    store.posts.loadPosts('myself')
   },
 
   methods: {
@@ -124,7 +122,7 @@ export default {
     },
 
     clickSendPost: function () {
-      this.$store.dispatch('posts_add', {content: this.newPostText})
+      store.posts.addPost({content: this.newPostText})
       this.newPostText = ''
     }
   }

@@ -150,28 +150,24 @@
 </style>
 
 <script>
-import { mapState } from 'vuex'
+import store from '@/store/stores/app'
+import '@/store/stores/users'
 
 export default {
-  computed: {
-    ...mapState({
-      menuItems: state => state.layout.menuItems
-    }),
-
+  fromMobx: {
     drawer: {
-      get () { return this.$store.state.layout.drawer },
-      set (value) { this.$store.commit('layout_drawer', value) }
+      get() { return store.app.drawer },
+      set(v) { store.app.setDrawer(v) }
     },
-
     clipped: {
-      get () { return this.$store.state.layout.clipped },
-      set (value) { this.$store.commit('layout_clipped', value) }
+      get() { return store.app.clipped },
+      set(v) { store.app.setClipped(v) }
     },
-
     miniVariant: {
-      get () { return this.$store.state.layout.miniVariant },
-      set (value) { this.$store.commit('layout_miniVariant', value) }
-    }
+      get() { return store.app.miniVariant },
+      set(v) { store.app.setMiniVariant(v) }
+    },
+    menuItems () { return store.app.menuItems }
   },
 
   methods: {
@@ -186,9 +182,7 @@ export default {
     },
 
     logout: function (event) {
-      window.sessionStorage.removeItem('alias')
-      window.sessionStorage.removeItem('tmp')
-      this.$store.dispatch('auth_logout')
+      store.auth.logout()
     },
 
     getLinkClass: function (item) {

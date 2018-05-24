@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import store from '@/store/stores/auth'
 
 export default {
   data () {
@@ -76,23 +76,27 @@ export default {
   },
 
   beforeCreate () {
-    this.$store.dispatch('auth_check_session')
+    store.auth.checkSession()
   },
-  computed: mapState({
-    successText: state => state.auth.successText,
-    errorText: state => state.auth.errorText,
-    pub: state => state.auth.pub
-  }),
+
+  fromMobx: {
+    successText () { return store.auth.successText },
+    errorText () { return store.auth.errorText },
+    pub () { return store.auth.pub }
+  },
+
   methods: {
     clickTabb: function (event) {
       this.$data.loginOrReg = !this.$data.loginOrReg
     },
+
     clickLogin: function (event) {
-      this.$store.dispatch('auth_login', {u: this.$data.username, p: this.$data.password})
+      store.auth.login({u: this.$data.username, p: this.$data.password})
       this.$data.password = ''
     },
+
     clickRegister: function (event) {
-      this.$store.dispatch('auth_signup', {u: this.$data.username, p: this.$data.password})
+      store.auth.register({u: this.$data.username, p: this.$data.password})
       this.$data.password = ''
     }
   }
