@@ -1,27 +1,33 @@
 
 var Gun = require('./root');
 Gun.chain.get = function(key, cb, as){
+	var gun, tmp;
 	if(typeof key === 'string'){
-		var gun, back = this, cat = back._;
-		var next = cat.next || empty, tmp;
+		var back = this, cat = back._;
+		var next = cat.next || empty;
 		if(!(gun = next[key])){
 			gun = cache(key, back);
 		}
+		gun = gun.gun;
 	} else
 	if(key instanceof Function){
-		var gun = this, at = gun._;
+		gun = this;
+		var at = gun._, root = at.root, tmp = root.now, ev;
 		as = cb || {};
 		as.use = key;
-		as.out = as.out || {cap: 1};
+		as.out = as.out || {};
 		as.out.get = as.out.get || {};
-		'_' != at.get && ((at.root._).now = true); // ugly hack for now.
-		at.on('in', use, as);
+		ev = at.on('in', use, as);
+		(root.now = {$:1})[as.now = at.id] = ev;
 		at.on('out', as.out);
-		(at.root._).now = false;
+		root.now = tmp;
 		return gun;
 	} else
 	if(num_is(key)){
 		return this.get(''+key, cb, as);
+	} else
+	if(tmp = rel.is(key)){
+		return this.get(tmp, cb, as);
 	} else {
 		(as = this.chain())._.err = {err: Gun.log('Invalid get request!', key)}; // CLEAN UP
 		if(cb){ cb.call(as, as._.err) }
@@ -38,24 +44,34 @@ Gun.chain.get = function(key, cb, as){
 function cache(key, back){
 	var cat = back._, next = cat.next, gun = back.chain(), at = gun._;
 	if(!next){ next = cat.next = {} }
-	next[at.get = key] = gun;
-	if(cat.root === back){ at.soul = key }
-	else if(cat.soul || cat.field){ at.field = key }
-	return gun;
+	next[at.get = key] = at;
+	if(back === cat.root.gun){
+		at.soul = key;
+	} else
+	if(cat.soul || cat.has){
+		at.has = key;
+		//if(obj_has(cat.put, key)){
+			//at.put = cat.put[key];
+		//}
+	}
+	return at;
 }
-function use(at){
-	var ev = this, as = ev.as, gun = at.gun, cat = gun._, data = at.put, tmp;
+function use(msg){
+	var ev = this, as = ev.as, gun = msg.gun, at = gun._, root = at.root, data = msg.put, tmp;
+	if((tmp = root.now) && ev !== tmp[as.now]){
+		return ev.to.next(msg);
+	}
 	if(u === data){
-		data = cat.put;
+		data = at.put;
 	}
 	if((tmp = data) && tmp[rel._] && (tmp = rel.is(tmp))){
-		tmp = (cat.root.get(tmp)._);
+		tmp = (at.root.gun.get(tmp)._);
 		if(u !== tmp.put){
-			at = obj_to(at, {put: tmp.put});
+			msg = obj_to(msg, {put: tmp.put});
 		}
 	}
-	as.use(at, at.event || ev);
-	ev.to.next(at);
+	as.use(msg, msg.event || ev);
+	ev.to.next(msg);
 }
 var obj = Gun.obj, obj_has = obj.has, obj_to = Gun.obj.to;
 var num_is = Gun.num.is;
