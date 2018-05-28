@@ -1,12 +1,14 @@
 <template>
   <span>
-    <template v-if="loggedIn">
-      <router-view></router-view>
-    </template>
-    <template v-else>
-      <v-app>
-        <auth></auth>
-      </v-app>
+    <template v-if="inited">
+      <template v-if="loggedIn">
+        <router-view></router-view>
+      </template>
+      <template v-else>
+        <v-app>
+          <auth></auth>
+        </v-app>
+      </template>
     </template>
   </span>
 </template>
@@ -45,7 +47,8 @@ html {
 
 <script>
 import auth from '@/components/auth.vue'
-import store from '@/store/stores/auth'
+import store from '@/store/stores/app'
+import '@/store/stores/auth'
 
 export default {
   name: 'app',
@@ -61,6 +64,7 @@ export default {
   },
 
   fromMobx: {
+    inited () { return store.app.inited },
     loggedIn () { return store.auth.loggedIn }
   },
 

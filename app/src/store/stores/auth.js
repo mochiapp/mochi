@@ -1,3 +1,4 @@
+import '@/modules/i18n'
 import {observable, action} from 'mobx'
 import store from '@/store/store'
 
@@ -11,33 +12,33 @@ class Auth {
   @action.bound login (data) {
     store.login(data.u, data.p).then((result) => {
       this.setVals(true, result.alias, result.pub)
-      this.successText = 'Login succesfull!'
+      this.successText = 'auth:login_suc'
     }).catch((reason) => {
       this.setVals(false, '', '')
-      this.errorText = 'Sorry, login failed. Please try again.'
+      this.errorText = 'auth:login_fail'
     })
   }
 
   @action.bound logout (data) {
     store.logout().then((result) => {
       this.setVals(false, '', '')
-      this.successText = 'Logout succesfull!'
+      this.successText = 'auth:logout_suc'
     }).catch((reason) => {
       this.successText = ''
-      this.errorText = 'Sorry, logout failed. Please try again.'
+      this.errorText = 'auth:logout_fail'
     })
   }
 
   @action.bound register (data) {
     store.register(data.u, data.p).then((result) => {
       this.setVals(false, '', '')
-      this.successText = 'Registration succesfull! Now please log in.'
+      this.successText = 'auth:register_suc'
     }).catch((reason) => {
       this.setVals(false, '', '')
       if (reason.toLowerCase().indexOf('user already created') >= 0) {
-        this.errorText = 'Sorry, that username is already registered!'
+        this.errorText = 'auth:register_user_exists'
       } else {
-        this.errorText = 'Sorry, something went wrong! (' + reason + ')'
+        this.errorText = 'auth:register_fail, {"reason": "' + reason + '"}'
       }
     })
   }
@@ -45,7 +46,7 @@ class Auth {
   @action.bound checkSession (data) {
     store.checkSession().then((result) => {
       this.setVals(true, result.alias, result.pub)
-      this.successText = 'Auto login succesfull!'
+      this.successText = 'auth:auto_logout_suc'
     }).catch((reason) => {
       this.setVals(false, '', '')
     })

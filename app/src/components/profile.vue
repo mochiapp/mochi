@@ -1,12 +1,11 @@
 <template>
-  <app-layout top-title="Profile">
+  <app-layout :top-title="$t('Profile')">
     <v-container fluid fill-height class="fab-parent ob-profile-container">
       <v-list dense class="pt-0">
-        <b>Hi there! :-)</b><br><br>
         <v-card>
           <v-card-title primary-title>
             <div>
-              <div class="ob-profile-kyt">Your alias:</div>
+              <div class="ob-profile-kyt">{{$t('profile:your_username')}}</div>
               <div class="ob-profile-val">{{auth.alias}}</div>
             </div>
           </v-card-title>
@@ -14,10 +13,10 @@
         <v-card>
           <v-card-title primary-title>
             <div>
-              <div class="ob-profile-kyt">Your public id:<span ref="gncopy" class="js-copy"><v-icon color="grey lighten-2">file_copy</v-icon></span></div>
+              <div class="ob-profile-kyt">{{$t('profile:your_id')}}<span ref="gncopy" class="js-copy"><v-icon color="grey lighten-2">file_copy</v-icon></span></div>
               <div class="ob-profile-val">
                 <span class="pub">{{auth.pub}}</span><br>
-                <div class="expl">You can copy this id (by clicking the icon) and send it to someone else so they can connect with you.</div>
+                <div class="expl">{{$t('profile:id_explain')}}</div>
               </div>
             </div>
           </v-card-title>
@@ -27,7 +26,6 @@
   </app-layout>
 </template>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .ob-profile-kyt {
   color: #888;
@@ -61,11 +59,16 @@
 </style>
 
 <script>
+import i18next from 'i18next'
 import store from '@/store/stores/auth'
 
 export default {
   fromMobx: {
     auth () { return store.auth }
+  },
+
+  beforeCreate () {
+    i18next.loadNamespaces('profile')
   },
 
   mounted () {

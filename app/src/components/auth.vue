@@ -6,14 +6,14 @@
     <div class="screen2">
       <div class="logincard">
         <div>
-            <h1>Welcome!</h1>
+            <h1>{{$t('auth:Welcome')}}</h1>
 
             <div class="tabbwrapper">
                 <div id="tabLogin" class="tabb" v-bind:class="{ active: loginOrReg }" @click="clickTabb">
-                    Login
+                    {{$t('auth:Login')}}
                 </div>
                 <div id="tabRegister" class="tabb" v-bind:class="{ active: !loginOrReg }" @click="clickTabb">
-                    Register
+                    {{$t('auth:Register')}}
                 </div>
             </div>
             
@@ -21,15 +21,15 @@
                 <v-text-field
                   v-model="username"
                   name="username"
-                  label="Username"
+                  :label="$t('auth:Username')"
                   id="username"
                 ></v-text-field>
 
                 <v-text-field
                   v-model="password"
                   name="password"
-                  label="Passphrase or password"
-                  hint="At least 9 characters"
+                  :label="$t('auth:Passphrase')"
+                  :hint="$t('auth:pass_hint')"
                   min="9"
                   :append-icon="hidePassword ? 'visibility' : 'visibility_off'"
                   :append-icon-cb="() => (hidePassword = !hidePassword)"
@@ -49,23 +49,32 @@
                   <p>pub: {{ pub }}</p>
                 </div> -->
 
-                <v-btn v-if="loginOrReg" class="vbtn" color="primary" @click="clickLogin">Log in</v-btn>
-                <v-btn v-else class="vbtn" color="primary" @click="clickRegister">Register</v-btn>
+                <v-btn v-if="loginOrReg" class="vbtn" color="primary" @click="clickLogin">{{$t('auth:Log_in')}}</v-btn>
+                <v-btn v-else class="vbtn" color="primary" @click="clickRegister">{{$t('auth:Register')}}</v-btn>
         
-                <div class="lnkwrapper" v-if="loginOrReg">
-                  <p class="lnk">Password lost?</p>
-                </div>
+                <v-layout row justify-end>
+                  <template v-if="loginOrReg">
+                    <div class="lnk pw">{{$t('auth:pass_lost')}}</div>
+                  </template>
+                  <language addclass="compact" />
+                </v-layout>
             </div>
         </div>
       </div>
     </div>
-  </div>
+</div>
 </template>
 
 <script>
+import i18next from 'i18next'
+import Language from './language.vue'
 import store from '@/store/stores/auth'
 
 export default {
+  components:{
+    'language': Language
+  },
+
   data () {
     return {
       hidePassword: true,
@@ -76,12 +85,24 @@ export default {
   },
 
   beforeCreate () {
+    i18next.loadNamespaces('auth')
     store.auth.checkSession()
   },
 
   fromMobx: {
-    successText () { return store.auth.successText },
-    errorText () { return store.auth.errorText },
+    successText () { return i18next.t(store.auth.successText) },
+    errorText () {
+      let s = store.auth.errorText
+      let as = s.split(', {')
+      let o = {}
+      if (as.length > 1) {
+        s = as[0]
+        try {
+          o = JSON.parse('{' + as[1])
+        } catch (_) {}
+      }
+      return i18next.t(s, o)
+    },
     pub () { return store.auth.pub }
   },
 
@@ -223,5 +244,13 @@ h1 {
 
 .successtxt {
     color: green;
+}
+
+.pw {
+  color: #888 !important;
+  margin-right: 12px;
+}
+.pw:hover {
+  color: #444 !important;
 }
 </style>

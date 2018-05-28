@@ -1,11 +1,11 @@
 <template>
-  <app-layout top-title="Timeline">
+  <app-layout :top-title="$t('Timeline')">
     <v-container fluid fill-height class="fab-parent ob-timeline-container">
       <v-list dense class="pt-0">
         <v-card>
           <v-card-title primary-title style="display: flex; flex-direction: column;">
             <v-text-field
-              :label="'What\'s on your heart, ' + alias + '?'"
+              :label="$t('feed:whats_on', {alias: alias})"
               textarea
               rows=1
               auto-grow
@@ -13,8 +13,8 @@
               v-model="newPostText"
           ></v-text-field>
             <div v-if="isTextInEditor" style="display: flex; justify-content: flex-end; width: 100%;">
-              <v-btn @click.stop="newPostText=''">Cancel</v-btn>
-              <v-btn color="primary" @click="clickSendPost()">Post</v-btn>
+              <v-btn @click.stop="newPostText=''">{{$t('Cancel')}}</v-btn>
+              <v-btn color="primary" @click="clickSendPost()">{{$t('Post')}}</v-btn>
             </div>
           </v-card-title>
         </v-card>
@@ -35,7 +35,6 @@
   </app-layout>
 </template>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .ob-time {
   color: #aaa;
@@ -66,9 +65,10 @@
 </style>
 
 <script>
+import i18next from 'i18next'
+import {stripTags} from '@/lib/clean'
 import TimeDisplay from './timedisplay.vue'
 import UserDisplay from './userdisplay.vue'
-
 import store from '@/store/stores/posts'
 
 export default {
@@ -103,6 +103,7 @@ export default {
   },
 
   beforeCreate () {
+    i18next.loadNamespaces('feed')
     store.users.loadFriends()
     store.posts.loadPosts('myself')
   },
@@ -118,7 +119,7 @@ export default {
         }
         ret = ret.replace(/\n/g, '<br>')
       }
-      return ret
+      return stripTags(ret)
     },
 
     clickSendPost: function () {

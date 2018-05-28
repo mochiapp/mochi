@@ -8,12 +8,22 @@ import 'vuetify/dist/vuetify.css'
 import AppLayout from '@/components/applayout'
 import Movue from 'movue'
 import * as mobx from 'mobx'
+import {i18next} from '@/modules/i18n'
+import VueI18Next from '@panter/vue-i18next'
 
 /*
 --------------------------------------------------------------------------
 */
 
 Vue.use(Movue, mobx)
+
+/*
+--------------------------------------------------------------------------
+*/
+
+Vue.use(VueI18Next)
+
+const i18n = new VueI18Next(i18next)
 
 /*
 --------------------------------------------------------------------------
@@ -45,5 +55,6 @@ new Vue({
   el: '#app',
   router,
   template: '<App/>',
-  components: { App }
+  components: { App },
+  i18n: i18n
 })

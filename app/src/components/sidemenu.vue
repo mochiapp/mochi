@@ -167,7 +167,7 @@ export default {
       get() { return store.app.miniVariant },
       set(v) { store.app.setMiniVariant(v) }
     },
-    menuItems () { return store.app.menuItems }
+    menuItems () { return [...store.app.menuItems] }
   },
 
   methods: {

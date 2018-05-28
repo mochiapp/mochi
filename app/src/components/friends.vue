@@ -1,5 +1,5 @@
 <template>
-  <app-layout top-title="Friends">
+  <app-layout :top-title="$t('Friends')">
     <v-container fluid fill-height class="fab-parent ob-friends-container">
       <v-list dense class="pt-0">
         <template v-for="item in friends">
@@ -17,27 +17,26 @@
     <v-dialog v-model="dialogAddFriend" max-width="500px">
       <v-card>
         <v-card-title>
-          Add a friend
+          {{$t('user:add_friend')}}
         </v-card-title>
         <v-card-text>
-          Ask your friend to send you their id and paste it here.<br>
-          The id can be found in the 'Profile' page.<br>
+          <span v-html="stripTags($t('user:ask_friend'))"></span><br>
           <br>
           <v-text-field
-            label="Friend id"
+            :label="$t('user:friend_id')"
             autofocus
             v-model="searchFriendId"
           ></v-text-field>
           <div v-if="userFound">
-            We have found a user with that id: <b>{{userSearchResultAlias}}</b><br>
-            <v-btn color="primary" v-on:click="clickAddFriend">Add this user to my friends</v-btn>
+            <span v-html="foundUserWith"></span><br>
+            <v-btn color="primary" v-on:click="clickAddFriend">{{$t('user:add_to_friends')}}</v-btn>
           </div>
           <div v-if="userSearching">
-            Searching...
+            {{$t('Searching_dots')}}
           </div>
         </v-card-text>
         <v-card-actions style="display: flex; justify-content: flex-end;">
-          <v-btn color="primary" @click.stop="dialogAddFriend=false">Close</v-btn>
+          <v-btn color="primary" @click.stop="dialogAddFriend=false">{{$t('Close')}}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -85,6 +84,8 @@
 </style>
 
 <script>
+import i18next from 'i18next'
+import {stripTags} from '@/lib/clean'
 import store from '@/store/stores/users'
 
 export default {
@@ -100,7 +101,7 @@ export default {
     userFound () { return typeof store.users.searchFriendId.res === 'object' },
     userSearching () { return store.users.searchFriendId.res === 1 },
     userSearchResult () { return store.users.searchFriendId.res },
-    userSearchResultAlias () { return store.users.searchFriendId.res.alias }
+    foundUserWith() { return stripTags(i18next.t('user:found_user_with', {alias: '<b>' + store.users.searchFriendId.res.alias + '</b>', interpolation: { escapeValue: false }})) }
   },
 
   watch: {
@@ -110,12 +111,13 @@ export default {
   },
 
   beforeCreate () {
+    i18next.loadNamespaces('user')
     store.users.loadFriends()
   },
 
   methods: {
     getFriendTitle: function (friend) {
-      return friend.alias
+      return stripTags(friend.alias)
     },
 
     clickAdd: function (event) {
@@ -125,7 +127,9 @@ export default {
     clickAddFriend: function (event) {
       var friendData = store.users.searchFriendId.res
       store.users.addFriend(friendData.pub)
-    }
+    },
+
+    stripTags: stripTags
   }
 }
 </script>
