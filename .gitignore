@@ -1,4 +1,4 @@
-bower_components/
+qbower_components/
 build/
 !app4/build/
 node_modules/
@@ -8,8 +8,11 @@ cert.pem
 key.pem
 /gun/
 
+.env
 .vscode
 .vagrant
+
+*.*~
 
 dist/
 server/dist/
