@@ -1,29 +1,50 @@
-// https://eslint.org/docs/user-guide/configuring
-
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
   parserOptions: {
-    ecmaVersion: 2017,
-    ecmaFeatures: {
-      experimentalDecorators: true
-    },
+    parser: 'babel-eslint',
     sourceType: 'module'
   },
   env: {
-    browser: true,
+    browser: true
   },
-  // https://github.com/standard/standard/blob/master/docs/RULES-en.md
-  extends: 'standard',
+  extends: [
+    // https://github.com/vuejs/eslint-plugin-vue#priority-a-essential-error-prevention
+    // consider switching to `plugin:vue/strongly-recommended` or `plugin:vue/recommended` for stricter rules.
+    'plugin:vue/essential',
+    // https://github.com/standard/standard/blob/master/docs/RULES-en.md
+    'standard'
+  ],
   // required to lint *.vue files
   plugins: [
-    'html'
+    'vue'
   ],
+  globals: {
+    'ga': true, // Google Analytics
+    'cordova': true,
+    '__statics': true,
+    'Clipboard': true,
+    'moment': true,
+    '__glob_app_version_': true
+  },
   // add your custom rules here
-  rules: {
+  'rules': {
     // allow async-await
     'generator-star-spacing': 'off',
+
+    // allow paren-less arrow functions
+    'arrow-parens': 0,
+    'one-var': 0,
+
+    'import/first': 0,
+    'import/named': 2,
+    'import/namespace': 2,
+    'import/default': 2,
+    'import/export': 2,
+    'import/extensions': 0,
+    'import/no-unresolved': 0,
+    'import/no-extraneous-dependencies': 0,
+
     // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
   }
 }

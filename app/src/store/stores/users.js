@@ -1,9 +1,10 @@
 import {observable, action} from 'mobx'
-import store from '@/store/store'
+import store from '../store'
 
 class Users {
   @observable friends = []
   @observable searchFriendId = { src: '', res: 0 }
+  @observable addFriendDialogState = false
 
   @action.bound loadFriends () {
     store.subscribeData(store.getUserNode('ob/friends'), 'users/friends', {fn: this.friendRefLoaded})
@@ -40,6 +41,10 @@ class Users {
 
   @action.bound addFriend (data) {
     store.addToSet(store.getUserNode('ob/friends'), data)
+  }
+
+  @action.bound setAddFriendDialogState (data) {
+    this.addFriendDialogState = data
   }
 }
 

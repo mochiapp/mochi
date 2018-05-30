@@ -1,6 +1,6 @@
-import {i18next, i18nextInited} from '@/modules/i18n'
+import {i18next, i18nextInited} from '../../plugins/i18n'
 import {observable, action, observe} from 'mobx'
-import store from '@/store/store'
+import store from '../store'
 
 class App {
   @observable drawer = parseInt(window.innerWidth) > 639
@@ -11,6 +11,7 @@ class App {
     dark: false
   }
   @observable language = 'en'
+  @observable langTrick = 0.1
   @observable inited = false
 
   @observable menuItems = []
@@ -24,6 +25,7 @@ class App {
       observe(that, 'language', (change) => {
         i18next.changeLanguage(change.newValue, (_err, t) => {
           that.setMenu()
+          that.langTrick = Math.random()
         })
         window.localStorage.setItem('language', change.newValue)
       })

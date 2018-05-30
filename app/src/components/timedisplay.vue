@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       tmp: 0
     }
@@ -22,7 +22,7 @@ export default {
     }
   },
 
-  mounted() {
+  mounted () {
     setInterval(this.onInterval, this.interval * 1000)
   },
 
@@ -36,8 +36,8 @@ export default {
   },
 
   methods: {
-    onInterval() {
-      this.tmp ++
+    onInterval () {
+      this.tmp++
       if (this.tmp > 100) {
         this.tmp = 0
       }

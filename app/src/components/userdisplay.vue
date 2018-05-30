@@ -1,5 +1,5 @@
 <template>
-  <span class="primary--text">
+  <span class="text-bold text-primary">
     {{userAlias}}
   </span>
 </template>
@@ -11,7 +11,7 @@ span {
 </style>
 
 <script>
-import store from '@/store/stores/users'
+import store from '../store/stores/users'
 
 export default {
   props: [

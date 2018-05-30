@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
 
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = 2048
+    vb.memory = 3048
     vb.cpus = 2
     vb.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
   end
@@ -18,14 +18,18 @@ Vagrant.configure("2") do |config|
   config.ssh.forward_agent=true
 
   config.vm.provision "shell", inline: <<-SHELL
-    apt-get update
-    apt-get install -y nodejs
+#    apt-get update
+#    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
     sudo apt update
+    sudo apt install -y nodejs
     sudo apt install -y yarn
-    sudo apt install -y python-minimal
-    sudo apt install -y build-essential
+#    sudo apt install -y python-minimal
+#    sudo apt install -y build-essential
+    npm install -g quasar-cli
+#    yarn global add quasar-cli
     rsync -avzh /vagrant/ /_vagrant/
     cd /_vagrant/app
     yarn

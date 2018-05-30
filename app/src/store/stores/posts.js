@@ -1,5 +1,5 @@
 import {observable, action} from 'mobx'
-import store from '@/store/store'
+import store from '../store'
 
 class Posts {
   @observable posts = []

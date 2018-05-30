@@ -1,34 +1,24 @@
 import Vue from 'vue'
-import Router from 'vue-router'
-const Profile = () => import('@/components/profile.vue') // Will be loaded async / only when needed.
-const Friends = () => import('@/components/friends.vue')
-const Feed = () => import('@/components/feed.vue')
-const Options = () => import('@/components/options.vue')
+import VueRouter from 'vue-router'
 
-Vue.use(Router)
+import routes from './routes'
 
-export default new Router({
-  mode: 'history',
-  routes: [
-    {
-      path: '/profile',
-      name: 'profile',
-      component: Profile
-    },
-    {
-      path: '/options',
-      name: 'options',
-      component: Options
-    },
-    {
-      path: '/friends',
-      name: 'friends',
-      component: Friends
-    },
-    {
-      path: '/',
-      name: 'feed',
-      component: Feed
-    }
-  ]
+Vue.use(VueRouter)
+
+const Router = new VueRouter({
+  /*
+   * NOTE! Change Vue Router mode from quasar.conf.js -> build -> vueRouterMode
+   *
+   * When going with "history" mode, please also make sure "build.publicPath"
+   * is set to something other than an empty string.
+   * Example: '/' instead of ''
+   */
+
+  // Leave as is and change from quasar.conf.js instead!
+  mode: process.env.VUE_ROUTER_MODE,
+  base: process.env.VUE_ROUTER_BASE,
+  scrollBehavior: () => ({ y: 0 }),
+  routes
 })
+
+export default Router

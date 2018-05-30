@@ -13,7 +13,7 @@ echo \"$(tput setaf 3)http://127.0.0.1:51075$(tput sgr0)\" ; ^
 echo \"===============================\" ; ^
 echo ; ^
 cd /_vagrant/app ; ^
-sudo yarn dev
+sudo quasar dev
 
 
 SET sys_build_title=OpenBook_build

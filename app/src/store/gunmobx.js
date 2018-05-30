@@ -1,6 +1,6 @@
-import './lib/gun/gun'
-import './lib/gun/sea'
-import './lib/gun/lib/time'
+import {Gun} from './gun/gun'
+import './gun/sea'
+import './gun/lib/time'
 
 import {extendObservable} from 'mobx'
 

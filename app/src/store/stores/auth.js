@@ -1,6 +1,6 @@
-import '@/modules/i18n'
+import '../../plugins/i18n'
 import {observable, action} from 'mobx'
-import store from '@/store/store'
+import store from '../store'
 
 class Auth {
   @observable loggedIn = false
