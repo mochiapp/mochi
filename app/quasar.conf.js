@@ -1,4 +1,5 @@
 // Configuration for your app
+require('dotenv').config();
 
 module.exports = function (ctx) {
   return {
@@ -35,7 +36,7 @@ module.exports = function (ctx) {
     },
     devServer: {
       https: true,
-      port: 51075,
+      port: process.env.PORT || 51075,
       open: false // opens browser window automatically
     },
     // framework: 'all' --- includes everything; for dev only!
