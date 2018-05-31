@@ -14,6 +14,12 @@
         <!-- </q-list> -->
       </q-card-main>
     </q-card>
+
+    <br>
+    Language test:<br>
+    <br>
+    <q-datetime-picker value="" type="date" />
+
   </pagecontent>
 </template>
 

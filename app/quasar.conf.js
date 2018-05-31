@@ -32,7 +32,8 @@ module.exports = function (ctx) {
           loader: 'eslint-loader',
           exclude: /(node_modules|quasar)/
         })
-      }
+      },
+      rtl: true
     },
     devServer: {
       https: true,
@@ -61,7 +62,8 @@ module.exports = function (ctx) {
         'QCard',
         'QCardMain',
         'QInput',
-        'QDialog'
+        'QDialog',
+        'QDatetimePicker'
       ],
       directives: [
         'Ripple'
@@ -69,9 +71,9 @@ module.exports = function (ctx) {
       // Quasar plugins
       plugins: [
         'Notify'
-      ]
+      ] // ,
       // iconSet: ctx.theme.mat ? 'material-icons' : 'ionicons'
-      // i18n: 'de' // Quasar language
+      // i18n: 'en' // Quasar language
     },
     // animations: 'all' --- includes all animations
     animations: [

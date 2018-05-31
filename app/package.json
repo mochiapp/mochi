@@ -1,8 +1,8 @@
 {
-  "name": "openbook",
+  "name": "mochi",
   "version": "0.0.1",
-  "description": "OpenBook",
-  "productName": "OpenBook",
+  "description": "Mochi",
+  "productName": "Mochi",
   "cordovaId": "org.cordova.quasar.app",
   "author": "",
   "private": true,

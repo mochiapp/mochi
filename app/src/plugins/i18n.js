@@ -3,8 +3,8 @@ import XHR from 'i18next-xhr-backend'
 
 i18next.use(XHR).init({
   // debug: true,
-  lng: 'en',
-  fallbackLng: 'en',
+  lng: 'en-US',
+  fallbackLng: 'en-US',
   defaultNS: 'common',
   fallbackNS: 'common',
   ns: ['common'],
