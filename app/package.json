@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@panter/vue-i18next": "^0.9.1",
+    "core-js": "2.5.7",
     "dotenv": "5.0.1",
     "i18next": "^11.3.2",
     "i18next-xhr-backend": "^1.5.1",
