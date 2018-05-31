@@ -1,9 +1,12 @@
 <template>
-  <pagecontent>
+  <mochi-page-content>
     <template v-for="item in friends">
       <q-card :key="item['_']['#']">
         <q-card-main>
-          <div class="q-subheading" v-html="getFriendTitle(item)"></div>
+          <div
+            class="q-subheading"
+            v-html="getFriendTitle(item)"
+          />
         </q-card-main>
       </q-card>
     </template>
@@ -18,54 +21,67 @@
       v-model="addFriendDialogState"
       @show="onShow"
     >
-      <span slot="title">{{$t('user:add_friend')}}</span>
+      <span slot="title">{{ $t('user:add_friend') }}</span>
 
-      <span slot="message" v-html="stripTags($t('user:ask_friend'))"></span>
+      <span
+        slot="message"
+        v-html="stripTags($t('user:ask_friend'))"
+      />
 
       <div slot="body">
         <q-input
+          ref="inp"
           v-model="searchFriendId"
           :float-label="$t('user:friend_id')"
           clearable
-          ref="inp"
-        ></q-input>
+        />
         <br>
 
         <div v-if="userFound">
           <q-card>
             <q-card-main>
               <!-- <span v-html="foundUserWith"></span><br> -->
-              <div class="q-subheading q-mb-md">{{$t('user:found_user_with')}}</div>
+              <div class="q-subheading q-mb-md">{{ $t('user:found_user_with') }}</div>
               <div class="row items-center">
-                <div class="col q-title">{{foundUserAlias}}</div>
-                <q-btn color="primary" v-on:click="clickAddFriend">{{$t('user:add_to_friends')}}</q-btn>
+                <div class="col q-title">{{ foundUserAlias }}</div>
+                <q-btn
+                  color="primary"
+                  @click="clickAddFriend"
+                >
+                  {{ $t('user:add_to_friends') }}
+                </q-btn>
               </div>
             </q-card-main>
           </q-card>
         </div>
         <div v-if="userSearching">
-          {{$t('Searching_dots')}}
+          {{ $t('Searching_dots') }}
         </div>
       </div>
 
-      <template slot="buttons" slot-scope="props">
-        <q-btn color="primary" :label="$t('Close')" @click="props.cancel" />
+      <template
+        slot="buttons"
+        slot-scope="props"
+      >
+        <q-btn
+          :label="$t('Close')"
+          color="primary"
+          @click="props.cancel"
+        />
       </template>
     </q-dialog>
-  </pagecontent>
+  </mochi-page-content>
 </template>
 
 <script>
 import i18next from 'i18next'
 import {stripTags} from '../plugins/clean'
 import store from '../store/stores/users'
-import Pagecontent from '../components/pagecontent.vue'
+import MochiPageContent from '../components/mochi-page-content.vue'
 
 export default {
-  name: 'PageFriends',
-
   components: {
-    'pagecontent': Pagecontent
+    'mochi-page-content': MochiPageContent
   },
 
   data () {
@@ -132,7 +148,7 @@ export default {
 
 <style scoped lang="stylus">
 .footer
-  width: 100%;
-  padding: 4px;
-  border-top: 1px solid #ddd;
+  width 100%
+  padding 4px
+  border-top 1px solid #ddd
 </style>

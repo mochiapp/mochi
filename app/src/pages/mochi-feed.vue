@@ -1,18 +1,26 @@
 <template>
-  <pagecontent class="ob-timeline-container">
+  <mochi-page-content class="timeline-container">
     <q-card>
       <q-card-main>
         <q-input
           v-model="newPostText"
-          type="textarea"
           :placeholder="$t('feed:whats_on', {alias: alias})"
+          type="textarea"
           rows="1"
           hide-underline
         />
-        <div v-if="isTextInEditor" class="row justify-end">
-          <q-btn @click.stop="newPostText=''">{{$t('Cancel')}}</q-btn>
+        <div
+          v-if="isTextInEditor"
+          class="row justify-end"
+        >
+          <q-btn @click.stop="newPostText=''">{{ $t('Cancel') }}</q-btn>
           <div class="q-mr-md" />
-          <q-btn color="primary" @click="clickSendPost()">{{$t('Post')}}</q-btn>
+          <q-btn
+            color="primary"
+            @click="clickSendPost()"
+          >
+            {{ $t('Post') }}
+          </q-btn>
         </div>
       </q-card-main>
     </q-card>
@@ -20,30 +28,28 @@
     <template v-for="item in timelineFiltered">
       <q-card :key="item['_']['#']">
         <q-card-main>
-          <div class="ob-username"><userdisplay :pub="item['_'].meta.user" /></div>
-          <div class="ob-time"><timedisplay :time="item._time" /></div>
-          <div v-html="getFeedTitle(item)"></div>
+          <div class="username"><mochi-user-display :pub="item['_'].meta.user" /></div>
+          <div class="time"><mochi-time-display :time="item._time" /></div>
+          <div v-html="getFeedTitle(item)" />
         </q-card-main>
       </q-card>
     </template>
-  </pagecontent>
+  </mochi-page-content>
 </template>
 
 <script>
-import Pagecontent from '../components/pagecontent.vue'
+import MochiPageContent from '../components/mochi-page-content.vue'
 import i18next from 'i18next'
 import {stripTags} from '../plugins/clean'
-import TimeDisplay from '../components/timedisplay.vue'
-import UserDisplay from '../components/userdisplay.vue'
+import MochiTimeDisplay from '../components/mochi-time-display.vue'
+import MochiUserDisplay from '../components/mochi-user-display.vue'
 import store from '../store/stores/posts'
 
 export default {
-  name: 'PageFeed',
-
   components: {
-    'pagecontent': Pagecontent,
-    'timedisplay': TimeDisplay,
-    'userdisplay': UserDisplay
+    'mochi-page-content': MochiPageContent,
+    'mochi-time-display': MochiTimeDisplay,
+    'mochi-user-display': MochiUserDisplay
   },
 
   data () {
@@ -101,14 +107,14 @@ export default {
 </script>
 
 <style scoped lang="stylus">
-.ob-time
-  color: #aaa;
-  font-size: 11px;
-  margin-bottom: 6px;
+.time
+  color #aaa
+  font-size 11px
+  margin-bottom 6px
 
-.ob-username
-  margin-bottom: 0;
+.username
+  margin-bottom 0
 
-.ob-timeline-container p
-  margin-bottom: 0 !important;
+.timeline-container p
+  margin-bottom 0 !important
 </style>

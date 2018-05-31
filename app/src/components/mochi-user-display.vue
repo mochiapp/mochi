@@ -1,22 +1,19 @@
 <template>
   <span class="text-bold text-primary">
-    {{userAlias}}
+    {{ userAlias }}
   </span>
 </template>
-
-<style scoped>
-span {
-  font-weight: 500;
-}
-</style>
 
 <script>
 import store from '../store/stores/users'
 
 export default {
-  props: [
-    'pub'
-  ],
+  props: {
+    pub: {
+      type: String,
+      default: ''
+    }
+  },
 
   computed: {
     userAlias () {
@@ -33,3 +30,6 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="stylus">
+</style>

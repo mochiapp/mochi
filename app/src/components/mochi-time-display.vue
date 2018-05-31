@@ -1,29 +1,26 @@
 <template>
   <span>
-    {{ctime}}
+    {{ ctime }}
   </span>
 </template>
 
 <script>
 export default {
-  data () {
-    return {
-      tmp: 0
-    }
-  },
-
   props: {
     interval: {
       type: Number,
       default: 30
     },
     time: {
-      type: Number
+      type: Number,
+      default: 0
     }
   },
 
-  mounted () {
-    setInterval(this.onInterval, this.interval * 1000)
+  data () {
+    return {
+      tmp: 0
+    }
   },
 
   computed: {
@@ -31,8 +28,12 @@ export default {
       var time = this.time + this.tmp
       time /= 1000
       // return moment.unix(time).format('dddd, MMMM Do, YYYY h:mm:ss A')
-      return moment.unix(time).fromNow()
+      return moment.unix(time).fromNow() // todo i18n
     }
+  },
+
+  mounted () {
+    setInterval(this.onInterval, this.interval * 1000)
   },
 
   methods: {

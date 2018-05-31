@@ -1,6 +1,11 @@
 <template>
   <div class="flex justify-center">
-    <q-btn flat icon="add" :label="$t('user:add_friend')" @click="clickAdd" />
+    <q-btn
+      :label="$t('user:add_friend')"
+      icon="add"
+      flat
+      @click="clickAdd"
+    />
   </div>
 </template>
 

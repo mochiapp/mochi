@@ -1,5 +1,5 @@
 <template>
-  <div :class="addclass + ' ob-lang-sel'">
+  <div :class="addClass + ' lang-sel'">
     <!-- <v-select
       :items="languages"
       v-model="language"
@@ -20,16 +20,19 @@
 import store from '../store/stores/app'
 
 export default {
+  props: {
+    addClass: {
+      type: String,
+      default: ''
+    }
+  },
+
   fromMobx: {
     language: {
       get () { return store.app.language },
       set (v) { store.app.setLanguage(v) }
     }
   },
-
-  props: [
-    'addclass'
-  ],
 
   computed: {
     languages () {
@@ -41,7 +44,7 @@ export default {
     },
 
     attrs () {
-      return this.addclass === 'compact' ? { hideUnderline: true, align: 'right' } : {}
+      return this.addClass === 'compact' ? { hideUnderline: true, align: 'right' } : {}
     }
   }
 }
@@ -50,20 +53,19 @@ export default {
 <style scoped lang="stylus">
 .compact
   & .q-select
-    display: inline-flex;
-    font-size: 12px;
-    text-decoration: underline;
-    color: #888 !important;
+    display inline-flex
+    font-size 12px
+    text-decoration underline
+    color #888 !important
     &:hover
-      color: #444 !important;
-</style>
-<style lang="stylus">
-.ob-lang-sel.compact
+      color #444 !important
+
+.lang-sel.compact /deep/
   & .q-input-target
-    color: #888 !important;
+    color #889 !important
     &:hover
-      color: #444 !important;
+      color #444 !important
 
   & .q-icon
-    display: none !important;
+    display none !important
 </style>
