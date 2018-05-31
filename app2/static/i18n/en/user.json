@@ -1,7 +1,0 @@
-{
-  "add_friend": "Add a friend",
-  "ask_friend": "Ask your friend to send you their id and paste it here.\nThe id can be found in the 'Profile' page.",
-  "friend_id": "Friend id",
-  "found_user_with": "We have found a user with that id: {{alias}}",
-  "add_to_friends": "Add this user to my friends"
-}

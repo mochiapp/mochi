@@ -1,4 +1,4 @@
-import {GunStore} from './gunmobx'
+import {GunStore} from './gun-mobx'
 
 class Store extends GunStore {
 }

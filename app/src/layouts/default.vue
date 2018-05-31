@@ -1,37 +1,43 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <template v-if="loggedIn">
-      <q-layout-header>
+      <q-layout-header key="logged-in">
         <q-toolbar
-          color="primary"
           :inverted="$q.theme === 'ios'"
+          color="primary"
         >
           <q-btn
             flat
             dense
             round
-            @click="leftDrawerOpen = !leftDrawerOpen"
             aria-label="Menu"
+            @click="leftDrawerOpen = !leftDrawerOpen"
           >
             <q-icon name="menu" />
           </q-btn>
 
           <q-toolbar-title>
-            {{getTitle}}
+            {{ getTitle }}
             <!-- <div slot="subtitle">Running on Quasar v{{ $q.version }}</div> -->
           </q-toolbar-title>
 
           <router-view name="subheader"/>
 
-          <q-btn flat no-caps icon="account_circle" :label="alias" @click="clickUser" />
+          <q-btn
+            :label="alias"
+            icon="account_circle"
+            flat
+            no-caps
+            @click="clickUser"
+          />
         </q-toolbar>
       </q-layout-header>
 
       <q-layout-footer v-if="hasFooter">
         <q-toolbar
+          :xxxinverted="$q.theme === 'ios'"
           color="primary"
           inverted
-          :xxxinverted="$q.theme === 'ios'"
         >
           <router-view name="footer"/>
         </q-toolbar>
@@ -40,10 +46,13 @@
       <q-layout-drawer
         v-model="leftDrawerOpen"
         :xxxcontent-class="$q.theme === 'mat' ? 'bg-grey-2' : null"
-        class="ob-side"
+        class="side"
       >
-        <div class="column" style="height: 100%;">
-          <div class="ob-sidemenu-header">
+        <div
+          class="column"
+          style="height: 100%;"
+        >
+          <div class="sidemenu-header">
             <img src="../assets/globe.svg">
             <div>Mochi</div>
           </div>
@@ -56,23 +65,36 @@
             <!-- <q-list-header>Mochi</q-list-header> -->
             <template v-for="item in menuItems">
               <template v-if="typeof item.routeName !== 'undefined'">
-                <q-item :to="item.routeName ? {name: item.routeName} : null" :key="item.title" exact>
+                <q-item
+                  :to="item.routeName ? {name: item.routeName} : null"
+                  :key="item.title"
+                  exact
+                >
                   <q-item-side :icon="item.icon" />
-                  <q-item-main :label="item.title" sublabel="" />
+                  <q-item-main
+                    :label="item.title"
+                    sublabel=""
+                  />
                 </q-item>
               </template>
               <template v-else>
-                <q-item :key="item.title" @click.native="click(item.click, $event)">
+                <q-item
+                  :key="item.title"
+                  @click.native="click(item.click, $event)"
+                >
                   <q-item-side :icon="item.icon" />
-                  <q-item-main :label="item.title" sublabel="" />
+                  <q-item-main
+                    :label="item.title"
+                    sublabel=""
+                  />
                 </q-item>
               </template>
             </template>
           </q-list>
 
-          <div class="ob-sidemenu-footer">
+          <div class="sidemenu-footer">
             <div>&copy; 2018 Mochi</div>
-            <div class="version">{{getAppVersion()}}</div>
+            <div class="version">{{ getAppVersion() }}</div>
           </div>
         </div>
       </q-layout-drawer>
@@ -82,23 +104,19 @@
       </q-page-container>
     </template>
     <template v-else>
-      <!-- <v-app> -->
-        <auth></auth>
-      <!-- </v-app> -->
+      <auth key="logged-out" />
     </template>
   </q-layout>
 </template>
 
 <script>
 // import { openURL } from 'quasar'
-import auth from '../pages/auth.vue'
+import auth from '../pages/mochi-auth.vue'
 import store from '../store/stores/app'
 import '../store/stores/auth'
 import router from '../router'
 
 export default {
-  name: 'LayoutDefault',
-
   components: { auth },
 
   data () {
@@ -154,50 +172,47 @@ export default {
 @import '~variables'
 
 .router-link-exact-active
-  background-color: inherit !important;
+  background-color inherit !important
 
-.ob-sidemenu-header
-  height: 50px;
-  width: 100%;
-  /* box-shadow: 0 8px 10px -6px var(--ob-shadow-color) !important; */
-  border-bottom: 1px solid #e8e8e8;
-  display: flex;
-  align-items: center;
-  padding-left: 18px;
-  color: #2196F3;
+.sidemenu-header
+  height 50px
+  width 100%
+  /* box-shadow 0 8px 10px -6px var(--ob-shadow-color) !important */
+  border-bottom 1px solid #e8e8e8
+  display flex
+  align-items center
+  padding-left 18px
+  color #2196F3
 
   & > div
-    height: 20px !important;
-    background-color: inherit !important;
-    font-size: 20px !important;
-    font-weight: 500;
-    line-height: 1 !important;
-    letter-spacing: 0.02em !important;
+    height 20px !important
+    background-color inherit !important
+    font-size 20px !important
+    font-weight 500
+    line-height 1 !important
+    letter-spacing 0.02em !important
 
   & > img
-    height: 28px;
-    margin-right: $flex-gutter-sm;
+    height 28px
+    margin-right $flex-gutter-sm
 
-.ob-sidemenu-footer
-  padding: $flex-gutter-xs $flex-gutter-sm;
-  border-top: 1px solid #e8e8e8;
-  font-size: 14px !important;
+.sidemenu-footer
+  padding $flex-gutter-xs $flex-gutter-sm
+  border-top 1px solid #e8e8e8
+  font-size 14px !important
 
 .version
-  color: #aaa;
-  font-size: 10px !important;
-  margin: -4px 0 0 0;
-</style>
-<style lang="stylus">
-@import '~variables'
+  color #aaa
+  font-size 10px !important
+  margin -4px 0 0 0
 
-.ob-side .q-item:hover
-  background-color: inherit !important;
+.side /deep/ .q-item:hover
+  background-color inherit !important
 
   & .q-item-label, i
-    color: $primary !important;
+    color $primary !important
 
-.ob-side .router-link-exact-active
+.side /deep/ .router-link-exact-active
   & .q-item-label, i
-    color: $primary !important;
+    color $primary !important
 </style>
