@@ -1,3 +1,3 @@
-# OpenBook
+# Mochi
 
 > WIP

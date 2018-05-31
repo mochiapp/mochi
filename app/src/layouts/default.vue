@@ -45,7 +45,7 @@
         <div class="column" style="height: 100%;">
           <div class="ob-sidemenu-header">
             <img src="../assets/globe.svg">
-            <div>OpenBook</div>
+            <div>Mochi</div>
           </div>
 
           <q-list
@@ -53,7 +53,7 @@
             link
             class="col"
           >
-            <!-- <q-list-header>OpenBook</q-list-header> -->
+            <!-- <q-list-header>Mochi</q-list-header> -->
             <template v-for="item in menuItems">
               <template v-if="typeof item.routeName !== 'undefined'">
                 <q-item :to="item.routeName ? {name: item.routeName} : null" :key="item.title" exact>
@@ -71,7 +71,7 @@
           </q-list>
 
           <div class="ob-sidemenu-footer">
-            <div>&copy; 2018 OpenBook</div>
+            <div>&copy; 2018 Mochi</div>
             <div class="version">{{getAppVersion()}}</div>
           </div>
         </div>

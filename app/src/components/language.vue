@@ -34,9 +34,9 @@ export default {
   computed: {
     languages () {
       let ls = []
-      // ls.push(this.$i18n.i18next.t('English'))
-      ls.push({label: 'English', value: 'en'})
+      ls.push({label: 'English', value: 'en-US'})
       ls.push({label: 'Nederlands', value: 'nl'})
+      ls.push({label: 'عربى', value: 'ar'})
       return ls
     },
 

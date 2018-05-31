@@ -1,6 +1,7 @@
 import {i18next, i18nextInited} from '../../plugins/i18n'
 import {observable, action, observe} from 'mobx'
 import store from '../store'
+import Quasar from 'quasar'
 
 class App {
   @observable drawer = parseInt(window.innerWidth) > 639
@@ -10,7 +11,7 @@ class App {
     light: true,
     dark: false
   }
-  @observable language = 'en'
+  @observable language = 'en-US'
   @observable langTrick = 0.1
   @observable inited = false
 
@@ -24,17 +25,29 @@ class App {
 
       observe(that, 'language', (change) => {
         i18next.changeLanguage(change.newValue, (_err, t) => {
-          that.setMenu()
-          that.langTrick = Math.random()
+          import('quasar-framework/i18n/' + change.newValue.toLowerCase()).then(lang => {
+            that.updateLang(lang.default)
+          })
+          that.updateLang(null)
         })
+
         window.localStorage.setItem('language', change.newValue)
       })
 
       // setTimeout(_ => {
-      that.language = window.localStorage.getItem('language') || (window.navigator && (window.navigator.language + '')).substr(0, 2) || 'en'
+      that.language = window.localStorage.getItem('language') || (window.navigator && (window.navigator.language + '')).substr(0, 2) || 'en-US'
       that.inited = true
       // }, 1)
     })
+  }
+
+  updateLang (l) {
+    if (l) {
+      Quasar.i18n.set(l)
+      document.documentElement.dir = l.rtl ? 'rtl' : 'ltr' // Fix because Quasar somehow does not to the switch in time.
+    }
+    this.setMenu()
+    this.langTrick = Math.random()
   }
 
   setMenu () {
