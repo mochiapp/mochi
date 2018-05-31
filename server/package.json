@@ -1,7 +1,7 @@
 {
-  "name": "openbookserver",
+  "name": "mochiserver",
   "version": "0.0.1",
-  "description": "OpenBookServer",
+  "description": "MochiServer",
   "main": "index.js",
   "license": "MIT",
   "scripts": {

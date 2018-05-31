@@ -1,7 +1,0 @@
-https://www.openbookchallenge.com/
-
-Mochi
-Waffle
-
-https://vuejs.org/v2/style-guide/
-https://standardjs.com/
