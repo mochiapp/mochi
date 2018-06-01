@@ -1,5 +1,6 @@
 import {observable, action} from 'mobx'
 import store from '../store'
+import generateAvatar from '../helpers/avatar'
 
 class Users {
   @observable friends = []
@@ -15,8 +16,12 @@ class Users {
     store.posts && store.posts.loadPosts(data.data) // Todo Move somewhere else?
   }
 
-  @action.bound friendLoaded (data) {
-    store.upsertArray(this.friends, data.data)
+  @action.bound friendLoaded (dat) {
+    let data = dat.data
+    if (!data.avatar) {
+      data.avatar = generateAvatar(data['_']['#'])
+    }
+    store.upsertArray(this.friends, data)
   }
 
   @action.bound find (data) {
@@ -33,8 +38,8 @@ class Users {
   }
 
   @action.bound getUserByPub (pub, me) {
-    if (pub === 'myself') {
-      return me
+    if (pub === 'myself' || pub === me.pub) {
+      return me.userData
     }
     return this.friends.find(user => user.pub === pub)
   }

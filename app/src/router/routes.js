@@ -3,7 +3,7 @@ export default [
     path: '/',
     component: () => import('layouts/default'),
     children: [
-      { path: '', name: 'feed', component: () => import('pages/mochi-feed'), meta: { title: 'Feed' } },
+      { path: '', name: 'feed', component: () => import('pages/mochi-feed'), meta: { title: 'Timeline' } },
       {
         path: 'friends',
         name: 'friends',

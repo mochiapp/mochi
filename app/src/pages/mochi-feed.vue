@@ -28,8 +28,10 @@
     <template v-for="item in timelineFiltered">
       <q-card :key="item['_']['#']">
         <q-card-main>
-          <div class="username"><mochi-user-display :pub="item['_'].meta.user" /></div>
-          <div class="time"><mochi-time-display :time="item._time" /></div>
+          <mochi-user-display
+            :pub="item['_'].meta.user"
+            :time="item._time"
+          />
           <div v-html="getFeedTitle(item)" />
         </q-card-main>
       </q-card>
@@ -41,14 +43,12 @@
 import MochiPageContent from '../components/mochi-page-content.vue'
 import i18next from 'i18next'
 import {stripTags} from '../plugins/clean'
-import MochiTimeDisplay from '../components/mochi-time-display.vue'
 import MochiUserDisplay from '../components/mochi-user-display.vue'
 import store from '../store/stores/posts'
 
 export default {
   components: {
     'mochi-page-content': MochiPageContent,
-    'mochi-time-display': MochiTimeDisplay,
     'mochi-user-display': MochiUserDisplay
   },
 
@@ -107,14 +107,6 @@ export default {
 </script>
 
 <style scoped lang="stylus">
-.time
-  color #aaa
-  font-size 11px
-  margin-bottom 6px
-
-.username
-  margin-bottom 0
-
 .timeline-container p
   margin-bottom 0 !important
 </style>

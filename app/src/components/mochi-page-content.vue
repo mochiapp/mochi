@@ -24,9 +24,10 @@ export default {
 <style scoped lang="stylus">
 @import '~variables'
 
-.vpage-content-wrapper
+.mochi-page-content-wrapper
   display flex
   flex-direction column
+  background-color $mochi-page-background-color
 
   & > *
     width 100%
@@ -47,4 +48,9 @@ export default {
   & /deep/ > *
     width 100%
     margin-bottom 16px
+
+  & /deep/ > .q-card
+    // box-shadow 0 0 0 1px rgba(0,0,0,0.05), 0 2px 0 0 rgba(0,0,0,0.08) !important
+    box-shadow none !important
+    background-color $mochi-page-item-background-color
 </style>

@@ -63,7 +63,8 @@ module.exports = function (ctx) {
         'QCardMain',
         'QInput',
         'QDialog',
-        'QDatetimePicker'
+        'QDatetimePicker',
+        'QItemTile'
       ],
       directives: [
         'Ripple'

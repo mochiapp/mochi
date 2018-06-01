@@ -3,9 +3,9 @@
     <template v-for="item in friends">
       <q-card :key="item['_']['#']">
         <q-card-main>
-          <div
-            class="q-subheading"
-            v-html="getFriendTitle(item)"
+          <mochi-user-display
+            :pub="item.pub"
+            class="q-mb-none"
           />
         </q-card-main>
       </q-card>
@@ -78,10 +78,12 @@ import i18next from 'i18next'
 import {stripTags} from '../plugins/clean'
 import store from '../store/stores/users'
 import MochiPageContent from '../components/mochi-page-content.vue'
+import MochiUserDisplay from '../components/mochi-user-display.vue'
 
 export default {
   components: {
-    'mochi-page-content': MochiPageContent
+    'mochi-page-content': MochiPageContent,
+    'mochi-user-display': MochiUserDisplay
   },
 
   data () {
@@ -116,10 +118,6 @@ export default {
   },
 
   methods: {
-    getFriendTitle: function (friend) {
-      return stripTags(friend.alias)
-    },
-
     clickAdd: function (event) {
       this.dialogAddFriend = true
     },
