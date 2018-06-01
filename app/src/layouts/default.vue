@@ -24,12 +24,17 @@
           <router-view name="subheader"/>
 
           <q-btn
-            :label="alias"
-            icon="account_circle"
             flat
             no-caps
             @click="clickUser"
-          />
+          >
+            <mochi-user-display
+              pub="myself"
+              class="q-mb-none"
+              avatar-size="24px"
+              no-color
+            />
+          </q-btn>
         </q-toolbar>
       </q-layout-header>
 
@@ -115,9 +120,13 @@ import auth from '../pages/mochi-auth.vue'
 import store from '../store/stores/app'
 import '../store/stores/auth'
 import router from '../router'
+import MochiUserDisplay from '../components/mochi-user-display.vue'
 
 export default {
-  components: { auth },
+  components: {
+    auth,
+    'mochi-user-display': MochiUserDisplay
+  },
 
   data () {
     return {

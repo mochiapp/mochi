@@ -1,6 +1,7 @@
 import '../../plugins/i18n'
 import {observable, action} from 'mobx'
 import store from '../store'
+import generateAvatar from '../helpers/avatar'
 
 class Auth {
   @observable loggedIn = false
@@ -11,17 +12,17 @@ class Auth {
 
   @action.bound login (data) {
     store.login(data.u, data.p).then((result) => {
-      this.setVals(true, result.alias, result.pub)
+      this.setVals(true, result)
       this.successText = 'auth:login_suc'
     }).catch((reason) => {
-      this.setVals(false, '', '')
+      this.setVals(false, null)
       this.errorText = 'auth:login_fail'
     })
   }
 
   @action.bound logout (data) {
     store.logout().then((result) => {
-      this.setVals(false, '', '')
+      this.setVals(false, null)
       this.successText = 'auth:logout_suc'
     }).catch((reason) => {
       this.successText = ''
@@ -31,10 +32,10 @@ class Auth {
 
   @action.bound register (data) {
     store.register(data.u, data.p).then((result) => {
-      this.setVals(false, '', '')
+      this.setVals(false, null)
       this.successText = 'auth:register_suc'
     }).catch((reason) => {
-      this.setVals(false, '', '')
+      this.setVals(false, null)
       if (reason.toLowerCase().indexOf('user already created') >= 0) {
         this.errorText = 'auth:register_user_exists'
       } else {
@@ -45,19 +46,28 @@ class Auth {
 
   @action.bound checkSession (data) {
     store.checkSession().then((result) => {
-      this.setVals(true, result.alias, result.pub)
+      this.setVals(true, result)
       this.successText = 'auth:auto_logout_suc'
     }).catch((reason) => {
-      this.setVals(false, '', '')
+      this.setVals(false, null)
     })
   }
 
-  @action.bound setVals (li, alias, pub) {
+  @action.bound setVals (li, userData) {
     this.loggedIn = li
     this.successText = ''
     this.errorText = ''
-    this.pub = pub
-    this.alias = alias
+    this.userData = userData
+    if (userData) {
+      this.pub = userData.pub
+      this.alias = userData.alias
+      if (!this.userData.avatar) {
+        this.userData.avatar = generateAvatar(this.userData.pub)
+      }
+    } else {
+      this.pub = ''
+      this.alias = ''
+    }
   }
 }
 
