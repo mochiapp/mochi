@@ -1,6 +1,6 @@
-import {Gun} from './gun/gun'
-import './gun/sea'
-import './gun/lib/time'
+const Gun = require('gun')
+require('gun/sea')
+// require('gun/lib/time')
 
 import {extendObservable} from 'mobx'
 
