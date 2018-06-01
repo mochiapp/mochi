@@ -1,5 +1,5 @@
 // Configuration for your app
-require('dotenv').config();
+require('dotenv').config()
 
 module.exports = function (ctx) {
   return {
