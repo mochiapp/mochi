@@ -1,5 +1,6 @@
 // Configuration for your app
 require('dotenv').config()
+const path = require('path')
 
 module.exports = function (ctx) {
   return {
@@ -30,7 +31,8 @@ module.exports = function (ctx) {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /(node_modules|quasar)/
+          exclude: /(node_modules|quasar)/,
+          include: [ path.join(__dirname, 'packages') ]
         })
       },
       rtl: true

@@ -6,9 +6,23 @@
   "cordovaId": "org.cordova.quasar.app",
   "author": "",
   "private": true,
+  "//": "Lerna+WebPack from: https://github.com/dmk255/lerna-webpack-example/blob/master/package.json",
   "scripts": {
-    "lint": "eslint --ext .js,.vue src",
-    "test": "echo \"No test specified\" && exit 0"
+    "prebuild": "git clean -fdx packages -e packages/*/node_modules",
+    "bootstrap": "lerna bootstrap",
+    "dev": "yarn && quasar dev",
+    "fix": "lerna run fix",
+    "lint": "yarn lint:app && lerna run lint",
+    "lint:app": "eslint --ext .js,.vue src",
+    "lint:packages": "eslint --cache --ignore-path .eslintignore ./packages/*/lib",
+    "test": "echo \"No test specified\" && exit 0",
+    "build:parallel": "lerna exec --parallel --scope waffle -- babel src -d lib --config-file ../../.babelrc",
+    "build:babel": "lerna run build:babel",
+    "build:webpack": "lerna run build:webpack",
+    "build": "yarn build:babel && yarn build:webpack",
+    "release": "yarn lint && yarn build && lerna publish",
+    "watch": "yarn build:parallel -- -w",
+    "predeploy": "yarn build"
   },
   "dependencies": {
     "@panter/vue-i18next": "^0.9.1",
@@ -33,7 +47,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "eslint-plugin-vue": "^4.3.0",
     "lerna": "^2.11.0",
-    "quasar-cli": "^0.16.0"
+    "quasar-cli": "^0.16.0",
   },
   "engines": {
     "node": ">= 8.9.0",
