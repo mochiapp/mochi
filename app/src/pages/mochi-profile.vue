@@ -2,10 +2,41 @@
   <mochi-page-content>
     <q-card>
       <q-card-main>
+        <div class="q-subheading q-pb-xs">{{ $t('profile:your_avatar_and_sizes') }}</div>
+        <div class="val row items-center">
+          <mochi-avatar-display
+            :pub="auth.pub"
+            size="100px"
+            class="avatar-big"
+          />
+          <mochi-avatar-display
+            :pub="auth.pub"
+            size="40px"
+            class="avatar-medium"
+          />
+          <mochi-avatar-display
+            :pub="auth.pub"
+            size="24px"
+            class="avatar-small"
+          />
+          <div class="col self-stretch column items-end justify-end">
+            <q-btn
+              @click="clickChangeAvatar"
+            >
+              {{ $t('Change') }}
+            </q-btn>
+          </div>
+        </div>
+      </q-card-main>
+    </q-card>
+
+    <q-card>
+      <q-card-main>
         <div class="q-subheading q-pb-xs">{{ $t('profile:your_username') }}</div>
         <div class="val">{{ auth.alias }}</div>
       </q-card-main>
     </q-card>
+
     <q-card>
       <q-card-main>
         <div class="q-subheading q-pb-xs">
@@ -33,10 +64,12 @@
 import i18next from 'i18next'
 import store from '../store/stores/auth'
 import MochiPageContent from '../components/mochi-page-content.vue'
+import MochiAvatarDisplay from '../components/mochi-avatar-display.vue'
 
 export default {
   components: {
-    'mochi-page-content': MochiPageContent
+    'mochi-page-content': MochiPageContent,
+    'mochi-avatar-display': MochiAvatarDisplay
   },
 
   fromMobx: {
@@ -67,6 +100,8 @@ export default {
 </script>
 
 <style scoped lang="stylus">
+@import '~variables'
+
 .q-subheading
   color #888
 
@@ -90,4 +125,7 @@ export default {
 .pub
   word-break break-all
   display inline-block
+
+.avatar-big, .avatar-medium
+  margin-right $flex-gutter-xs
 </style>
