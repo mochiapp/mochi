@@ -5,27 +5,38 @@
         <div class="q-subheading q-pb-xs">{{ $t('profile:your_avatar_and_sizes') }}</div>
         <div class="val row items-center">
           <mochi-avatar-display
+            :avatar="avatar"
             :pub="auth.pub"
             size="100px"
             class="avatar-big"
           />
           <mochi-avatar-display
+            :avatar="avatar"
             :pub="auth.pub"
             size="40px"
             class="avatar-medium"
           />
           <mochi-avatar-display
+            :avatar="avatar"
             :pub="auth.pub"
             size="24px"
             class="avatar-small"
           />
           <div class="col self-stretch column items-end justify-end">
             <q-btn
-              @click="clickChangeAvatar"
+              @click="showAvatarDialog = !showAvatarDialog"
             >
               {{ $t('Change') }}
             </q-btn>
           </div>
+
+          <mochi-image-picker
+            :show-dialog="showAvatarDialog"
+            :title="$t('profile:change_avatar')"
+            :src="avatar"
+            @image-picked="onImagePicked"
+            @dialog-closed="onDialogClosed"
+          />
         </div>
       </q-card-main>
     </q-card>
@@ -65,15 +76,27 @@ import i18next from 'i18next'
 import store from '../store/stores/auth'
 import MochiPageContent from '../components/mochi-page-content.vue'
 import MochiAvatarDisplay from '../components/mochi-avatar-display.vue'
+import MochiImagePicker from '../components/mochi-image-picker.vue'
 
 export default {
   components: {
     'mochi-page-content': MochiPageContent,
-    'mochi-avatar-display': MochiAvatarDisplay
+    'mochi-avatar-display': MochiAvatarDisplay,
+    'mochi-image-picker': MochiImagePicker
+  },
+
+  data () {
+    return {
+      showAvatarDialog: false
+    }
   },
 
   fromMobx: {
-    auth () { return store.auth }
+    auth () { return store.auth },
+    avatar: {
+      get () { return store.auth.avatar },
+      set (data) { store.auth.setAvatar(data) }
+    }
   },
 
   beforeCreate () {
@@ -95,6 +118,17 @@ export default {
           type: 'positive'
         })
       })
+  },
+
+  methods: {
+    onImagePicked (data) {
+      this.avatar = data
+      this.showAvatarDialog = false
+    },
+
+    onDialogClosed () {
+      this.showAvatarDialog = false
+    }
   }
 }
 </script>

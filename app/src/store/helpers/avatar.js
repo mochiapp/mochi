@@ -4,7 +4,7 @@ export default function generateAvatar (pub) {
   let canvas = document.createElement('canvas')
   canvas.style.cssText = 'display: none;'
   document.body.appendChild(canvas)
-  Ucavatar(canvas, pub, 40)
+  Ucavatar(canvas, pub, 160)
   let url = canvas.toDataURL('image/png')
   canvas.outerHTML = ''
   return url

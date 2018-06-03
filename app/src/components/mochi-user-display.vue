@@ -2,6 +2,7 @@
   <div class="user row items-center">
     <mochi-avatar-display
       :pub="pub"
+      :avatar="avatar"
       :size="avatarSize"
       class="avatar"
     />
@@ -31,6 +32,11 @@ export default {
 
   props: {
     pub: {
+      type: String,
+      default: ''
+    },
+
+    avatar: {
       type: String,
       default: ''
     },

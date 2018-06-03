@@ -3,5 +3,6 @@
   "your_id": "Your public id:",
   "id_explain": "You can copy this id (by clicking the icon) and send it to someone else so they can connect with you.",
   "copied": "Okay, copied to the clipboard.",
-  "your_avatar_and_sizes": "Your profile picture (in different sizes):"
+  "your_avatar_and_sizes": "Your profile picture (in different sizes):",
+  "change_avatar": "Choose new profile picture"
 }

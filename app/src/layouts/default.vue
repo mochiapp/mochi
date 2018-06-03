@@ -29,6 +29,7 @@
             @click="clickUser"
           >
             <mochi-user-display
+              :avatar="avatar"
               pub="myself"
               class="q-mb-none"
               avatar-size="24px"
@@ -139,7 +140,8 @@ export default {
     loggedIn () { return store.auth.loggedIn },
     menuItems () { return [...store.app.menuItems] },
     langTrick () { return store.app.langTrick },
-    alias () { return store.auth.alias }
+    alias () { return store.auth.alias },
+    avatar () { return store.auth.avatar }
   },
 
   computed: {

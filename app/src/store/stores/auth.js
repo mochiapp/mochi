@@ -9,6 +9,7 @@ class Auth {
   @observable errorText = ''
   @observable pub = ''
   @observable alias = ''
+  @observable avatar = ''
 
   @action.bound login (data) {
     store.login(data.u, data.p).then((result) => {
@@ -57,17 +58,20 @@ class Auth {
     this.loggedIn = li
     this.successText = ''
     this.errorText = ''
-    this.userData = userData
     if (userData) {
       this.pub = userData.pub
       this.alias = userData.alias
-      if (!this.userData.avatar) {
-        this.userData.avatar = generateAvatar(this.userData.pub)
+      if (!this.avatar) {
+        this.avatar = generateAvatar(this.pub)
       }
     } else {
       this.pub = ''
       this.alias = ''
     }
+  }
+
+  @action.bound setAvatar (data) {
+    this.avatar = data.src
   }
 }
 

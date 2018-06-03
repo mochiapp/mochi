@@ -39,7 +39,7 @@ class Users {
 
   @action.bound getUserByPub (pub, me) {
     if (pub === 'myself' || pub === me.pub) {
-      return me.userData
+      return me
     }
     return this.friends.find(user => user.pub === pub)
   }
