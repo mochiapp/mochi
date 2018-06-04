@@ -4,7 +4,8 @@ echo.
 echo.
 echo ======================================================================
 echo.
-echo !TIME!... file(s) changed... triggering file sync.
+time /t
+echo ... file(s) changed... triggering file sync.
 echo.
 echo ======================================================================
 echo.
