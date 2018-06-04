@@ -2,6 +2,44 @@ https://www.openbookchallenge.com/
 
 Mochi
 Waffle
+Sundae
+
+# lerna run compile
 
 https://vuejs.org/v2/style-guide/
 https://standardjs.com/
+
+/*
+--------------------------------------------------------------------------
+Interesting image manipulation libs
+--------------------------------------------------------------------------
+*/
+
+http://itiskj.com/instagram_js_filter/
+https://github.com/azat-io/postcss-instagram/blob/master/LIST.md
+https://github.com/girliemac/filterous-2
+
+http://evanw.github.io/glfx.js/demo/
+http://joelb.me/jsmanipulate/
+http://www.arahaya.com/imagefilters/
+https://web-photo-filter.firebaseapp.com/
+
+/*
+--------------------------------------------------------------------------
+Face filtering and effects (like Snapchat)
+--------------------------------------------------------------------------
+*/
+
+https://github.com/jeeliz/jeelizFaceFilter
+https://github.com/auduno/clmtrackr
+https://trackingjs.com/
+
+/*
+--------------------------------------------------------------------------
+Instagram diverse
+--------------------------------------------------------------------------
+*/
+
+https://petapixel.com/2017/10/28/instagrams-photo-filters-used-top-users/
+
+https://github.com/michael-lynch/instagram-lite

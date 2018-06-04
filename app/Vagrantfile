@@ -28,11 +28,14 @@ Vagrant.configure("2") do |config|
     sudo apt install -y yarn
 #    sudo apt install -y python-minimal
 #    sudo apt install -y build-essential
+    npm install --global lerna
     npm install -g quasar-cli
 #    yarn global add quasar-cli
     rsync -avzh /vagrant/ /_vagrant/
     cd /_vagrant/app
-    yarn
+    yarn config set workspaces-experimental true
+#    yarn
+    lerna bootstrap
   SHELL
 
   config.vm.provider :virtualbox do |vm|

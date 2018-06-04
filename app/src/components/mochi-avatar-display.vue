@@ -4,7 +4,7 @@
     avatar
   >
     <img
-      :src="avatar"
+      :src="xavatar"
       :style="getStyles"
     >
   </q-item-tile>
@@ -20,6 +20,11 @@ export default {
       default: ''
     },
 
+    avatar: {
+      type: String,
+      default: ''
+    },
+
     size: {
       type: String,
       default: '38px'
@@ -27,12 +32,16 @@ export default {
   },
 
   computed: {
-    avatar () {
-      var user = store.users.getUserByPub(this.pub, store.auth)
-      if (user) {
-        return user.avatar
+    xavatar () {
+      if (this.avatar === '') {
+        var user = store.users.getUserByPub(this.pub, store.auth)
+        if (user) {
+          return user.avatar
+        }
+        return ''
+      } else {
+        return this.avatar
       }
-      return ''
     },
 
     getStyles () { return 'width: ' + this.size + '; height: ' + this.size + ';' }
