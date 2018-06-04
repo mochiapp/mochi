@@ -32,6 +32,7 @@ module.exports = function (ctx) {
 	  test(/\.js$/).
 	  pre().
 	  include.add(path.join(__dirname, 'packages', 'waffle')).end().
+	  exclude.add(path.join(__dirname, 'packages', 'waffle', 'node_modules')).end().
 	  use('babel').loader('babel-loader').options({
 	    presets: [ '@babel/preset-env' ],
 	    plugins: [ '@babel/plugin-proposal-class-properties' ]
