@@ -1026,7 +1026,7 @@
     var Gun = USE('./sea').Gun
     Gun.chain.then = function (cb) {
       var gun = this, p = (new Promise(function (resolve, reject) {
-        gun.once(res)
+        gun.once(resolve)
       }))
       return cb ? p.then(cb) : p
     }
