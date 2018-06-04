@@ -2,6 +2,7 @@ https://www.openbookchallenge.com/
 
 Mochi
 Waffle
+Sundae
 
 # lerna run compile
 
