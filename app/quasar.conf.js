@@ -26,14 +26,25 @@ module.exports = function (ctx) {
       // gzip: true,
       // analyze: true,
       // extractCSS: false,
+
+      chainWebpack (chain) {
+	chain.module.rule('babel:waffle').
+	  test(/\.js$/).
+	  pre().
+	  include.add(path.join(__dirname, 'packages', 'waffle')).end().
+	  use('babel').loader('babel-loader').options({
+	    presets: [ '@babel/preset-env' ],
+	    plugins: [ '@babel/plugin-proposal-class-properties' ]
+	  })
+      },
       extendWebpack (cfg) {
-        cfg.module.rules.push({
-          enforce: 'pre',
-          test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
-          exclude: /(node_modules|quasar)/,
-          include: [ path.join(__dirname, 'packages') ]
-        })
+        // cfg.module.rules.push({
+        //   enforce: 'pre',
+        //   test: /\.(js|vue)$/,
+        //   loader: 'eslint-loader',
+        //   exclude: /(node_modules|quasar)/,
+        //   include: [ path.join(__dirname, 'packages') ]
+        // })
       },
       rtl: true
     },
