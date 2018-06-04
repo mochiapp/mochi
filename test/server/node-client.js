@@ -1,9 +1,9 @@
-var Gun = require('../../index');
+var Gun = require('../../index')
 
-var location = {host:"localhost"};
+var location = {host: 'localhost'}
 
-var gun = Gun( { file: 'read.json', peers: ['http://' + location.host + ':8080/gun'] });
+var gun = Gun({ file: 'read.json', peers: ['http://' + location.host + ':8080/gun'] })
 
-gun.get( 'data' ).path('stuff').map(function(val,field){ console.log( field, "=", val ); } );
+gun.get('data').path('stuff').map(function (val, field) { console.log(field, '=', val) })
 
-console.log( "done... wait forever?" );
+console.log('done... wait forever?')

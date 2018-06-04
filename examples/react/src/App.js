@@ -5,12 +5,12 @@ import Chat from './Chat'
 import Json from './Json'
 
 class App extends Component {
-  constructor() {
-    super();
+  constructor () {
+    super()
     this.gun = Gun(location.origin + '/gun')
   }
-  
-  render() {
+
+  render () {
     return (
       <div>
         <h1>React Examples</h1>
@@ -25,8 +25,8 @@ class App extends Component {
         <h2>Json</h2>
         <Json gun={this.gun} />
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default App

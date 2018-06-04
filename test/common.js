@@ -1,175 +1,179 @@
 var root;
-(function(env){
-	root = env.window? env.window : global;
-	env.window && root.localStorage && root.localStorage.clear();
-	try{ require('fs').unlinkSync('data.json') }catch(e){}
-	//root.Gun = root.Gun || require('../gun');
-	if(root.Gun){
-		root.Gun = root.Gun;
-	} else {
-		root.Gun = require('../gun');
-		Gun.serve = require('../lib/serve');
-		//require('./s3');
-		//require('./uws');
-		//require('./wsp/server');
-		require('../lib/file');
-	}
-}(this));
-//Gun.log.squelch = true;
-var gleak = {globals: {}, check: function(){ // via tobyho
-  var leaked = []
-  for (var key in gleak.globe){ if (!(key in gleak.globals)){ leaked.push(key)} }
-  if (leaked.length > 0){ console.log("GLOBAL LEAK!", leaked); return leaked }
-}};
-(function(env){
-	for (var key in (gleak.globe = env)){ gleak.globals[key] = true }
-}(this));
+(function (env) {
+  root = env.window ? env.window : global
+  env.window && root.localStorage && root.localStorage.clear()
+  try { require('fs').unlinkSync('data.json') } catch (e) {}
+  // root.Gun = root.Gun || require('../gun');
+  if (root.Gun) {
+    root.Gun = root.Gun
+  } else {
+    root.Gun = require('../gun')
+    Gun.serve = require('../lib/serve')
+    // require('./s3');
+    // require('./uws');
+    // require('./wsp/server');
+    require('../lib/file')
+  }
+}(this))
+// Gun.log.squelch = true;
+var gleak = {globals: {},
+  check: function () { // via tobyho
+    var leaked = []
+    for (var key in gleak.globe) { if (!(key in gleak.globals)) { leaked.push(key) } }
+    if (leaked.length > 0) { console.log('GLOBAL LEAK!', leaked); return leaked }
+  }};
+(function (env) {
+  for (var key in (gleak.globe = env)) { gleak.globals[key] = true }
+}(this))
 
-describe('Performance', function(){ return; // performance tests
-	var console = root.console || {log: function(){}};
-	function perf(fn, i){
-		i = i || 1000;
-		while(--i){
-			fn(i);
-		}
-	}
-	perf.now = this.performance? function(){ return performance.now() } : function(){ return Gun.time.now()/1000 };
-	(function(){
-		var t1 = perf.now();
-		var obj = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i'};
-		Object.keys && perf(function(){
-			var l = Object.keys(obj), ll = l.length, i = 0, s = '';
-			for(; i < ll; i++){
-				var v = l[i];
-				s += v;
-			}
-		});
-		console.log('map: native', (t1 = (perf.now() - t1)/1000) + 's');
+describe('Performance', function () {
+  return // performance tests
+  var console = root.console || {log: function () {}}
+  function perf (fn, i) {
+    i = i || 1000
+    while (--i) {
+      fn(i)
+    }
+  }
+  perf.now = this.performance ? function () { return performance.now() } : function () { return Gun.time.now() / 1000 };
+  (function () {
+    var t1 = perf.now()
+    var obj = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i'}
+    Object.keys && perf(function () {
+      var l = Object.keys(obj), ll = l.length, i = 0, s = ''
+      for (; i < ll; i++) {
+        var v = l[i]
+        s += v
+      }
+    })
+    console.log('map: native', (t1 = (perf.now() - t1) / 1000) + 's')
 
-		var t2 = perf.now();
-		var obj = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i'};
-		perf(function(){
-			var s = '';
-			Gun.obj.map(obj, function(v){
-				s += v;
-			})
-		});
-		console.log('map: gun', (t2 = (perf.now() - t2)/1000) + 's', (t2 / t1).toFixed(1)+'x', 'slower.');
-	}());
-	(function(){
-		if(!Gun.store){
-			var tab = Gun().tab;
-			if(!tab){ return }
-			Gun.store = tab.store;
-		}
-		root.localStorage && root.localStorage.clear();
-		var it = 1000;
-		var t1 = perf.now();
-		perf(function(i){
-			var obj = {'i': i, 'v': Gun.text.random(100)};
-			Gun.store.put('test/native/' + i, obj);
-		}, it);
-		console.log('store: native', (t1 = (perf.now() - t1)/1000) + 's');
+    var t2 = perf.now()
+    var obj = {1: 'a', 2: 'b', 3: 'c', 4: 'd', 5: 'e', 6: 'f', 7: 'g', 8: 'h', 9: 'i'}
+    perf(function () {
+      var s = ''
+      Gun.obj.map(obj, function (v) {
+        s += v
+      })
+    })
+    console.log('map: gun', (t2 = (perf.now() - t2) / 1000) + 's', (t2 / t1).toFixed(1) + 'x', 'slower.')
+  }());
+  (function () {
+    if (!Gun.store) {
+      var tab = Gun().tab
+      if (!tab) { return }
+      Gun.store = tab.store
+    }
+    root.localStorage && root.localStorage.clear()
+    var it = 1000
+    var t1 = perf.now()
+    perf(function (i) {
+      var obj = {'i': i, 'v': Gun.text.random(100)}
+      Gun.store.put('test/native/' + i, obj)
+    }, it)
+    console.log('store: native', (t1 = (perf.now() - t1) / 1000) + 's')
 
-		root.localStorage && root.localStorage.clear();
-		var gun = Gun({wire: {get:function(l,cb){cb()},put:function(g,cb){
-			Gun.is.graph(g, function(node, soul){
-				Gun.store.put(soul, node);
-			});
-			cb(null);
-		}}});
-		var t2 = perf.now();
-		perf(function(i){
-			var obj = {'i': i, 'v': Gun.text.random(100)};
-			gun.put(obj);
-		}, it);
-		console.log('store: gun', (t2 = (perf.now() - t2)/1000) + 's', (t2 / t1).toFixed(1)+'x', 'slower.');
-		root.localStorage && root.localStorage.clear();
-	}());
-	(function(){ // setTimeout
-		if(!Gun.store){
-			var tab = Gun().tab;
-			if(!tab){ return }
-			Gun.store = tab.store;
-		}
-		root.localStorage && root.localStorage.clear();
-		var t1 = perf.now();
-		i = i || 1000;
-		while(--i){
-			var obj = {'i': i, 'v': Gun.text.random(100)};
-			Gun.store.put('test/native/' + i, obj);
-		}
-		console.log('store: native', (t1 = (perf.now() - t1)/1000) + 's');
+    root.localStorage && root.localStorage.clear()
+    var gun = Gun({wire: {get: function (l, cb) { cb() },
+      put: function (g, cb) {
+        Gun.is.graph(g, function (node, soul) {
+          Gun.store.put(soul, node)
+        })
+        cb(null)
+      }}})
+    var t2 = perf.now()
+    perf(function (i) {
+      var obj = {'i': i, 'v': Gun.text.random(100)}
+      gun.put(obj)
+    }, it)
+    console.log('store: gun', (t2 = (perf.now() - t2) / 1000) + 's', (t2 / t1).toFixed(1) + 'x', 'slower.')
+    root.localStorage && root.localStorage.clear()
+  }());
+  (function () { // setTimeout
+    if (!Gun.store) {
+      var tab = Gun().tab
+      if (!tab) { return }
+      Gun.store = tab.store
+    }
+    root.localStorage && root.localStorage.clear()
+    var t1 = perf.now()
+    i = i || 1000
+    while (--i) {
+      var obj = {'i': i, 'v': Gun.text.random(100)}
+      Gun.store.put('test/native/' + i, obj)
+    }
+    console.log('store: native', (t1 = (perf.now() - t1) / 1000) + 's')
 
-		root.localStorage && root.localStorage.clear();
-		var gun = Gun({wire: {get:function(l,cb){cb()},put:function(g,cb){
-			Gun.is.graph(g, function(node, soul){
-				Gun.store.put(soul, node);
-			});
-			cb(null);
-		}}});
-		var t2 = perf.now();
-		perf(function(i){
-			var obj = {'i': i, 'v': Gun.text.random(100)};
-			gun.put(obj);
-		}, it);
-		console.log('store: gun', (t2 = (perf.now() - t2)/1000) + 's', (t2 / t1).toFixed(1)+'x', 'slower.');
-		root.localStorage && root.localStorage.clear();
-	}());
-	(function(){
-		var t1 = perf.now();
-		var on = Gun.on.create(), c = 0, o = [];
-		perf(function(i){
-			o.push(function(n){
-				c += 1;
-			});
-			var ii = 0, l = o.length;
-			for(; ii < l; ii++){
-				o[ii](i);
-			}
-		});
-		console.log('on: native', (t1 = (perf.now() - t1)/1000) + 's');
+    root.localStorage && root.localStorage.clear()
+    var gun = Gun({wire: {get: function (l, cb) { cb() },
+      put: function (g, cb) {
+        Gun.is.graph(g, function (node, soul) {
+          Gun.store.put(soul, node)
+        })
+        cb(null)
+      }}})
+    var t2 = perf.now()
+    perf(function (i) {
+      var obj = {'i': i, 'v': Gun.text.random(100)}
+      gun.put(obj)
+    }, it)
+    console.log('store: gun', (t2 = (perf.now() - t2) / 1000) + 's', (t2 / t1).toFixed(1) + 'x', 'slower.')
+    root.localStorage && root.localStorage.clear()
+  }());
+  (function () {
+    var t1 = perf.now()
+    var on = Gun.on.create(), c = 0, o = []
+    perf(function (i) {
+      o.push(function (n) {
+        c += 1
+      })
+      var ii = 0, l = o.length
+      for (; ii < l; ii++) {
+        o[ii](i)
+      }
+    })
+    console.log('on: native', (t1 = (perf.now() - t1) / 1000) + 's')
 
-		var on = Gun.on.create(), c = 0;
-		var t2 = perf.now();
-		perf(function(i){
-			on('change').event(function(n){
-				c += 1;
-			});
-			on('change').emit(i);
-		});
-		console.log('on: gun', (t2 = (perf.now() - t2)/1000) + 's', (t2 / t1).toFixed(1)+'x', 'slower.');
-	}());return;
-	(function(){ // always do this last!
-		var t1 = perf.now();
-		perf(function(i){
-			setTimeout(function(){
-				if(i === 1){
-					cb1();
-				}
-			},0);
-		}); var cb1 = function(){
-			console.log('setTimeout: native', (t1 = (perf.now() - t1)/1000) + 's', (t1 / t2).toFixed(1)+'x', 'slower.');
-		}
-		var t2 = perf.now();
-		perf(function(i){
-			setImmediate(function(){
-				if(i === 1){
-					cb2();
-				}
-			});
-		}); var cb2 = function(){
-			console.log('setImmediate: gun', (t2 = (perf.now() - t2)/1000) + 's', (t2 / t1).toFixed(1)+'x', 'slower.');
-		}
-	}());
-});
+    var on = Gun.on.create(), c = 0
+    var t2 = perf.now()
+    perf(function (i) {
+      on('change').event(function (n) {
+        c += 1
+      })
+      on('change').emit(i)
+    })
+    console.log('on: gun', (t2 = (perf.now() - t2) / 1000) + 's', (t2 / t1).toFixed(1) + 'x', 'slower.')
+  }());
+  (function () { // always do this last!
+    var t1 = perf.now()
+    perf(function (i) {
+      setTimeout(function () {
+        if (i === 1) {
+          cb1()
+        }
+      }, 0)
+    }); var cb1 = function () {
+      console.log('setTimeout: native', (t1 = (perf.now() - t1) / 1000) + 's', (t1 / t2).toFixed(1) + 'x', 'slower.')
+    }
+    var t2 = perf.now()
+    perf(function (i) {
+      setImmediate(function () {
+        if (i === 1) {
+          cb2()
+        }
+      })
+    }); var cb2 = function () {
+      console.log('setImmediate: gun', (t2 = (perf.now() - t2) / 1000) + 's', (t2 / t1).toFixed(1) + 'x', 'slower.')
+    }
+  }())
+})
 
-describe('Gun', function(){
-	var t = {};
+describe('Gun', function () {
+  var t = {}
 
-	describe('Utility', function(){
-		var u;
-		/* // causes logger to no longer log.
+  describe('Utility', function () {
+    var u
+    /* // causes logger to no longer log.
 		it('verbose console.log debugging', function(done) {
 
 			var gun = Gun();
@@ -193,209 +197,209 @@ describe('Gun', function(){
 		} );
 		*/
 
-		describe('Type Check', function(){
-			it('binary', function(){
-				expect(Gun.bi.is(false)).to.be(true);
-				expect(Gun.bi.is(true)).to.be(true);
-				expect(Gun.bi.is(u)).to.be(false);
-				expect(Gun.bi.is(null)).to.be(false);
-				expect(Gun.bi.is('')).to.be(false);
-				expect(Gun.bi.is('a')).to.be(false);
-				expect(Gun.bi.is(0)).to.be(false);
-				expect(Gun.bi.is(1)).to.be(false);
-				expect(Gun.bi.is([])).to.be(false);
-				expect(Gun.bi.is([1])).to.be(false);
-				expect(Gun.bi.is({})).to.be(false);
-				expect(Gun.bi.is({a:1})).to.be(false);
-				expect(Gun.bi.is(function(){})).to.be(false);
-			});
-			it('number',function(){
-				expect(Gun.num.is(0)).to.be(true);
-				expect(Gun.num.is(1)).to.be(true);
-				expect(Gun.num.is(Infinity)).to.be(true);
-				expect(Gun.num.is(u)).to.be(false);
-				expect(Gun.num.is(null)).to.be(false);
-				expect(Gun.num.is(NaN)).to.be(false);
-				expect(Gun.num.is('')).to.be(false);
-				expect(Gun.num.is('a')).to.be(false);
-				expect(Gun.num.is([])).to.be(false);
-				expect(Gun.num.is([1])).to.be(false);
-				expect(Gun.num.is({})).to.be(false);
-				expect(Gun.num.is({a:1})).to.be(false);
-				expect(Gun.num.is(false)).to.be(false);
-				expect(Gun.num.is(true)).to.be(false);
-				expect(Gun.num.is(function(){})).to.be(false);
-			});
-			it('text',function(){
-				expect(Gun.text.is('')).to.be(true);
-				expect(Gun.text.is('a')).to.be(true);
-				expect(Gun.text.is(u)).to.be(false);
-				expect(Gun.text.is(null)).to.be(false);
-				expect(Gun.text.is(false)).to.be(false);
-				expect(Gun.text.is(true)).to.be(false);
-				expect(Gun.text.is(0)).to.be(false);
-				expect(Gun.text.is(1)).to.be(false);
-				expect(Gun.text.is([])).to.be(false);
-				expect(Gun.text.is([1])).to.be(false);
-				expect(Gun.text.is({})).to.be(false);
-				expect(Gun.text.is({a:1})).to.be(false);
-				expect(Gun.text.is(function(){})).to.be(false);
-			});
-			it('list',function(){
-				expect(Gun.list.is([])).to.be(true);
-				expect(Gun.list.is([1])).to.be(true);
-				expect(Gun.list.is(u)).to.be(false);
-				expect(Gun.list.is(null)).to.be(false);
-				expect(Gun.list.is(0)).to.be(false);
-				expect(Gun.list.is(1)).to.be(false);
-				expect(Gun.list.is('')).to.be(false);
-				expect(Gun.list.is('a')).to.be(false);
-				expect(Gun.list.is({})).to.be(false);
-				expect(Gun.list.is({a:1})).to.be(false);
-				expect(Gun.list.is(false)).to.be(false);
-				expect(Gun.list.is(true)).to.be(false);
-				expect(Gun.list.is(function(){})).to.be(false);
-			});
-			it('obj',function(){
-				expect(Gun.obj.is({})).to.be(true);
-				expect(Gun.obj.is({a:1})).to.be(true);
-				expect(Gun.obj.is(u)).to.be(false);
-				expect(Gun.obj.is()).to.be(false);
-				expect(Gun.obj.is(undefined)).to.be(false);
-				expect(Gun.obj.is(null)).to.be(false);
-				expect(Gun.obj.is(NaN)).to.be(false);
-				expect(Gun.obj.is(0)).to.be(false);
-				expect(Gun.obj.is(1)).to.be(false);
-				expect(Gun.obj.is('')).to.be(false);
-				expect(Gun.obj.is('a')).to.be(false);
-				expect(Gun.obj.is([])).to.be(false);
-				expect(Gun.obj.is([1])).to.be(false);
-				expect(Gun.obj.is(false)).to.be(false);
-				expect(Gun.obj.is(true)).to.be(false);
-				expect(Gun.obj.is(function(){})).to.be(false);
-				expect(Gun.obj.is(new Date())).to.be(false);
-				expect(Gun.obj.is(/regex/)).to.be(false);
-				this.document && expect(Gun.obj.is(document.createElement('div'))).to.be(false);
-				expect(Gun.obj.is(new (function Class(){ this.x = 1; this.y = 2 })())).to.be(true);
-			});
-			it('fns',function(){
-				expect(Gun.fns.is(function(){})).to.be(true);
-				expect(Gun.fns.is(u)).to.be(false);
-				expect(Gun.fns.is(null)).to.be(false);
-				expect(Gun.fns.is('')).to.be(false);
-				expect(Gun.fns.is('a')).to.be(false);
-				expect(Gun.fns.is(0)).to.be(false);
-				expect(Gun.fns.is(1)).to.be(false);
-				expect(Gun.fns.is([])).to.be(false);
-				expect(Gun.fns.is([1])).to.be(false);
-				expect(Gun.fns.is({})).to.be(false);
-				expect(Gun.fns.is({a:1})).to.be(false);
-				expect(Gun.fns.is(false)).to.be(false);
-				expect(Gun.fns.is(true)).to.be(false);
-			});
-			it('time',function(){
-				t.ts = Gun.time.is();
-				expect(13 <= t.ts.toString().length).to.be.ok();
-				expect(Gun.num.is(t.ts)).to.be.ok();
-				expect(Gun.time.is(new Date())).to.be.ok();
-			});
-		});
-		describe('Text', function(){
-			it('ify',function(){
-				expect(Gun.text.ify(0)).to.be('0');
-				expect(Gun.text.ify(22)).to.be('22');
-				expect(Gun.text.ify([true,33,'yay'])).to.be('[true,33,"yay"]');
-				expect(Gun.text.ify({a:0,b:'1',c:[0,'1'],d:{e:'f'}})).to.be('{"a":0,"b":"1","c":[0,"1"],"d":{"e":"f"}}');
-				expect(Gun.text.ify(false)).to.be('false');
-				expect(Gun.text.ify(true)).to.be('true');
-			});
-			it('random',function(){
-				expect(Gun.text.random().length).to.be(24);
-				expect(Gun.text.random(11).length).to.be(11);
-				expect(Gun.text.random(4).length).to.be(4);
-				t.tr = Gun.text.random(2,'as'); expect((t.tr=='as'||t.tr=='aa'||t.tr=='sa'||t.tr=='ss')).to.be.ok();
-			});
-			it('match',function(){
-				expect(Gun.text.match("user/mark", 'user/mark')).to.be.ok();
-				expect(Gun.text.match("user/mark/nadal", {'=': 'user/mark'})).to.not.be.ok();
-				expect(Gun.text.match("user/mark", {'~': 'user/Mark'})).to.be.ok();
-				expect(Gun.text.match("user/mark/nadal", {'*': 'user/'})).to.be.ok();
-				expect(Gun.text.match("email/mark@gunDB.io", {'*': 'user/'})).to.not.be.ok();
-				expect(Gun.text.match("user/mark/nadal", {'*': 'user/', '>': 'j', '<': 'o'})).to.be.ok();
-				expect(Gun.text.match("user/amber/nadal", {'*': 'user/', '>': 'j', '<': 'o'})).to.not.be.ok();
-				expect(Gun.text.match("user/amber/nadal", {'*': 'user/', '>': 'a', '<': 'c'})).to.be.ok();
-				expect(Gun.text.match("user/mark/nadal", {'*': 'user/', '>': 'a', '<': 'c'})).to.not.be.ok();
-				expect(Gun.text.match("user/mark/nadal", {'*': 'user/', '>': 'j', '<': 'o', '?': 'm/n'})).to.be.ok();
-				expect(Gun.text.match("user/amber/cazzell", {'*': 'user/', '?': 'm/n'})).to.not.be.ok();
-				expect(Gun.text.match("user/mark/nadal", {'*': 'user/', '-': 'mad'})).to.be.ok();
-				expect(Gun.text.match("user/mad/person", {'*': 'user/', '-': 'mad'})).to.not.be.ok();
-				expect(Gun.text.match("user/mark/timothy/nadal", {'*': 'user/', '-': ['mark', 'nadal']})).to.not.be.ok();
-				expect(Gun.text.match("user/amber/rachel/cazzell", {'*': 'user/', '-': ['mark', 'nadal']})).to.be.ok();
-				expect(Gun.text.match("user/mark/nadal", {'*': 'user/', '+': 'ark'})).to.be.ok();
-				expect(Gun.text.match("user/mad/person", {'*': 'user/', '+': 'ark'})).to.not.be.ok();
-				expect(Gun.text.match("user/mark/timothy/nadal", {'*': 'user/', '+': ['mark', 'nadal']})).to.be.ok();
-				expect(Gun.text.match("user/mark/timothy/nadal", {'*': 'user/', '+': ['nadal', 'mark']})).to.be.ok();
-				expect(Gun.text.match("user/mark/timothy/nadal", {'*': 'user/', '+': ['mark', 'amber']})).to.not.be.ok();
-				expect(Gun.text.match("user/mark/rachel/nadal/cazzell", {'*': 'user/', '+': ['mark', 'cazzell'], '-': ['amber', 'timothy']})).to.be.ok();
-				expect(Gun.text.match("user/mark/rachel/timothy/cazzell", {'*': 'user/', '+': ['mark', 'cazzell'], '-': ['amber', 'timothy']})).to.not.be.ok();
-				expect(Gun.text.match("photo/kitten.jpg", {'*': 'photo/', '!': '.jpg'})).to.be.ok();
-				expect(Gun.text.match("photo/kittens.gif", {'*': 'photo/', '!': '.jpg'})).to.not.be.ok();
-			});
-		});
-		describe('List', function(){
-			it('slit',function(){
-				(function(){
-					expect(Gun.list.slit.call(arguments, 0)).to.eql([1,2,3,'a','b','c']);
-				}(1,2,3,'a','b','c'));
-			});
-			it('sort',function(){
-				expect([{i:9},{i:4},{i:1},{i:-3},{i:0}].sort(Gun.list.sort('i'))).to.eql([{i:-3},{i:0},{i:1},{i:4},{i:9}]);
-			});
-			it('map',function(){
-				expect(Gun.list.map([1,2,3,4,5],function(v,i,t){ t(v+=this.d); this.d=v; },{d:0})).to.eql([1,3,6,10,15]);
-				expect(Gun.list.map([2,3,0,4],function(v,i,t){ if(!v){ return } t(v*=this.d); this.d=v; },{d:1})).to.eql([2,6,24]);
-				expect(Gun.list.map([true,false,NaN,Infinity,'',9],function(v,i,t){ if(i===3){ return 0 }})).to.be(0);
-			});
-		});
-		describe('Object', function(){
-			it('del',function(){
-				var obj = {a:1,b:2};
-				Gun.obj.del(obj,'a');
-				expect(obj).to.eql({b:2});
-			});
-			it('has',function(){
-				var obj = {a:1,b:2};
-				expect(Gun.obj.has(obj,'a')).to.be.ok();
-			});
-			it('empty',function(){
-				expect(Gun.obj.empty()).to.be(true);
-				expect(Gun.obj.empty({a:false})).to.be(false);
-				expect(Gun.obj.empty({a:false},'a')).to.be(true);
-				expect(Gun.obj.empty({a:false},{a:1})).to.be(true);
-				expect(Gun.obj.empty({a:false,b:1},'a')).to.be(false);
-				expect(Gun.obj.empty({a:false,b:1},{a:1})).to.be(false);
-				expect(Gun.obj.empty({a:false,b:1},{a:1,b:1})).to.be(true);
-				expect(Gun.obj.empty({a:false,b:1,c:3},{a:1,b:1})).to.be(false);
-				expect(Gun.obj.empty({1:1},'danger')).to.be(false);
-			});
-			it('copy',function(){
-				var obj = {"a":false,"b":1,"c":"d","e":[0,1],"f":{"g":"h"}};
-				var copy = Gun.obj.copy(obj);
-				expect(copy).to.eql(obj);
-				expect(copy).to.not.be(obj);
-			});
-			it('ify',function(){
-				expect(Gun.obj.ify('[0,1]')).to.eql([0,1]);
-				expect(Gun.obj.ify('{"a":false,"b":1,"c":"d","e":[0,1],"f":{"g":"h"}}')).to.eql({"a":false,"b":1,"c":"d","e":[0,1],"f":{"g":"h"}});
-			});
-			it('map',function(){
-				expect(Gun.obj.map({a:'z',b:'y',c:'x'},function(v,i,t){ t(v,i) })).to.eql({x:'c',y:'b',z:'a'});
-				expect(Gun.obj.map({a:'z',b:false,c:'x'},function(v,i,t){ if(!v){ return } t(i,v) })).to.eql({a:'z',c:'x'});
-				expect(Gun.obj.map({a:'z',b:3,c:'x'},function(v,i,t){ if(v===3){ return 0 }})).to.be(0);
-			});
-		});
-		describe('Functions', function(){
-			/*
+    describe('Type Check', function () {
+      it('binary', function () {
+        expect(Gun.bi.is(false)).to.be(true)
+        expect(Gun.bi.is(true)).to.be(true)
+        expect(Gun.bi.is(u)).to.be(false)
+        expect(Gun.bi.is(null)).to.be(false)
+        expect(Gun.bi.is('')).to.be(false)
+        expect(Gun.bi.is('a')).to.be(false)
+        expect(Gun.bi.is(0)).to.be(false)
+        expect(Gun.bi.is(1)).to.be(false)
+        expect(Gun.bi.is([])).to.be(false)
+        expect(Gun.bi.is([1])).to.be(false)
+        expect(Gun.bi.is({})).to.be(false)
+        expect(Gun.bi.is({a: 1})).to.be(false)
+        expect(Gun.bi.is(function () {})).to.be(false)
+      })
+      it('number', function () {
+        expect(Gun.num.is(0)).to.be(true)
+        expect(Gun.num.is(1)).to.be(true)
+        expect(Gun.num.is(Infinity)).to.be(true)
+        expect(Gun.num.is(u)).to.be(false)
+        expect(Gun.num.is(null)).to.be(false)
+        expect(Gun.num.is(NaN)).to.be(false)
+        expect(Gun.num.is('')).to.be(false)
+        expect(Gun.num.is('a')).to.be(false)
+        expect(Gun.num.is([])).to.be(false)
+        expect(Gun.num.is([1])).to.be(false)
+        expect(Gun.num.is({})).to.be(false)
+        expect(Gun.num.is({a: 1})).to.be(false)
+        expect(Gun.num.is(false)).to.be(false)
+        expect(Gun.num.is(true)).to.be(false)
+        expect(Gun.num.is(function () {})).to.be(false)
+      })
+      it('text', function () {
+        expect(Gun.text.is('')).to.be(true)
+        expect(Gun.text.is('a')).to.be(true)
+        expect(Gun.text.is(u)).to.be(false)
+        expect(Gun.text.is(null)).to.be(false)
+        expect(Gun.text.is(false)).to.be(false)
+        expect(Gun.text.is(true)).to.be(false)
+        expect(Gun.text.is(0)).to.be(false)
+        expect(Gun.text.is(1)).to.be(false)
+        expect(Gun.text.is([])).to.be(false)
+        expect(Gun.text.is([1])).to.be(false)
+        expect(Gun.text.is({})).to.be(false)
+        expect(Gun.text.is({a: 1})).to.be(false)
+        expect(Gun.text.is(function () {})).to.be(false)
+      })
+      it('list', function () {
+        expect(Gun.list.is([])).to.be(true)
+        expect(Gun.list.is([1])).to.be(true)
+        expect(Gun.list.is(u)).to.be(false)
+        expect(Gun.list.is(null)).to.be(false)
+        expect(Gun.list.is(0)).to.be(false)
+        expect(Gun.list.is(1)).to.be(false)
+        expect(Gun.list.is('')).to.be(false)
+        expect(Gun.list.is('a')).to.be(false)
+        expect(Gun.list.is({})).to.be(false)
+        expect(Gun.list.is({a: 1})).to.be(false)
+        expect(Gun.list.is(false)).to.be(false)
+        expect(Gun.list.is(true)).to.be(false)
+        expect(Gun.list.is(function () {})).to.be(false)
+      })
+      it('obj', function () {
+        expect(Gun.obj.is({})).to.be(true)
+        expect(Gun.obj.is({a: 1})).to.be(true)
+        expect(Gun.obj.is(u)).to.be(false)
+        expect(Gun.obj.is()).to.be(false)
+        expect(Gun.obj.is(undefined)).to.be(false)
+        expect(Gun.obj.is(null)).to.be(false)
+        expect(Gun.obj.is(NaN)).to.be(false)
+        expect(Gun.obj.is(0)).to.be(false)
+        expect(Gun.obj.is(1)).to.be(false)
+        expect(Gun.obj.is('')).to.be(false)
+        expect(Gun.obj.is('a')).to.be(false)
+        expect(Gun.obj.is([])).to.be(false)
+        expect(Gun.obj.is([1])).to.be(false)
+        expect(Gun.obj.is(false)).to.be(false)
+        expect(Gun.obj.is(true)).to.be(false)
+        expect(Gun.obj.is(function () {})).to.be(false)
+        expect(Gun.obj.is(new Date())).to.be(false)
+        expect(Gun.obj.is(/regex/)).to.be(false)
+        this.document && expect(Gun.obj.is(document.createElement('div'))).to.be(false)
+        expect(Gun.obj.is(new function Class () { this.x = 1; this.y = 2 }())).to.be(true)
+      })
+      it('fns', function () {
+        expect(Gun.fns.is(function () {})).to.be(true)
+        expect(Gun.fns.is(u)).to.be(false)
+        expect(Gun.fns.is(null)).to.be(false)
+        expect(Gun.fns.is('')).to.be(false)
+        expect(Gun.fns.is('a')).to.be(false)
+        expect(Gun.fns.is(0)).to.be(false)
+        expect(Gun.fns.is(1)).to.be(false)
+        expect(Gun.fns.is([])).to.be(false)
+        expect(Gun.fns.is([1])).to.be(false)
+        expect(Gun.fns.is({})).to.be(false)
+        expect(Gun.fns.is({a: 1})).to.be(false)
+        expect(Gun.fns.is(false)).to.be(false)
+        expect(Gun.fns.is(true)).to.be(false)
+      })
+      it('time', function () {
+        t.ts = Gun.time.is()
+        expect(t.ts.toString().length >= 13).to.be.ok()
+        expect(Gun.num.is(t.ts)).to.be.ok()
+        expect(Gun.time.is(new Date())).to.be.ok()
+      })
+    })
+    describe('Text', function () {
+      it('ify', function () {
+        expect(Gun.text.ify(0)).to.be('0')
+        expect(Gun.text.ify(22)).to.be('22')
+        expect(Gun.text.ify([true, 33, 'yay'])).to.be('[true,33,"yay"]')
+        expect(Gun.text.ify({a: 0, b: '1', c: [0, '1'], d: {e: 'f'}})).to.be('{"a":0,"b":"1","c":[0,"1"],"d":{"e":"f"}}')
+        expect(Gun.text.ify(false)).to.be('false')
+        expect(Gun.text.ify(true)).to.be('true')
+      })
+      it('random', function () {
+        expect(Gun.text.random().length).to.be(24)
+        expect(Gun.text.random(11).length).to.be(11)
+        expect(Gun.text.random(4).length).to.be(4)
+        t.tr = Gun.text.random(2, 'as'); expect((t.tr == 'as' || t.tr == 'aa' || t.tr == 'sa' || t.tr == 'ss')).to.be.ok()
+      })
+      it('match', function () {
+        expect(Gun.text.match('user/mark', 'user/mark')).to.be.ok()
+        expect(Gun.text.match('user/mark/nadal', {'=': 'user/mark'})).to.not.be.ok()
+        expect(Gun.text.match('user/mark', {'~': 'user/Mark'})).to.be.ok()
+        expect(Gun.text.match('user/mark/nadal', {'*': 'user/'})).to.be.ok()
+        expect(Gun.text.match('email/mark@gunDB.io', {'*': 'user/'})).to.not.be.ok()
+        expect(Gun.text.match('user/mark/nadal', {'*': 'user/', '>': 'j', '<': 'o'})).to.be.ok()
+        expect(Gun.text.match('user/amber/nadal', {'*': 'user/', '>': 'j', '<': 'o'})).to.not.be.ok()
+        expect(Gun.text.match('user/amber/nadal', {'*': 'user/', '>': 'a', '<': 'c'})).to.be.ok()
+        expect(Gun.text.match('user/mark/nadal', {'*': 'user/', '>': 'a', '<': 'c'})).to.not.be.ok()
+        expect(Gun.text.match('user/mark/nadal', {'*': 'user/', '>': 'j', '<': 'o', '?': 'm/n'})).to.be.ok()
+        expect(Gun.text.match('user/amber/cazzell', {'*': 'user/', '?': 'm/n'})).to.not.be.ok()
+        expect(Gun.text.match('user/mark/nadal', {'*': 'user/', '-': 'mad'})).to.be.ok()
+        expect(Gun.text.match('user/mad/person', {'*': 'user/', '-': 'mad'})).to.not.be.ok()
+        expect(Gun.text.match('user/mark/timothy/nadal', {'*': 'user/', '-': ['mark', 'nadal']})).to.not.be.ok()
+        expect(Gun.text.match('user/amber/rachel/cazzell', {'*': 'user/', '-': ['mark', 'nadal']})).to.be.ok()
+        expect(Gun.text.match('user/mark/nadal', {'*': 'user/', '+': 'ark'})).to.be.ok()
+        expect(Gun.text.match('user/mad/person', {'*': 'user/', '+': 'ark'})).to.not.be.ok()
+        expect(Gun.text.match('user/mark/timothy/nadal', {'*': 'user/', '+': ['mark', 'nadal']})).to.be.ok()
+        expect(Gun.text.match('user/mark/timothy/nadal', {'*': 'user/', '+': ['nadal', 'mark']})).to.be.ok()
+        expect(Gun.text.match('user/mark/timothy/nadal', {'*': 'user/', '+': ['mark', 'amber']})).to.not.be.ok()
+        expect(Gun.text.match('user/mark/rachel/nadal/cazzell', {'*': 'user/', '+': ['mark', 'cazzell'], '-': ['amber', 'timothy']})).to.be.ok()
+        expect(Gun.text.match('user/mark/rachel/timothy/cazzell', {'*': 'user/', '+': ['mark', 'cazzell'], '-': ['amber', 'timothy']})).to.not.be.ok()
+        expect(Gun.text.match('photo/kitten.jpg', {'*': 'photo/', '!': '.jpg'})).to.be.ok()
+        expect(Gun.text.match('photo/kittens.gif', {'*': 'photo/', '!': '.jpg'})).to.not.be.ok()
+      })
+    })
+    describe('List', function () {
+      it('slit', function () {
+        (function () {
+          expect(Gun.list.slit.call(arguments, 0)).to.eql([1, 2, 3, 'a', 'b', 'c'])
+        }(1, 2, 3, 'a', 'b', 'c'))
+      })
+      it('sort', function () {
+        expect([{i: 9}, {i: 4}, {i: 1}, {i: -3}, {i: 0}].sort(Gun.list.sort('i'))).to.eql([{i: -3}, {i: 0}, {i: 1}, {i: 4}, {i: 9}])
+      })
+      it('map', function () {
+        expect(Gun.list.map([1, 2, 3, 4, 5], function (v, i, t) { t(v += this.d); this.d = v }, {d: 0})).to.eql([1, 3, 6, 10, 15])
+        expect(Gun.list.map([2, 3, 0, 4], function (v, i, t) { if (!v) { return } t(v *= this.d); this.d = v }, {d: 1})).to.eql([2, 6, 24])
+        expect(Gun.list.map([true, false, NaN, Infinity, '', 9], function (v, i, t) { if (i === 3) { return 0 } })).to.be(0)
+      })
+    })
+    describe('Object', function () {
+      it('del', function () {
+        var obj = {a: 1, b: 2}
+        Gun.obj.del(obj, 'a')
+        expect(obj).to.eql({b: 2})
+      })
+      it('has', function () {
+        var obj = {a: 1, b: 2}
+        expect(Gun.obj.has(obj, 'a')).to.be.ok()
+      })
+      it('empty', function () {
+        expect(Gun.obj.empty()).to.be(true)
+        expect(Gun.obj.empty({a: false})).to.be(false)
+        expect(Gun.obj.empty({a: false}, 'a')).to.be(true)
+        expect(Gun.obj.empty({a: false}, {a: 1})).to.be(true)
+        expect(Gun.obj.empty({a: false, b: 1}, 'a')).to.be(false)
+        expect(Gun.obj.empty({a: false, b: 1}, {a: 1})).to.be(false)
+        expect(Gun.obj.empty({a: false, b: 1}, {a: 1, b: 1})).to.be(true)
+        expect(Gun.obj.empty({a: false, b: 1, c: 3}, {a: 1, b: 1})).to.be(false)
+        expect(Gun.obj.empty({1: 1}, 'danger')).to.be(false)
+      })
+      it('copy', function () {
+        var obj = {'a': false, 'b': 1, 'c': 'd', 'e': [0, 1], 'f': {'g': 'h'}}
+        var copy = Gun.obj.copy(obj)
+        expect(copy).to.eql(obj)
+        expect(copy).to.not.be(obj)
+      })
+      it('ify', function () {
+        expect(Gun.obj.ify('[0,1]')).to.eql([0, 1])
+        expect(Gun.obj.ify('{"a":false,"b":1,"c":"d","e":[0,1],"f":{"g":"h"}}')).to.eql({'a': false, 'b': 1, 'c': 'd', 'e': [0, 1], 'f': {'g': 'h'}})
+      })
+      it('map', function () {
+        expect(Gun.obj.map({a: 'z', b: 'y', c: 'x'}, function (v, i, t) { t(v, i) })).to.eql({x: 'c', y: 'b', z: 'a'})
+        expect(Gun.obj.map({a: 'z', b: false, c: 'x'}, function (v, i, t) { if (!v) { return } t(i, v) })).to.eql({a: 'z', c: 'x'})
+        expect(Gun.obj.map({a: 'z', b: 3, c: 'x'}, function (v, i, t) { if (v === 3) { return 0 } })).to.be(0)
+      })
+    })
+    describe('Functions', function () {
+      /*
 			it.skip('sum',function(done){ // deprecate?
 				var obj = {a:2, b:2, c:3, d: 9};
 				Gun.obj.map(obj, function(num, key){
@@ -411,991 +415,1011 @@ describe('Gun', function(){
 				}));
 			});
 			*/
-		});
-		describe('On', function(){
-			it('subscribe', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a){
-					done.first = true;
-					expect(a).to.be(1);
-					this.to.next(a);
-				});
-				e.on('foo', function(a){
-					expect(a).to.be(1);
-					expect(done.first).to.be.ok();
-					done();
-				});
-				e.on('foo', 1);
-			});
-			it('unsubscribe', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a){
-					this.off();
-					done.first = a;
-					expect(a).to.be(1);
-					this.to.next(a);
-				});
-				e.on('foo', function(a){
-					var to = this;
-					expect(a).to.be(done.second? 2 : 1);
-					expect(done.first).to.be(1);
-					done.second = true;
-					if(a === 2){
-						setTimeout(function(){
-							expect(e.tag.foo.to === to).to.be.ok();
-							done();
-						}, 10);
-					}
-				});
-				e.on('foo', 1);
-				e.on('foo', 2);
-			});
-			it('stun', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a, ev){
-					if(2 === a){
-						done.first2 = true;
-						this.to.next(a);
-						return;
-					}
-					setTimeout(function(){
-						expect(done.second).to.not.be.ok();
-						expect(done.second2).to.be.ok();
-						expect(done.first2).to.be.ok();
-						done();
-					},10);
-				});
-				e.on('foo', function(a, ev){
-					if(2 === a){
-						done.second2 = true;
-					} else {
-						done.second = true;
-					}
-				});
-				e.on('foo', 1);
-				e.on('foo', 2);
-			});
-			it('resume', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a, ev){
-					var to = this.to;
-					setTimeout(function(){
-						expect(done.second).to.not.be.ok();
-						to.next(a);
-					},10);
-				});
-				e.on('foo', function(a){
-					done.second = true;
-					expect(a).to.be(1);
-					done();
-				});
-				e.on('foo', 1);
-			});
-			it('double resume', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a, ev){
-					var to = this.to;
-					setTimeout(function(){
-						if(1 === a){
-							done.first1 = true;
-							expect(done.second).to.not.be.ok();
-						}
-						if(2 === a){
-							done.first2 = true;
-						}
-						to.next(a);
-					},10);
-				});
-				e.on('foo', function(a, ev){
-					done.second = true;
-					if(1 === a){
-						expect(done.first2).to.not.be.ok();
-						done.second1 = true;
-					}
-					if(2 === a){
-						expect(done.first2).to.be.ok();
-						if(done.second1){
-							done();
-						}
-					}
-				});
-				e.on('foo', 1);
-				e.on('foo', 2);
-			});
-			it('double resume different event', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a, ev){
-					var to = this.to;
-					setTimeout(function(){
-						done.first1 = true;
-						to.next(a);
-					},10);
-				});
-				e.on('foo', function(a){
-					if(1 === a){
-						expect(done.first1).to.be.ok();
-						done();
-					}
-				});
-				e.on('foo', 1);
-				e.on('bar', 2);
-			});
-			it('resume params', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a, ev){
-					var to = this.to;
-					setTimeout(function(){
-						expect(done.second).to.not.be.ok();
-						to.next(0);
-					},10);
-				});
-				e.on('foo', function(a){
-					done.second = true;
-					expect(a).to.be(0);
-					done();
-				});
-				e.on('foo', 1);
-			});
-			it('map', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a, ev){
-					var to = this.to;
-					Gun.obj.map(a.it, function(v,f){
-						setTimeout(function(){
-							var emit = {field: 'where', soul: f};
-							to.next(emit);
-						},10);
-					})
-				});
-				e.on('foo', function(a, ev){
-					var to = this.to;
-					setTimeout(function(){
-						to.next({node: a.soul});
-					},100);
-				});
-				e.on('foo', function(a){
-					if('a' == a.node){
-						done.a = true;
-					} else {
-						expect(done.a).to.be.ok();
-						done();
-					}
-				});
-				e.on('foo', {field: 'where', it: {a: 1, b: 2}});
-			});
-			it('map synchronous', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a, ev){
-					var to = this.to;
-					Gun.obj.map(a.node, function(v,f){
-						//setTimeout(function(){
-							var emit = {field: 'where', soul: f};
-							to.next(emit);
-						//},10);
-					})
-				});
-				e.on('foo', function(a, ev){
-					var to = this.to;
-					setTimeout(function(){
-						to.next({node: a.soul});
-					},100);
-				});
-				e.on('foo', function(a){
-					expect(this.as.hi).to.be(1);
-					if('a' == a.node){
-						done.a = true;
-					} else {
-						expect(done.a).to.be.ok();
-						done();
-					}
-				}, {hi: 1}).on.on('foo', {field: 'where', node: {a: 1, b: 2}});
-			});
-			it('synchronous async', function(done){
-				var e = {on: Gun.on};
-				e.on('foo', function(a){
-					expect(a.b).to.be(5);
-					done.first = true;
-					this.to.next(a);
-				});
-				e.on('foo', function(a, ev){
-					expect(a.b).to.be(5);
-					done.second = true;
-					var to = this.to;
-					setTimeout(function(){
-						to.next({c: 9, again: a.again});
-					},100);
-				});
-				e.on('foo', function(a){
-					this.off();
-					expect(a.again).to.not.be.ok();
-					expect(a.c).to.be(9);
-					expect(done.first).to.be.ok();
-					expect(done.second).to.be.ok();
-					done();
-				}).on.on('foo', {b: 5}).on.on('foo', {b:5, again: true});
-			});
-		});
-		describe('flow', function(){
-			var i = 0;
-			function flow(){
-				var f = function(arg){
-					var cb = f.cb? f.cb.fn : f.fn;
-					if(cb){
-						f.cb = cb;
-						var ff = flow();
-						ff.f = f;
-						cb(ff);
-						return;
-					}
-					if(f.f){
-						f.f(arg);
-						f.cb = 0;
-						return;
-					}
-				}, cb;
-				f.flow = function(fn){
-					cb = (cb || f).fn = fn;
-					return f;
-				};
-				return f;
-			}
-			it('intermittent interruption', function(done){
-				var f = flow();
-				//var f = {flow: flow}
-				f.flow(function(f){
-					//console.log(1);
-					f.flow(function(f){
-						//console.log(2);
-						f({yes: 'please'});
-					});
-					setTimeout(function(){
-						f.flow(function(f){
-							//console.log(2.1);
-							f({forever: 'there'});
-						});
-						f({strange: 'places'});
-						//console.log("-----");
-						f({earlier: 'location'});
-					},100);
-				});
-				f.flow(function(f){
-					//console.log(3);
-					f({ok: 'now'});
-				});
-				f.flow(function(f){
-					//console.log(4);
-					done();
-				});
-				setTimeout(function(){
-					f({hello: 'world'});
-				}, 100);
-			});
-			var i = 0;
-			;(function(exports){
-				function next(arg){ var n = this;
-					if(arg instanceof Function){
-						if(!n.fn){ return n.fn = arg, n }
-						var f = {next: next, fn: arg, first: n.first || n};
-						n.last = (n.last || n).to = f;
-						return n;
-					}
-					if(n.fn){
-						var sub = {next: next, from: n.to || (n.first || {}).from};
-						n.fn(sub);
-						return;
-					}
-					if(n.from){
-						n.from.next(arg);
-						return;
-					}
-				}
-				exports.next = next;
-			}(Gun));
-			it('intermittent interruptions', function(done){
-				//var f = flow();
-				var f = {next: Gun.next}; // for now
-				f.next(function(f){
-					//console.log(1, f);
-					f.next(function(f){
-						//console.log(2, f);
-						f.next({yes: 'please'});
-					});
-					setTimeout(function(){
-						f.next(function(f){
-							//console.log(2.1, f);
-							f.next({forever: 'there'});
-						});
-						f.next({strange: 'places'});
-						//console.log("-----");
-						f.next({earlier: 'location'});
-					},100);
-				});
-				f.next(function(f){
-					//console.log(3);
-					f.next({ok: 'now'});
-				});
-				f.next(function(f){
-					//console.log(4);
-					if(!done.a){ return done.a = true }
-					done();
-				});
-				setTimeout(function(){
-					f.next({hello: 'world'});
-				}, 100);
-			});
-		});
-		describe('Gun Safety', function(){
-			/* WARNING NOTE: Internal API has significant breaking changes! */
-			var gun = Gun();
-			it('is',function(){
-				expect(Gun.is(gun)).to.be(true);
-				expect(Gun.is(true)).to.be(false);
-				expect(Gun.is(false)).to.be(false);
-				expect(Gun.is(0)).to.be(false);
-				expect(Gun.is(1)).to.be(false);
-				expect(Gun.is('')).to.be(false);
-				expect(Gun.is('a')).to.be(false);
-				expect(Gun.is(Infinity)).to.be(false);
-				expect(Gun.is(NaN)).to.be(false);
-				expect(Gun.is([])).to.be(false);
-				expect(Gun.is([1])).to.be(false);
-				expect(Gun.is({})).to.be(false);
-				expect(Gun.is({a:1})).to.be(false);
-				expect(Gun.is(function(){})).to.be(false);
-			});
-			it('is value',function(){
-				expect(Gun.val.is(false)).to.be(true);
-				expect(Gun.val.is(true)).to.be(true);
-				expect(Gun.val.is(0)).to.be(true);
-				expect(Gun.val.is(1)).to.be(true);
-				expect(Gun.val.is('')).to.be(true);
-				expect(Gun.val.is('a')).to.be(true);
-				expect(Gun.val.is({'#':'somesoulidhere'})).to.be('somesoulidhere');
-				expect(Gun.val.is({'#':'somesoulidhere', and: 'nope'})).to.be(false);
-				expect(Gun.val.is(Infinity)).to.be(false); // boohoo :(
-				expect(Gun.val.is(NaN)).to.be(false);
-				expect(Gun.val.is([])).to.be(false);
-				expect(Gun.val.is([1])).to.be(false);
-				expect(Gun.val.is({})).to.be(false);
-				expect(Gun.val.is({a:1})).to.be(false);
-				expect(Gun.val.is(function(){})).to.be(false);
-			});
-			it('is rel',function(){
-				expect(Gun.val.rel.is({'#':'somesoulidhere'})).to.be('somesoulidhere');
-				expect(Gun.val.rel.is({'#':'somethingelsehere'})).to.be('somethingelsehere');
-				expect(Gun.val.rel.is({'#':'somesoulidhere', and: 'nope'})).to.be(false);
-				expect(Gun.val.rel.is({or: 'nope', '#':'somesoulidhere'})).to.be(false);
-				expect(Gun.val.rel.is(false)).to.be(false);
-				expect(Gun.val.rel.is(true)).to.be(false);
-				expect(Gun.val.rel.is('')).to.be(false);
-				expect(Gun.val.rel.is('a')).to.be(false);
-				expect(Gun.val.rel.is(0)).to.be(false);
-				expect(Gun.val.rel.is(1)).to.be(false);
-				expect(Gun.val.rel.is(Infinity)).to.be(false); // boohoo :(
-				expect(Gun.val.rel.is(NaN)).to.be(false);
-				expect(Gun.val.rel.is([])).to.be(false);
-				expect(Gun.val.rel.is([1])).to.be(false);
-				expect(Gun.val.rel.is({})).to.be(false);
-				expect(Gun.val.rel.is({a:1})).to.be(false);
-				expect(Gun.val.rel.is(function(){})).to.be(false);
-			});
-			it.skip('is lex',function(){
-				expect(Gun.is.lex({'#': 'soul'})).to.eql({soul: 'soul'});
-				expect(Gun.is.lex({'.': 'field'})).to.eql({field: 'field'});
-				expect(Gun.is.lex({'=': 'value'})).to.eql({value: 'value'});
-				expect(Gun.is.lex({'>': 'state'})).to.eql({state: 'state'});
-				expect(Gun.is.lex({'#': {'=': 'soul'}})).to.eql({soul: {'=': 'soul'}});
-				expect(Gun.is.lex({'#': {'=': 'soul'}, '.': []})).to.be(false);
-				expect(Gun.is.lex({'#': {'=': 'soul'}, 'asdf': 'oye'})).to.be(false);
-				expect(Gun.is.lex()).to.be(false);
-				expect(Gun.is.lex('')).to.be(false);
-			});
-			it.skip('is lex ify',function(){
-				expect(Gun.is.lex.ify({'#': 'soul', '.': 'field', soul: 'foo', field: 'field', state: 0})).to.eql({'#': 'soul', '.': 'field', '>': 0});
-			});
-			it('is node',function(){
-				var n;
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}})).to.be(true);
-				expect(Gun.node.is(n = {_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}})).to.be(true);
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}, g: Infinity})).to.be(false);
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}, a:0, b: 1, z: NaN, c: '', d: 'e'})).to.be(false);
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}, a:0, b: 1, y: {_: 'cool'}, c: '', d: 'e'})).to.be(false);
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}, a:0, b: 1, x: [], c: '', d: 'e'})).to.be(false);
-				expect(Gun.node.is({})).to.be(false);
-				expect(Gun.node.is({a:1})).to.be(false);
-				expect(Gun.node.is({_:{}})).to.be(false);
-				expect(Gun.node.is({_:{}, a:1})).to.be(false);
-				expect(Gun.node.is({'#':'somesoulidhere'})).to.be(false);
-				Gun.node.is(n, function(v,f){
-					//console.log("v/f", v,f);
-				});
-			});
-			it('is graph',function(){
-				var g;
-				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}}})).to.be(true);
-				expect(Gun.graph.is(g = {'somesoulidhere': {_:{'#':'somesoulidhere'}}, 'somethingelsehere': {_:{'#':'somethingelsehere'}}})).to.be(true);
-				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}}, 'somethingelsehere': {_:{'#':'somethingelsehere'}}})).to.be(true);
-				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}}})).to.be(true);
-				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}}, foo: 1, 'somethingelsehere': {_:{'#':'somethingelsehere'}}})).to.be(false);
-				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}}, foo: {}, 'somethingelsehere': {_:{'#':'somethingelsehere'}}})).to.be(false);
-				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}}, foo: {_:{'#':'FOO'}}, 'somethingelsehere': {_:{'#':'somethingelsehere'}}})).to.be(false);
-				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}}, foo: {_:{}}, 'somethingelsehere': {_:{'#':'somethingelsehere'}}})).to.be(false);
-				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: Infinity, c: '', d: 'e', f: {'#':'somethingelsehere'}}})).to.be(false);
-				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: Infinity, c: '', d: 'e', f: {'#':'somethingelsehere'}}, 'somethingelsehere': {_:{'#':'somethingelsehere'}}})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}, g: Infinity})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, z: NaN, c: '', d: 'e'})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, y: {_: 'cool'}, c: '', d: 'e'})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, x: [], c: '', d: 'e'})).to.be(false);
-				expect(Gun.graph.is({})).to.be(false); // Empty graph is not a graph :(
-				expect(Gun.graph.is({a:1})).to.be(false);
-				expect(Gun.graph.is({_:{}})).to.be(false);
-				expect(Gun.graph.is({_:{}, a:1})).to.be(false);
-				expect(Gun.graph.is({'#':'somesoulidhere'})).to.be(false);
-				Gun.graph.is(g, function(n,s){
-					//console.log("node/soul", n,s);
-				});
-			});
-			it('graph ify', function(done){
-				function map(v,f,n){
-					done.m = true;
-				}
-				var graph = Gun.graph.ify({
-					_: {'#': 'yay'},
-					a: 1
-				}, map);
-				expect(graph).to.eql({
-					yay: {
-						_: {'#': 'yay'},
-						a: 1
-					}
-				});
-				expect(done.m).to.be.ok();
-				var graph = Gun.graph.ify({
-					_: {'#': 'yay', '>': {a: 9}},
-					a: 1
-				}, map);
-				expect(graph).to.eql({
-					yay: {
-						_: {'#': 'yay', '>': {a: 9}},
-						a: 1
-					}
-				});
-				var map = Gun.state.map(map, 9);
-				var graph = Gun.graph.ify({
-					_: {'#': 'yay', '>': {a: 1}},
-					a: 1
-				}, map);
-				expect(graph).to.eql({
-					yay: {
-						_: {'#': 'yay', '>': {a: 9}},
-						a: 1
-					}
-				});
-				var graph = Gun.graph.ify({a:1});
-				Gun.obj.map(graph, function(node){
-					expect(node._['#']).to.be.ok();
-				});
+    })
+    describe('On', function () {
+      it('subscribe', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a) {
+          done.first = true
+          expect(a).to.be(1)
+          this.to.next(a)
+        })
+        e.on('foo', function (a) {
+          expect(a).to.be(1)
+          expect(done.first).to.be.ok()
+          done()
+        })
+        e.on('foo', 1)
+      })
+      it('unsubscribe', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a) {
+          this.off()
+          done.first = a
+          expect(a).to.be(1)
+          this.to.next(a)
+        })
+        e.on('foo', function (a) {
+          var to = this
+          expect(a).to.be(done.second ? 2 : 1)
+          expect(done.first).to.be(1)
+          done.second = true
+          if (a === 2) {
+            setTimeout(function () {
+              expect(e.tag.foo.to === to).to.be.ok()
+              done()
+            }, 10)
+          }
+        })
+        e.on('foo', 1)
+        e.on('foo', 2)
+      })
+      it('stun', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a, ev) {
+          if (a === 2) {
+            done.first2 = true
+            this.to.next(a)
+            return
+          }
+          setTimeout(function () {
+            expect(done.second).to.not.be.ok()
+            expect(done.second2).to.be.ok()
+            expect(done.first2).to.be.ok()
+            done()
+          }, 10)
+        })
+        e.on('foo', function (a, ev) {
+          if (a === 2) {
+            done.second2 = true
+          } else {
+            done.second = true
+          }
+        })
+        e.on('foo', 1)
+        e.on('foo', 2)
+      })
+      it('resume', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a, ev) {
+          var to = this.to
+          setTimeout(function () {
+            expect(done.second).to.not.be.ok()
+            to.next(a)
+          }, 10)
+        })
+        e.on('foo', function (a) {
+          done.second = true
+          expect(a).to.be(1)
+          done()
+        })
+        e.on('foo', 1)
+      })
+      it('double resume', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a, ev) {
+          var to = this.to
+          setTimeout(function () {
+            if (a === 1) {
+              done.first1 = true
+              expect(done.second).to.not.be.ok()
+            }
+            if (a === 2) {
+              done.first2 = true
+            }
+            to.next(a)
+          }, 10)
+        })
+        e.on('foo', function (a, ev) {
+          done.second = true
+          if (a === 1) {
+            expect(done.first2).to.not.be.ok()
+            done.second1 = true
+          }
+          if (a === 2) {
+            expect(done.first2).to.be.ok()
+            if (done.second1) {
+              done()
+            }
+          }
+        })
+        e.on('foo', 1)
+        e.on('foo', 2)
+      })
+      it('double resume different event', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a, ev) {
+          var to = this.to
+          setTimeout(function () {
+            done.first1 = true
+            to.next(a)
+          }, 10)
+        })
+        e.on('foo', function (a) {
+          if (a === 1) {
+            expect(done.first1).to.be.ok()
+            done()
+          }
+        })
+        e.on('foo', 1)
+        e.on('bar', 2)
+      })
+      it('resume params', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a, ev) {
+          var to = this.to
+          setTimeout(function () {
+            expect(done.second).to.not.be.ok()
+            to.next(0)
+          }, 10)
+        })
+        e.on('foo', function (a) {
+          done.second = true
+          expect(a).to.be(0)
+          done()
+        })
+        e.on('foo', 1)
+      })
+      it('map', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a, ev) {
+          var to = this.to
+          Gun.obj.map(a.it, function (v, f) {
+            setTimeout(function () {
+              var emit = {field: 'where', soul: f}
+              to.next(emit)
+            }, 10)
+          })
+        })
+        e.on('foo', function (a, ev) {
+          var to = this.to
+          setTimeout(function () {
+            to.next({node: a.soul})
+          }, 100)
+        })
+        e.on('foo', function (a) {
+          if (a.node == 'a') {
+            done.a = true
+          } else {
+            expect(done.a).to.be.ok()
+            done()
+          }
+        })
+        e.on('foo', {field: 'where', it: {a: 1, b: 2}})
+      })
+      it('map synchronous', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a, ev) {
+          var to = this.to
+          Gun.obj.map(a.node, function (v, f) {
+            // setTimeout(function(){
+            var emit = {field: 'where', soul: f}
+            to.next(emit)
+            // },10);
+          })
+        })
+        e.on('foo', function (a, ev) {
+          var to = this.to
+          setTimeout(function () {
+            to.next({node: a.soul})
+          }, 100)
+        })
+        e.on('foo', function (a) {
+          expect(this.as.hi).to.be(1)
+          if (a.node == 'a') {
+            done.a = true
+          } else {
+            expect(done.a).to.be.ok()
+            done()
+          }
+        }, {hi: 1}).on.on('foo', {field: 'where', node: {a: 1, b: 2}})
+      })
+      it('synchronous async', function (done) {
+        var e = {on: Gun.on}
+        e.on('foo', function (a) {
+          expect(a.b).to.be(5)
+          done.first = true
+          this.to.next(a)
+        })
+        e.on('foo', function (a, ev) {
+          expect(a.b).to.be(5)
+          done.second = true
+          var to = this.to
+          setTimeout(function () {
+            to.next({c: 9, again: a.again})
+          }, 100)
+        })
+        e.on('foo', function (a) {
+          this.off()
+          expect(a.again).to.not.be.ok()
+          expect(a.c).to.be(9)
+          expect(done.first).to.be.ok()
+          expect(done.second).to.be.ok()
+          done()
+        }).on.on('foo', {b: 5}).on.on('foo', {b: 5, again: true})
+      })
+    })
+    describe('flow', function () {
+      var i = 0
+      function flow () {
+        var f = function (arg) {
+            var cb = f.cb ? f.cb.fn : f.fn
+            if (cb) {
+              f.cb = cb
+              var ff = flow()
+              ff.f = f
+              cb(ff)
+              return
+            }
+            if (f.f) {
+              f.f(arg)
+              f.cb = 0
+            }
+          }, cb
+        f.flow = function (fn) {
+          cb = (cb || f).fn = fn
+          return f
+        }
+        return f
+      }
+      it('intermittent interruption', function (done) {
+        var f = flow()
+        // var f = {flow: flow}
+        f.flow(function (f) {
+          // console.log(1);
+          f.flow(function (f) {
+            // console.log(2);
+            f({yes: 'please'})
+          })
+          setTimeout(function () {
+            f.flow(function (f) {
+              // console.log(2.1);
+              f({forever: 'there'})
+            })
+            f({strange: 'places'})
+            // console.log("-----");
+            f({earlier: 'location'})
+          }, 100)
+        })
+        f.flow(function (f) {
+          // console.log(3);
+          f({ok: 'now'})
+        })
+        f.flow(function (f) {
+          // console.log(4);
+          done()
+        })
+        setTimeout(function () {
+          f({hello: 'world'})
+        }, 100)
+      })
+      var i = 0
+			;(function (exports) {
+        function next (arg) {
+          var n = this
+          if (arg instanceof Function) {
+            if (!n.fn) { return n.fn = arg, n }
+            var f = {next: next, fn: arg, first: n.first || n}
+            n.last = (n.last || n).to = f
+            return n
+          }
+          if (n.fn) {
+            var sub = {next: next, from: n.to || (n.first || {}).from}
+            n.fn(sub)
+            return
+          }
+          if (n.from) {
+            n.from.next(arg)
+          }
+        }
+        exports.next = next
+      }(Gun))
+      it('intermittent interruptions', function (done) {
+        // var f = flow();
+        var f = {next: Gun.next} // for now
+        f.next(function (f) {
+          // console.log(1, f);
+          f.next(function (f) {
+            // console.log(2, f);
+            f.next({yes: 'please'})
+          })
+          setTimeout(function () {
+            f.next(function (f) {
+              // console.log(2.1, f);
+              f.next({forever: 'there'})
+            })
+            f.next({strange: 'places'})
+            // console.log("-----");
+            f.next({earlier: 'location'})
+          }, 100)
+        })
+        f.next(function (f) {
+          // console.log(3);
+          f.next({ok: 'now'})
+        })
+        f.next(function (f) {
+          // console.log(4);
+          if (!done.a) { return done.a = true }
+          done()
+        })
+        setTimeout(function () {
+          f.next({hello: 'world'})
+        }, 100)
+      })
+    })
+    describe('Gun Safety', function () {
+      /* WARNING NOTE: Internal API has significant breaking changes! */
+      var gun = Gun()
+      it('is', function () {
+        expect(Gun.is(gun)).to.be(true)
+        expect(Gun.is(true)).to.be(false)
+        expect(Gun.is(false)).to.be(false)
+        expect(Gun.is(0)).to.be(false)
+        expect(Gun.is(1)).to.be(false)
+        expect(Gun.is('')).to.be(false)
+        expect(Gun.is('a')).to.be(false)
+        expect(Gun.is(Infinity)).to.be(false)
+        expect(Gun.is(NaN)).to.be(false)
+        expect(Gun.is([])).to.be(false)
+        expect(Gun.is([1])).to.be(false)
+        expect(Gun.is({})).to.be(false)
+        expect(Gun.is({a: 1})).to.be(false)
+        expect(Gun.is(function () {})).to.be(false)
+      })
+      it('is value', function () {
+        expect(Gun.val.is(false)).to.be(true)
+        expect(Gun.val.is(true)).to.be(true)
+        expect(Gun.val.is(0)).to.be(true)
+        expect(Gun.val.is(1)).to.be(true)
+        expect(Gun.val.is('')).to.be(true)
+        expect(Gun.val.is('a')).to.be(true)
+        expect(Gun.val.is({'#': 'somesoulidhere'})).to.be('somesoulidhere')
+        expect(Gun.val.is({'#': 'somesoulidhere', and: 'nope'})).to.be(false)
+        expect(Gun.val.is(Infinity)).to.be(false) // boohoo :(
+        expect(Gun.val.is(NaN)).to.be(false)
+        expect(Gun.val.is([])).to.be(false)
+        expect(Gun.val.is([1])).to.be(false)
+        expect(Gun.val.is({})).to.be(false)
+        expect(Gun.val.is({a: 1})).to.be(false)
+        expect(Gun.val.is(function () {})).to.be(false)
+      })
+      it('is rel', function () {
+        expect(Gun.val.rel.is({'#': 'somesoulidhere'})).to.be('somesoulidhere')
+        expect(Gun.val.rel.is({'#': 'somethingelsehere'})).to.be('somethingelsehere')
+        expect(Gun.val.rel.is({'#': 'somesoulidhere', and: 'nope'})).to.be(false)
+        expect(Gun.val.rel.is({or: 'nope', '#': 'somesoulidhere'})).to.be(false)
+        expect(Gun.val.rel.is(false)).to.be(false)
+        expect(Gun.val.rel.is(true)).to.be(false)
+        expect(Gun.val.rel.is('')).to.be(false)
+        expect(Gun.val.rel.is('a')).to.be(false)
+        expect(Gun.val.rel.is(0)).to.be(false)
+        expect(Gun.val.rel.is(1)).to.be(false)
+        expect(Gun.val.rel.is(Infinity)).to.be(false) // boohoo :(
+        expect(Gun.val.rel.is(NaN)).to.be(false)
+        expect(Gun.val.rel.is([])).to.be(false)
+        expect(Gun.val.rel.is([1])).to.be(false)
+        expect(Gun.val.rel.is({})).to.be(false)
+        expect(Gun.val.rel.is({a: 1})).to.be(false)
+        expect(Gun.val.rel.is(function () {})).to.be(false)
+      })
+      it.skip('is lex', function () {
+        expect(Gun.is.lex({'#': 'soul'})).to.eql({soul: 'soul'})
+        expect(Gun.is.lex({'.': 'field'})).to.eql({field: 'field'})
+        expect(Gun.is.lex({'=': 'value'})).to.eql({value: 'value'})
+        expect(Gun.is.lex({'>': 'state'})).to.eql({state: 'state'})
+        expect(Gun.is.lex({'#': {'=': 'soul'}})).to.eql({soul: {'=': 'soul'}})
+        expect(Gun.is.lex({'#': {'=': 'soul'}, '.': []})).to.be(false)
+        expect(Gun.is.lex({'#': {'=': 'soul'}, 'asdf': 'oye'})).to.be(false)
+        expect(Gun.is.lex()).to.be(false)
+        expect(Gun.is.lex('')).to.be(false)
+      })
+      it.skip('is lex ify', function () {
+        expect(Gun.is.lex.ify({'#': 'soul', '.': 'field', soul: 'foo', field: 'field', state: 0})).to.eql({'#': 'soul', '.': 'field', '>': 0})
+      })
+      it('is node', function () {
+        var n
+        expect(Gun.node.is({_: {'#': 'somesoulidhere'}})).to.be(true)
+        expect(Gun.node.is(n = {_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}})).to.be(true)
+        expect(Gun.node.is({_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}, g: Infinity})).to.be(false)
+        expect(Gun.node.is({_: {'#': 'somesoulidhere'}, a: 0, b: 1, z: NaN, c: '', d: 'e'})).to.be(false)
+        expect(Gun.node.is({_: {'#': 'somesoulidhere'}, a: 0, b: 1, y: {_: 'cool'}, c: '', d: 'e'})).to.be(false)
+        expect(Gun.node.is({_: {'#': 'somesoulidhere'}, a: 0, b: 1, x: [], c: '', d: 'e'})).to.be(false)
+        expect(Gun.node.is({})).to.be(false)
+        expect(Gun.node.is({a: 1})).to.be(false)
+        expect(Gun.node.is({_: {}})).to.be(false)
+        expect(Gun.node.is({_: {}, a: 1})).to.be(false)
+        expect(Gun.node.is({'#': 'somesoulidhere'})).to.be(false)
+        Gun.node.is(n, function (v, f) {
+          // console.log("v/f", v,f);
+        })
+      })
+      it('is graph', function () {
+        var g
+        expect(Gun.graph.is({'somesoulidhere': {_: {'#': 'somesoulidhere'}}})).to.be(true)
+        expect(Gun.graph.is(g = {'somesoulidhere': {_: {'#': 'somesoulidhere'}}, 'somethingelsehere': {_: {'#': 'somethingelsehere'}}})).to.be(true)
+        expect(Gun.graph.is({'somesoulidhere': {_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}}, 'somethingelsehere': {_: {'#': 'somethingelsehere'}}})).to.be(true)
+        expect(Gun.graph.is({'somesoulidhere': {_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}}})).to.be(true)
+        expect(Gun.graph.is({'somesoulidhere': {_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}}, foo: 1, 'somethingelsehere': {_: {'#': 'somethingelsehere'}}})).to.be(false)
+        expect(Gun.graph.is({'somesoulidhere': {_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}}, foo: {}, 'somethingelsehere': {_: {'#': 'somethingelsehere'}}})).to.be(false)
+        expect(Gun.graph.is({'somesoulidhere': {_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}}, foo: {_: {'#': 'FOO'}}, 'somethingelsehere': {_: {'#': 'somethingelsehere'}}})).to.be(false)
+        expect(Gun.graph.is({'somesoulidhere': {_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}}, foo: {_: {}}, 'somethingelsehere': {_: {'#': 'somethingelsehere'}}})).to.be(false)
+        expect(Gun.graph.is({'somesoulidhere': {_: {'#': 'somesoulidhere'}, a: 0, b: Infinity, c: '', d: 'e', f: {'#': 'somethingelsehere'}}})).to.be(false)
+        expect(Gun.graph.is({'somesoulidhere': {_: {'#': 'somesoulidhere'}, a: 0, b: Infinity, c: '', d: 'e', f: {'#': 'somethingelsehere'}}, 'somethingelsehere': {_: {'#': 'somethingelsehere'}}})).to.be(false)
+        expect(Gun.graph.is({_: {'#': 'somesoulidhere'}})).to.be(false)
+        expect(Gun.graph.is({_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}})).to.be(false)
+        expect(Gun.graph.is({_: {'#': 'somesoulidhere'}, a: 0, b: 1, c: '', d: 'e', f: {'#': 'somethingelsehere'}, g: Infinity})).to.be(false)
+        expect(Gun.graph.is({_: {'#': 'somesoulidhere'}, a: 0, b: 1, z: NaN, c: '', d: 'e'})).to.be(false)
+        expect(Gun.graph.is({_: {'#': 'somesoulidhere'}, a: 0, b: 1, y: {_: 'cool'}, c: '', d: 'e'})).to.be(false)
+        expect(Gun.graph.is({_: {'#': 'somesoulidhere'}, a: 0, b: 1, x: [], c: '', d: 'e'})).to.be(false)
+        expect(Gun.graph.is({})).to.be(false) // Empty graph is not a graph :(
+        expect(Gun.graph.is({a: 1})).to.be(false)
+        expect(Gun.graph.is({_: {}})).to.be(false)
+        expect(Gun.graph.is({_: {}, a: 1})).to.be(false)
+        expect(Gun.graph.is({'#': 'somesoulidhere'})).to.be(false)
+        Gun.graph.is(g, function (n, s) {
+          // console.log("node/soul", n,s);
+        })
+      })
+      it('graph ify', function (done) {
+        function map (v, f, n) {
+          done.m = true
+        }
+        var graph = Gun.graph.ify({
+          _: {'#': 'yay'},
+          a: 1
+        }, map)
+        expect(graph).to.eql({
+          yay: {
+            _: {'#': 'yay'},
+            a: 1
+          }
+        })
+        expect(done.m).to.be.ok()
+        var graph = Gun.graph.ify({
+          _: {'#': 'yay', '>': {a: 9}},
+          a: 1
+        }, map)
+        expect(graph).to.eql({
+          yay: {
+            _: {'#': 'yay', '>': {a: 9}},
+            a: 1
+          }
+        })
+        var map = Gun.state.map(map, 9)
+        var graph = Gun.graph.ify({
+          _: {'#': 'yay', '>': {a: 1}},
+          a: 1
+        }, map)
+        expect(graph).to.eql({
+          yay: {
+            _: {'#': 'yay', '>': {a: 9}},
+            a: 1
+          }
+        })
+        var graph = Gun.graph.ify({a: 1})
+        Gun.obj.map(graph, function (node) {
+          expect(node._['#']).to.be.ok()
+        })
 
-				var alice = {_:{'#':'ASDF'}, age: 27, name: "Alice"};
-				var bob = {_:{'#':'DASF'}, age: 29, name: "Bob"};
-				var cat = {_:{'#':'FDSA'}, name: "Fluffy", species: "kitty"};
-				alice.spouse = bob;
-				bob.spouse = alice;
-				alice.pet = cat;
-				cat.slave = bob;
-				cat.master = alice;
-				var graph = Gun.graph.ify(bob);
-				expect(graph).to.eql({
-					'ASDF': {_:{'#':'ASDF'},
-						age: 27,
-						name: "Alice",
-						spouse: {'#':'DASF'},
-						pet: {'#':'FDSA'}
-					},
-					'DASF': {_:{'#':'DASF'},
-						age: 29,
-						name: 'Bob',
-						spouse: {'#':'ASDF'},
-					},
-					'FDSA': {_:{'#':'FDSA'},
-						name: "Fluffy",
-						species: "kitty",
-						slave: {'#':'DASF'},
-						master: {'#':'ASDF'}
-					}
-				});
+        var alice = {_: {'#': 'ASDF'}, age: 27, name: 'Alice'}
+        var bob = {_: {'#': 'DASF'}, age: 29, name: 'Bob'}
+        var cat = {_: {'#': 'FDSA'}, name: 'Fluffy', species: 'kitty'}
+        alice.spouse = bob
+        bob.spouse = alice
+        alice.pet = cat
+        cat.slave = bob
+        cat.master = alice
+        var graph = Gun.graph.ify(bob)
+        expect(graph).to.eql({
+          'ASDF': {_: {'#': 'ASDF'},
+            age: 27,
+            name: 'Alice',
+            spouse: {'#': 'DASF'},
+            pet: {'#': 'FDSA'}
+          },
+          'DASF': {_: {'#': 'DASF'},
+            age: 29,
+            name: 'Bob',
+            spouse: {'#': 'ASDF'}
+          },
+          'FDSA': {_: {'#': 'FDSA'},
+            name: 'Fluffy',
+            species: 'kitty',
+            slave: {'#': 'DASF'},
+            master: {'#': 'ASDF'}
+          }
+        })
 
-				done();
-			});
-		});
-	});
-	describe('ify', function(){
-		console.log("TODO: BUG! Upgrade IFY tests to new internal API!");
-		return;
+        done()
+      })
+    })
+  })
+  describe('ify', function () {
+    console.log('TODO: BUG! Upgrade IFY tests to new internal API!')
+    return
 
-		var test, gun = Gun();
+    var test, gun = Gun()
 
-		it('null', function(done){
-			Gun.ify(null, function(err, ctx){
-				expect(err).to.be.ok();
-				done();
-			});
-		});
+    it('null', function (done) {
+      Gun.ify(null, function (err, ctx) {
+        expect(err).to.be.ok()
+        done()
+      })
+    })
 
-		it('basic', function(done){
-			var data = {a: false, b: true, c: 0, d: 1, e: '', f: 'g', h: null};
-			Gun.ify(data, function(err, ctx){
-				expect(err).to.not.be.ok();
-				expect(ctx.err).to.not.be.ok();
-				expect(ctx.root).to.eql(data);
-				expect(ctx.root === data).to.not.ok();
-				done();
-			}, {pure: true});
-		});
+    it('basic', function (done) {
+      var data = {a: false, b: true, c: 0, d: 1, e: '', f: 'g', h: null}
+      Gun.ify(data, function (err, ctx) {
+        expect(err).to.not.be.ok()
+        expect(ctx.err).to.not.be.ok()
+        expect(ctx.root).to.eql(data)
+        expect(ctx.root === data).to.not.ok()
+        done()
+      }, {pure: true})
+    })
 
-		it('basic soul', function(done){
-			var data = {_: {'#': 'SOUL'}, a: false, b: true, c: 0, d: 1, e: '', f: 'g', h: null};
-			Gun.ify(data, function(err, ctx){
-				expect(err).to.not.be.ok();
-				expect(ctx.err).to.not.be.ok();
+    it('basic soul', function (done) {
+      var data = {_: {'#': 'SOUL'}, a: false, b: true, c: 0, d: 1, e: '', f: 'g', h: null}
+      Gun.ify(data, function (err, ctx) {
+        expect(err).to.not.be.ok()
+        expect(ctx.err).to.not.be.ok()
 
-				expect(ctx.root).to.eql(data);
-				expect(ctx.root === data).to.not.be.ok();
-				expect(Gun.node.soul(ctx.root) === Gun.node.soul(data));
-				done();
-			}, {pure: true});
-		});
+        expect(ctx.root).to.eql(data)
+        expect(ctx.root === data).to.not.be.ok()
+        expect(Gun.node.soul(ctx.root) === Gun.node.soul(data))
+        done()
+      }, {pure: true})
+    })
 
-		it('arrays', function(done){
-			var data = {before: {path: 'kill'}, one: {two: {lol: 'troll', three: [9, 8, 7, 6, 5]}}};
-			Gun.ify(data, function(err, ctx){
-				expect(err).to.be.ok();
-				expect((err.err || err).indexOf("one.two.three")).to.not.be(-1);
-				done();
-			});
-		});
+    it('arrays', function (done) {
+      var data = {before: {path: 'kill'}, one: {two: {lol: 'troll', three: [9, 8, 7, 6, 5]}}}
+      Gun.ify(data, function (err, ctx) {
+        expect(err).to.be.ok()
+        expect((err.err || err).indexOf('one.two.three')).to.not.be(-1)
+        done()
+      })
+    })
 
-		it('undefined', function(done){
-			var data = {z: undefined, x: 'bye'};
-			Gun.ify(data, function(err, ctx){
-				expect(err).to.be.ok();
-				done();
-			});
-		});
+    it('undefined', function (done) {
+      var data = {z: undefined, x: 'bye'}
+      Gun.ify(data, function (err, ctx) {
+        expect(err).to.be.ok()
+        done()
+      })
+    })
 
-		it('NaN', function(done){
-			var data = {a: NaN, b: 2};
-			Gun.ify(data, function(err, ctx){
-				expect(err).to.be.ok();
-				done();
-			});
-		});
+    it('NaN', function (done) {
+      var data = {a: NaN, b: 2}
+      Gun.ify(data, function (err, ctx) {
+        expect(err).to.be.ok()
+        done()
+      })
+    })
 
-		it('Infinity', function(done){ // SAD DAY PANDA BEAR :( :( :(... Mark wants Infinity. JSON won't allow.
-			var data = {a: 1, b: Infinity};
-			Gun.ify(data, function(err, ctx){
-				expect(err).to.be.ok();
-				done();
-			});
-		});
+    it('Infinity', function (done) { // SAD DAY PANDA BEAR :( :( :(... Mark wants Infinity. JSON won't allow.
+      var data = {a: 1, b: Infinity}
+      Gun.ify(data, function (err, ctx) {
+        expect(err).to.be.ok()
+        done()
+      })
+    })
 
-		it('function', function(done){
-			var data = {c: function(){}, d: 'hi'};
-			Gun.ify(data, function(err, ctx){
-				expect(err).to.be.ok();
-				done();
-			});
-		});
+    it('function', function (done) {
+      var data = {c: function () {}, d: 'hi'}
+      Gun.ify(data, function (err, ctx) {
+        expect(err).to.be.ok()
+        done()
+      })
+    })
 
-		it('extraneous', function(done){
-			var data = {_: {'#': 'shhh', meta: {yay: 1}}, sneak: true};
-			Gun.ify(data, function(err, ctx){
-				expect(err).to.not.be.ok(); // extraneous metadata needs to be stored, but it can't be used for data.
-				done();
-			});
-		});
+    it('extraneous', function (done) {
+      var data = {_: {'#': 'shhh', meta: {yay: 1}}, sneak: true}
+      Gun.ify(data, function (err, ctx) {
+        expect(err).to.not.be.ok() // extraneous metadata needs to be stored, but it can't be used for data.
+        done()
+      })
+    })
 
-		it('document', function(done){
-			var data = {users: {1: {where: {lat: Math.random(), lng: Math.random(), i: 1}}}};
-			Gun.ify(data, function(err, ctx){
-				var soul, node;
-				expect(soul = Gun.val.rel.is(ctx.root.users)).to.be.ok();
-				node = ctx.graph[soul];
-				expect(soul = Gun.val.rel.is(node[1])).to.be.ok();
-				node = ctx.graph[soul];
-				expect(soul = Gun.val.rel.is(node.where)).to.be.ok();
-				node = ctx.graph[soul];
-				expect(node.lat).to.be.ok();
-				expect(node.lng).to.be.ok();
-				expect(node.i).to.be(1);
-				done();
-			});
-		});
+    it('document', function (done) {
+      var data = {users: {1: {where: {lat: Math.random(), lng: Math.random(), i: 1}}}}
+      Gun.ify(data, function (err, ctx) {
+        var soul, node
+        expect(soul = Gun.val.rel.is(ctx.root.users)).to.be.ok()
+        node = ctx.graph[soul]
+        expect(soul = Gun.val.rel.is(node[1])).to.be.ok()
+        node = ctx.graph[soul]
+        expect(soul = Gun.val.rel.is(node.where)).to.be.ok()
+        node = ctx.graph[soul]
+        expect(node.lat).to.be.ok()
+        expect(node.lng).to.be.ok()
+        expect(node.i).to.be(1)
+        done()
+      })
+    })
 
-		return; // TODO! Fix GUN to handle this!
-		data = {};
-		data.sneak = false;
-		data.both = {inside: 'meta data'};
-		data._ = {'#': 'shhh', data: {yay: 1}, spin: data.both};
-		test = Gun.ify(data);
-		expect(test.err.meta).to.be.ok(); // TODO: Fail: this passes, somehow? Fix ify code!
-	});
+		 // TODO! Fix GUN to handle this!
+    data = {}
+    data.sneak = false
+    data.both = {inside: 'meta data'}
+    data._ = {'#': 'shhh', data: {yay: 1}, spin: data.both}
+    test = Gun.ify(data)
+    expect(test.err.meta).to.be.ok() // TODO: Fail: this passes, somehow? Fix ify code!
+  })
 
-	describe('Schedule', function(){
-		console.log("TODO: BUG! Upgrade SCHEDULE tests to new internal API!");
-		return;
-		it('one', function(done){
-			Gun.schedule(Gun.time.is(), function(){
-				expect(true).to.be(true);
-				done(); //setTimeout(function(){ done() },1);
-			});
-		});
+  describe('Schedule', function () {
+    console.log('TODO: BUG! Upgrade SCHEDULE tests to new internal API!')
+    return
+    it('one', function (done) {
+      Gun.schedule(Gun.time.is(), function () {
+        expect(true).to.be(true)
+        done() // setTimeout(function(){ done() },1);
+      })
+    })
 
-		it('many', function(done){
-			Gun.schedule(Gun.time.is() + 50, function(){
-				done.first = true;
-			});
-			Gun.schedule(Gun.time.is() + 100, function(){
-				done.second = true;
-			});
-			Gun.schedule(Gun.time.is() + 200, function(){
-				done.third = true;
-				expect(done.first).to.be(true);
-				expect(done.second).to.be(true);
-				expect(done.third).to.be(true);
-				done(); //setTimeout(function(){ done() },1);
-			});
-		});
-	});
+    it('many', function (done) {
+      Gun.schedule(Gun.time.is() + 50, function () {
+        done.first = true
+      })
+      Gun.schedule(Gun.time.is() + 100, function () {
+        done.second = true
+      })
+      Gun.schedule(Gun.time.is() + 200, function () {
+        done.third = true
+        expect(done.first).to.be(true)
+        expect(done.second).to.be(true)
+        expect(done.third).to.be(true)
+        done() // setTimeout(function(){ done() },1);
+      })
+    })
+  })
 
-	describe('Union', function(){
-		console.log("TODO: BUG! Upgrade UNION tests to new internal API!");
-		return;
-		var gun = Gun();
+  describe('Union', function () {
+    console.log('TODO: BUG! Upgrade UNION tests to new internal API!')
+    return
+    var gun = Gun()
 
-		it('fail', function(){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						a: 'cheating'
-					}},
-					a: 0
-				}
-			}
+    it('fail', function () {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              a: 'cheating'
+            }},
+          a: 0
+        }
+      }
 
-			expect(gun.__.graph['asdf']).to.not.be.ok();
-			var ctx = Gun.HAM.graph(gun, prime);
-			expect(ctx).to.not.be.ok();
-		});return;
+      expect(gun.__.graph['asdf']).to.not.be.ok()
+      var ctx = Gun.HAM.graph(gun, prime)
+      expect(ctx).to.not.be.ok()
+    })
 
-		it('basic', function(done){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						a: Gun.time.is()
-					}},
-					a: 0
-				}
-			}
+    it('basic', function (done) {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              a: Gun.time.is()
+            }},
+          a: 0
+        }
+      }
 
-			expect(gun.__.graph['asdf']).to.not.be.ok();
-			var ctx = Gun.union(gun, prime, function(){
-				expect(gun.__.graph['asdf'].a).to.be(0);
-				done();
-			});
-		});
+      expect(gun.__.graph['asdf']).to.not.be.ok()
+      var ctx = Gun.union(gun, prime, function () {
+        expect(gun.__.graph['asdf'].a).to.be(0)
+        done()
+      })
+    })
 
-		it('disjoint', function(done){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						b: Gun.time.is()
-					}},
-					b: 'c'
-				}
-			}
+    it('disjoint', function (done) {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              b: Gun.time.is()
+            }},
+          b: 'c'
+        }
+      }
 
-			expect(gun.__.graph['asdf'].a).to.be(0);
-			expect(gun.__.graph['asdf'].b).to.not.be.ok();
-			var ctx = Gun.union(gun, prime, function(){
-				expect(gun.__.graph['asdf'].a).to.be(0);
-				expect(gun.__.graph['asdf'].b).to.be('c');
-				done();
-			});
-		});
+      expect(gun.__.graph['asdf'].a).to.be(0)
+      expect(gun.__.graph['asdf'].b).to.not.be.ok()
+      var ctx = Gun.union(gun, prime, function () {
+        expect(gun.__.graph['asdf'].a).to.be(0)
+        expect(gun.__.graph['asdf'].b).to.be('c')
+        done()
+      })
+    })
 
-		it('mutate', function(done){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						b: Gun.time.is()
-					}},
-					b: 'd'
-				}
-			}
+    it('mutate', function (done) {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              b: Gun.time.is()
+            }},
+          b: 'd'
+        }
+      }
 
-			expect(gun.__.graph['asdf'].b).to.be('c');
-			var ctx = Gun.union(gun, prime, function(){
-				expect(gun.__.graph['asdf'].b).to.be('d');
-				done();
-			});
-		});
+      expect(gun.__.graph['asdf'].b).to.be('c')
+      var ctx = Gun.union(gun, prime, function () {
+        expect(gun.__.graph['asdf'].b).to.be('d')
+        done()
+      })
+    })
 
-		it('disjoint past', function(done){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						x: 0 // beginning of time!
-					}},
-					x: 'hi'
-				}
-			}
-			expect(gun.__.graph['asdf'].x).to.not.be.ok();
-			var ctx = Gun.union(gun, prime, function(){
-				expect(gun.__.graph['asdf'].x).to.be('hi');
-				done();
-			});
-		});
+    it('disjoint past', function (done) {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              x: 0 // beginning of time!
+            }},
+          x: 'hi'
+        }
+      }
+      expect(gun.__.graph['asdf'].x).to.not.be.ok()
+      var ctx = Gun.union(gun, prime, function () {
+        expect(gun.__.graph['asdf'].x).to.be('hi')
+        done()
+      })
+    })
 
-		it('past', function(done){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						x: Gun.time.is() - (60 * 1000) // above lower boundary, below now or upper boundary.
-					}},
-					x: 'hello'
-				}
-			}
+    it('past', function (done) {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              x: Gun.time.is() - (60 * 1000) // above lower boundary, below now or upper boundary.
+            }},
+          x: 'hello'
+        }
+      }
 
-			expect(gun.__.graph['asdf'].x).to.be('hi');
-			var ctx = Gun.union(gun, prime, function(){
-				expect(gun.__.graph['asdf'].x).to.be('hello');
-				done();
-			});
-		});
+      expect(gun.__.graph['asdf'].x).to.be('hi')
+      var ctx = Gun.union(gun, prime, function () {
+        expect(gun.__.graph['asdf'].x).to.be('hello')
+        done()
+      })
+    })
 
-		it('future', function(done){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						x: Gun.time.is() + (200) // above now or upper boundary, aka future.
-					}},
-					x: 'how are you?'
-				}
-			}
+    it('future', function (done) {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              x: Gun.time.is() + (200) // above now or upper boundary, aka future.
+            }},
+          x: 'how are you?'
+        }
+      }
 
-			expect(gun.__.graph['asdf'].x).to.be('hello');
-			var now = Gun.time.is();
-			var ctx = Gun.union(gun, prime, function(){
-				expect(Gun.time.is() - now).to.be.above(100);
-				expect(gun.__.graph['asdf'].x).to.be('how are you?');
-				done();
-			});
-		});
-		var to = 5000;
-		it('disjoint future', function(done){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						y: Gun.time.is() + (200) // above now or upper boundary, aka future.
-					}},
-					y: 'goodbye'
-				}
-			}
-			expect(gun.__.graph['asdf'].y).to.not.be.ok();
-			var now = Gun.time.is();
-			var ctx = Gun.union(gun, prime, function(){
-				expect(Gun.time.is() - now).to.be.above(100);
-				expect(gun.__.graph['asdf'].y).to.be('goodbye');
-				done();
-			});
-		});
+      expect(gun.__.graph['asdf'].x).to.be('hello')
+      var now = Gun.time.is()
+      var ctx = Gun.union(gun, prime, function () {
+        expect(Gun.time.is() - now).to.be.above(100)
+        expect(gun.__.graph['asdf'].x).to.be('how are you?')
+        done()
+      })
+    })
+    var to = 5000
+    it('disjoint future', function (done) {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              y: Gun.time.is() + (200) // above now or upper boundary, aka future.
+            }},
+          y: 'goodbye'
+        }
+      }
+      expect(gun.__.graph['asdf'].y).to.not.be.ok()
+      var now = Gun.time.is()
+      var ctx = Gun.union(gun, prime, function () {
+        expect(Gun.time.is() - now).to.be.above(100)
+        expect(gun.__.graph['asdf'].y).to.be('goodbye')
+        done()
+      })
+    })
 
-		it('disjoint future max', function(done){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						y: Gun.time.is() + (2), // above now or upper boundary, aka future.
-						z: Gun.time.is() + (200) // above now or upper boundary, aka future.
-					}},
-					y: 'bye',
-					z: 'who'
-				}
-			}
+    it('disjoint future max', function (done) {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              y: Gun.time.is() + (2), // above now or upper boundary, aka future.
+              z: Gun.time.is() + (200) // above now or upper boundary, aka future.
+            }},
+          y: 'bye',
+          z: 'who'
+        }
+      }
 
-			expect(gun.__.graph['asdf'].y).to.be('goodbye');
-			expect(gun.__.graph['asdf'].z).to.not.be.ok();
-			var now = Gun.time.is();
-			var ctx = Gun.union(gun, prime, function(){
-				expect(Gun.time.is() - now).to.be.above(100);
-				expect(gun.__.graph['asdf'].y).to.be('bye');
-				expect(gun.__.graph['asdf'].z).to.be('who');
-				done(); //setTimeout(function(){ done() },1);
-			});
-		});
+      expect(gun.__.graph['asdf'].y).to.be('goodbye')
+      expect(gun.__.graph['asdf'].z).to.not.be.ok()
+      var now = Gun.time.is()
+      var ctx = Gun.union(gun, prime, function () {
+        expect(Gun.time.is() - now).to.be.above(100)
+        expect(gun.__.graph['asdf'].y).to.be('bye')
+        expect(gun.__.graph['asdf'].z).to.be('who')
+        done() // setTimeout(function(){ done() },1);
+      })
+    })
 
-		it('future max', function(done){
-			var prime = {
-				'asdf': {
-					_: {'#': 'asdf', '>':{
-						w: Gun.time.is() + (2), // above now or upper boundary, aka future.
-						x: Gun.time.is() - (60 * 1000), // above now or upper boundary, aka future.
-						y: Gun.time.is() + (200), // above now or upper boundary, aka future.
-						z: Gun.time.is() + (50) // above now or upper boundary, aka future.
-					}},
-					w: true,
-					x: 'nothing',
-					y: 'farewell',
-					z: 'doctor who'
-				}
-			}
+    it('future max', function (done) {
+      var prime = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              w: Gun.time.is() + (2), // above now or upper boundary, aka future.
+              x: Gun.time.is() - (60 * 1000), // above now or upper boundary, aka future.
+              y: Gun.time.is() + (200), // above now or upper boundary, aka future.
+              z: Gun.time.is() + (50) // above now or upper boundary, aka future.
+            }},
+          w: true,
+          x: 'nothing',
+          y: 'farewell',
+          z: 'doctor who'
+        }
+      }
 
-			expect(gun.__.graph['asdf'].w).to.not.be.ok();
-			expect(gun.__.graph['asdf'].x).to.be('how are you?');
-			expect(gun.__.graph['asdf'].y).to.be('bye');
-			expect(gun.__.graph['asdf'].z).to.be('who');
-			var now = Gun.time.is();
-			var ctx = Gun.union(gun, prime, function(){
-				expect(Gun.time.is() - now).to.be.above(100);
-				expect(gun.__.graph['asdf'].w).to.be(true);
-				expect(gun.__.graph['asdf'].x).to.be('how are you?');
-				expect(gun.__.graph['asdf'].y).to.be('farewell');
-				expect(gun.__.graph['asdf'].z).to.be('doctor who');
-				done(); //setTimeout(function(){ done() },1);
-			});
-		});
+      expect(gun.__.graph['asdf'].w).to.not.be.ok()
+      expect(gun.__.graph['asdf'].x).to.be('how are you?')
+      expect(gun.__.graph['asdf'].y).to.be('bye')
+      expect(gun.__.graph['asdf'].z).to.be('who')
+      var now = Gun.time.is()
+      var ctx = Gun.union(gun, prime, function () {
+        expect(Gun.time.is() - now).to.be.above(100)
+        expect(gun.__.graph['asdf'].w).to.be(true)
+        expect(gun.__.graph['asdf'].x).to.be('how are you?')
+        expect(gun.__.graph['asdf'].y).to.be('farewell')
+        expect(gun.__.graph['asdf'].z).to.be('doctor who')
+        done() // setTimeout(function(){ done() },1);
+      })
+    })
 
-		it('two nodes', function(done){ // chat app problem where disk dropped the last data, turns out it was a union problem!
-			var state = Gun.time.is();
-			var prime = {
-				'sadf': {
-					_: {'#': 'sadf', '>':{
-						1: state
-					}},
-					1: {'#': 'fdsa'}
-				},
-				'fdsa': {
-					_: {'#': 'fdsa', '>':{
-						msg: state
-					}},
-					msg: "Let's chat!"
-				}
-			}
+    it('two nodes', function (done) { // chat app problem where disk dropped the last data, turns out it was a union problem!
+      var state = Gun.time.is()
+      var prime = {
+        'sadf': {
+          _: {'#': 'sadf',
+            '>': {
+              1: state
+            }},
+          1: {'#': 'fdsa'}
+        },
+        'fdsa': {
+          _: {'#': 'fdsa',
+            '>': {
+              msg: state
+            }},
+          msg: "Let's chat!"
+        }
+      }
 
-			expect(gun.__.graph['sadf']).to.not.be.ok();
-			expect(gun.__.graph['fdsa']).to.not.be.ok();
-			var ctx = Gun.union(gun, prime, function(){
-				expect(gun.__.graph['sadf'][1]).to.be.ok();
-				expect(gun.__.graph['fdsa'].msg).to.be("Let's chat!");
-				done();
-			});
-		});
+      expect(gun.__.graph['sadf']).to.not.be.ok()
+      expect(gun.__.graph['fdsa']).to.not.be.ok()
+      var ctx = Gun.union(gun, prime, function () {
+        expect(gun.__.graph['sadf'][1]).to.be.ok()
+        expect(gun.__.graph['fdsa'].msg).to.be("Let's chat!")
+        done()
+      })
+    })
 
-		it('append third node', function(done){ // chat app problem where disk dropped the last data, turns out it was a union problem!
-			var state = Gun.time.is();
-			var prime = {
-				'sadf': {
-					_: {'#': 'sadf', '>':{
-						2: state
-					}},
-					2: {'#': 'fads'}
-				},
-				'fads': {
-					_: {'#': 'fads', '>':{
-						msg: state
-					}},
-					msg: "hi"
-				}
-			}
+    it('append third node', function (done) { // chat app problem where disk dropped the last data, turns out it was a union problem!
+      var state = Gun.time.is()
+      var prime = {
+        'sadf': {
+          _: {'#': 'sadf',
+            '>': {
+              2: state
+            }},
+          2: {'#': 'fads'}
+        },
+        'fads': {
+          _: {'#': 'fads',
+            '>': {
+              msg: state
+            }},
+          msg: 'hi'
+        }
+      }
 
-			expect(gun.__.graph['sadf']).to.be.ok();
-			expect(gun.__.graph['fdsa']).to.be.ok();
-			var ctx = Gun.union(gun, prime, function(){
-				expect(gun.__.graph['sadf'][1]).to.be.ok();
-				expect(gun.__.graph['sadf'][2]).to.be.ok();
-				expect(gun.__.graph['fads'].msg).to.be("hi");
-				done();
-			});
-		});
+      expect(gun.__.graph['sadf']).to.be.ok()
+      expect(gun.__.graph['fdsa']).to.be.ok()
+      var ctx = Gun.union(gun, prime, function () {
+        expect(gun.__.graph['sadf'][1]).to.be.ok()
+        expect(gun.__.graph['sadf'][2]).to.be.ok()
+        expect(gun.__.graph['fads'].msg).to.be('hi')
+        done()
+      })
+    })
 
-		it('ify null', function(){
-				var node = Gun.union.ify(null, 'pseudo');
-				expect(Gun.node.soul(node)).to.be('pseudo');
-		});
+    it('ify null', function () {
+      var node = Gun.union.ify(null, 'pseudo')
+      expect(Gun.node.soul(node)).to.be('pseudo')
+    })
 
-		it('ify node', function(){
+    it('ify node', function () {
+      var graph = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              x: Gun.time.is(),
+              y: Gun.time.is()
+            }},
+          x: 1,
+          y: 2
+        },
+        'soul': {
+          _: {'#': 'soul',
+            '~': 1,
+            '>': {
+              'asdf': Gun.time.is()
+            }},
+          'asdf': {'#': 'asdf'}
+        }
+      }
+      var node = Gun.union.ify(graph, 'soul')
+      expect(Gun.node.soul(node)).to.be('soul')
+      expect(node.x).to.be(1)
+      expect(node.y).to.be(2)
+    })
 
-			var graph = {
-				'asdf': {
-					_: {'#': 'asdf', '>': {
-						x: Gun.time.is(),
-						y: Gun.time.is()
-					}},
-					x: 1,
-					y: 2
-				},
-				'soul': {
-					_: {'#': 'soul', '~': 1, '>': {
-						'asdf': Gun.time.is()
-					}},
-					'asdf': {'#': 'asdf'}
-				}
-			}
-			var node = Gun.union.ify(graph, 'soul');
-			expect(Gun.node.soul(node)).to.be('soul');
-			expect(node.x).to.be(1);
-			expect(node.y).to.be(2);
-		});
+    it('ify graph', function () {
+      var graph = {
+        'asdf': {
+          _: {'#': 'asdf',
+            '>': {
+              a: Gun.time.is() - 2,
+              z: Gun.time.is() - 2
+            }},
+          a: 1,
+          z: 1
+        },
+        'fdsa': {
+          _: {'#': 'fdsa',
+            '>': {
+              b: Gun.time.is() - 1,
+              z: Gun.time.is() - 1
+            }},
+          b: 2,
+          z: 2
+        },
+        'sadf': {
+          _: {'#': 'sadf',
+            '>': {
+              c: Gun.time.is(),
+              z: Gun.time.is() - 100
+            }},
+          c: 3,
+          z: 3
+        },
+        'soul': {
+          _: {'#': 'soul',
+            '~': 1,
+            '>': {
+              'asdf': Gun.time.is(),
+              'fdsa': Gun.time.is(),
+              'sadf': Gun.time.is()
+            }},
+          'asdf': {'#': 'asdf'},
+          'fdsa': {'#': 'fdsa'},
+          'sadf': {'#': 'sadf'}
+        }
+      }
+      var node = Gun.union.ify(graph, 'soul')
+      expect(Gun.node.soul(node)).to.be('soul')
+      expect(node.a).to.be(1)
+      expect(node.b).to.be(2)
+      expect(node.c).to.be(3)
+      expect(node.z).to.be(2)
+    })
+  })
 
-		it('ify graph', function(){
-			var graph = {
-				'asdf': {
-					_: {'#': 'asdf', '>': {
-						a: Gun.time.is() - 2,
-						z: Gun.time.is() - 2
-					}},
-					a: 1,
-					z: 1
-				},
-				'fdsa': {
-					_: {'#': 'fdsa', '>': {
-						b: Gun.time.is() - 1,
-						z: Gun.time.is() - 1
-					}},
-					b: 2,
-					z: 2
-				},
-				'sadf': {
-					_: {'#': 'sadf', '>': {
-						c: Gun.time.is(),
-						z: Gun.time.is() - 100
-					}},
-					c: 3,
-					z: 3
-				},
-				'soul': {
-					_: {'#': 'soul', '~': 1, '>': {
-						'asdf': Gun.time.is(),
-						'fdsa': Gun.time.is(),
-						'sadf': Gun.time.is()
-					}},
-					'asdf': {'#': 'asdf'},
-					'fdsa': {'#': 'fdsa'},
-					'sadf': {'#': 'sadf'}
-				}
-			}
-			var node = Gun.union.ify(graph, 'soul');
-			expect(Gun.node.soul(node)).to.be('soul');
-			expect(node.a).to.be(1);
-			expect(node.b).to.be(2);
-			expect(node.c).to.be(3);
-			expect(node.z).to.be(2);
-		});
-	});
-
-	describe('API', function(){
+  describe('API', function(){
 		var gopt = {wire:{put:function(n,cb){cb()},get:function(k,cb){cb()}}};
 		var gun = Gun();
 
@@ -4422,7 +4446,7 @@ describe('Gun', function(){
 				done();
 			});
 		});
-		return;
+		
 		it('put put put put', function(){
 			var gun = Gun();
 			var get = gun.get('put/put/put/put');
@@ -6856,6 +6880,10 @@ describe('Gun', function(){
 			});
 		});
 		return;
+		
+		return;
+		
+		
 		return;
 		return;
 		return;
@@ -6867,16 +6895,12 @@ describe('Gun', function(){
 		return;
 		return;
 		return;
-		return;
-		return;
-		return;
-		return;
-		return;
-		return;
-		return;
-		return;
-		return;
-		return;
+		
+		
+		
+		
+		
+		
 		return;
 		return;
 		return;
@@ -8086,193 +8110,195 @@ describe('Gun', function(){
 		*/
 	});
 
-	describe('Streams', function(){
-		console.log("TODO: BUG! Upgrade UNION tests to new internal API!");
-		return;
-		var gun = Gun(), g = function(){
-			return Gun({wire: {get: ctx.get}});
-		}, ctx = {gen: 9, extra: 100, network: 2};
+  describe('Streams', function () {
+    console.log('TODO: BUG! Upgrade UNION tests to new internal API!')
+    return
+    var gun = Gun(), g = function () {
+        return Gun({wire: {get: ctx.get}})
+      }, ctx = {gen: 9, extra: 100, network: 2}
 
-		it('prep hook', function(done){
-			this.timeout(ctx.gen * ctx.extra);
-			var peer = Gun(), ref;
-			ctx.get = function(key, cb){
-				var c = 0;
-				cb = cb || function(){};
-				key = key['#'];
-				if('big' !== key){ return cb(null) }
-				setTimeout(function badNetwork(){
-					c += 1;
-					var soul = Gun.node.soul(ref);
-					var graph = {};
-					var data = /*graph[soul] = */ {_: {'#': soul, '>': {}}};
-					if(!ref['f' + c]){
-						return cb(null, data), cb(null, {});
-					}
-					data._[Gun._.state]['f' + c] = ref._[Gun._.state]['f' + c];
-					data['f' + c] = ref['f' + c];
-					cb(null, data);
-					setTimeout(badNetwork, ctx.network);
-				},ctx.network);
-			}
-			ctx.get.fake = {};
-			for(var i = 1; i < (ctx.gen) + 1; i++){
-				ctx.get.fake['f'+i] = i;
-				ctx.length = i;
-			}
-			ctx.get.fake = Gun.is.node.ify(ctx.get.fake, 'big');
-			var big = peer.put(ctx.get.fake).val(function(val){
-				ref = val;
-				ctx.get({'#': 'big'}, function(err, graph){
-					if(Gun.obj.empty(graph)){ done() }
-				});
-				gun.opt({wire: {get: ctx.get}});
-			});
-		});
+    it('prep hook', function (done) {
+      this.timeout(ctx.gen * ctx.extra)
+      var peer = Gun(), ref
+      ctx.get = function (key, cb) {
+        var c = 0
+        cb = cb || function () {}
+        key = key['#']
+        if (key !== 'big') { return cb(null) }
+        setTimeout(function badNetwork () {
+          c += 1
+          var soul = Gun.node.soul(ref)
+          var graph = {}
+          var data = /* graph[soul] = */ {_: {'#': soul, '>': {}}}
+          if (!ref['f' + c]) {
+            return cb(null, data), cb(null, {})
+          }
+          data._[Gun._.state]['f' + c] = ref._[Gun._.state]['f' + c]
+          data['f' + c] = ref['f' + c]
+          cb(null, data)
+          setTimeout(badNetwork, ctx.network)
+        }, ctx.network)
+      }
+      ctx.get.fake = {}
+      for (var i = 1; i < (ctx.gen) + 1; i++) {
+        ctx.get.fake['f' + i] = i
+        ctx.length = i
+      }
+      ctx.get.fake = Gun.is.node.ify(ctx.get.fake, 'big')
+      var big = peer.put(ctx.get.fake).val(function (val) {
+        ref = val
+        ctx.get({'#': 'big'}, function (err, graph) {
+          if (Gun.obj.empty(graph)) { done() }
+        })
+        gun.opt({wire: {get: ctx.get}})
+      })
+    })
 
-		it('map chain', function(done){
-			var set = gun.put({a: {here: 'you'}, b: {go: 'dear'}, c: {sir: '!'} });
-			set.map().val(function(obj, field){
-				if(obj.here){
-					done.a = obj.here;
-					expect(obj.here).to.be('you');
-				}
-				if(obj.go){
-					done.b = obj.go;
-					expect(obj.go).to.be('dear');
-				}
-				if(obj.sir){
-					done.c = obj.sir;
-					expect(obj.sir).to.be('!');
-				}
-				if(done.a && done.b && done.c){
-					done();
-				}
-			});
-		});
+    it('map chain', function (done) {
+      var set = gun.put({a: {here: 'you'}, b: {go: 'dear'}, c: {sir: '!'} })
+      set.map().val(function (obj, field) {
+        if (obj.here) {
+          done.a = obj.here
+          expect(obj.here).to.be('you')
+        }
+        if (obj.go) {
+          done.b = obj.go
+          expect(obj.go).to.be('dear')
+        }
+        if (obj.sir) {
+          done.c = obj.sir
+          expect(obj.sir).to.be('!')
+        }
+        if (done.a && done.b && done.c) {
+          done()
+        }
+      })
+    })
 
-		it('map chain path', function(done){
-			var set = gun.put({
-				a: {name: "Mark",
-					pet: {coat: "tabby", name: "Hobbes"}
-				}, b: {name: "Alice",
-					pet: {coat: "calico", name: "Cali"}
-				}, c: {name: "Bob",
-					pet: {coat: "tux", name: "Casper"}
-				}
-			});
-			set.map().path('pet').val(function(obj, field){
-				if(obj.name === 'Hobbes'){
-					done.hobbes = obj.name;
-					expect(obj.name).to.be('Hobbes');
-					expect(obj.coat).to.be('tabby');
-				}
-				if(obj.name === 'Cali'){
-					done.cali = obj.name;
-					expect(obj.name).to.be('Cali');
-					expect(obj.coat).to.be('calico');
-				}
-				if(obj.name === 'Casper'){
-					done.casper = obj.name;
-					expect(obj.name).to.be('Casper');
-					expect(obj.coat).to.be('tux');
-				}
-				if(done.hobbes && done.cali && done.casper){
-					done();
-				}
-			});
-		});
+    it('map chain path', function (done) {
+      var set = gun.put({
+        a: {name: 'Mark',
+          pet: {coat: 'tabby', name: 'Hobbes'}
+        },
+        b: {name: 'Alice',
+          pet: {coat: 'calico', name: 'Cali'}
+        },
+        c: {name: 'Bob',
+          pet: {coat: 'tux', name: 'Casper'}
+        }
+      })
+      set.map().path('pet').val(function (obj, field) {
+        if (obj.name === 'Hobbes') {
+          done.hobbes = obj.name
+          expect(obj.name).to.be('Hobbes')
+          expect(obj.coat).to.be('tabby')
+        }
+        if (obj.name === 'Cali') {
+          done.cali = obj.name
+          expect(obj.name).to.be('Cali')
+          expect(obj.coat).to.be('calico')
+        }
+        if (obj.name === 'Casper') {
+          done.casper = obj.name
+          expect(obj.name).to.be('Casper')
+          expect(obj.coat).to.be('tux')
+        }
+        if (done.hobbes && done.cali && done.casper) {
+          done()
+        }
+      })
+    })
 
-		it('get big on', function(done){
-			this.timeout(ctx.gen * ctx.extra);
-			var test = {c: 0, last: 0};
-			g().get('big').on(function(val){
-				if(test.done){ return console.log("hey yo! you got duplication on your ons!"); }
-				delete val._;
-				if(val['f' + (test.last + 1)]){
-					test.c += 1;
-					test.last += 1;
-				}
-				var obj = {};
-				for(var i = 1; i < test.c + 1; i++){
-					obj['f'+i] = i;
-				}
-				expect(val).to.eql(obj);
-				if(test.c === ctx.length){
-					test.done = true;
-					done();
-				}
-			});
-		});
+    it('get big on', function (done) {
+      this.timeout(ctx.gen * ctx.extra)
+      var test = {c: 0, last: 0}
+      g().get('big').on(function (val) {
+        if (test.done) { return console.log('hey yo! you got duplication on your ons!') }
+        delete val._
+        if (val['f' + (test.last + 1)]) {
+          test.c += 1
+          test.last += 1
+        }
+        var obj = {}
+        for (var i = 1; i < test.c + 1; i++) {
+          obj['f' + i] = i
+        }
+        expect(val).to.eql(obj)
+        if (test.c === ctx.length) {
+          test.done = true
+          done()
+        }
+      })
+    })
 
-		it('get big on delta', function(done){
-			this.timeout(ctx.gen * ctx.extra);
-			var test = {c: 0, seen: {}};
-			g().get('big').on(function(val){
-				delete val._;
-				if(test.seen['f' + test.c]){ return }
-				test.seen['f' + test.c] = true;
-				test.c += 1;
-				var obj = {};
-				obj['f' + test.c] = test.c;
-				expect(val).to.eql(obj);
-				if(test.c === ctx.length){
-					done();
-				}
-			}, true);
-		});
+    it('get big on delta', function (done) {
+      this.timeout(ctx.gen * ctx.extra)
+      var test = {c: 0, seen: {}}
+      g().get('big').on(function (val) {
+        delete val._
+        if (test.seen['f' + test.c]) { return }
+        test.seen['f' + test.c] = true
+        test.c += 1
+        var obj = {}
+        obj['f' + test.c] = test.c
+        expect(val).to.eql(obj)
+        if (test.c === ctx.length) {
+          done()
+        }
+      }, true)
+    })
 
-		it('get val', function(done){
-			this.timeout(ctx.gen * ctx.extra);
-			g().get('big').val(function(obj){
-				delete obj._;
-				expect(obj.f1).to.be(1);
-				expect(obj['f' + ctx.length]).to.be(ctx.length);
-				var raw = Gun.obj.copy(ctx.get.fake);
-				delete raw._;
-				expect(obj).to.be.eql(raw);
-				Gun.log.debug = 0;
-				done();
-			});
-		});
+    it('get val', function (done) {
+      this.timeout(ctx.gen * ctx.extra)
+      g().get('big').val(function (obj) {
+        delete obj._
+        expect(obj.f1).to.be(1)
+        expect(obj['f' + ctx.length]).to.be(ctx.length)
+        var raw = Gun.obj.copy(ctx.get.fake)
+        delete raw._
+        expect(obj).to.be.eql(raw)
+        Gun.log.debug = 0
+        done()
+      })
+    })
 
-		it('get big map val', function(done){
-			this.timeout(ctx.gen * ctx.extra);
-			var test = {c: 0, seen: {}};
-			g().get('big').map().val(function(val, field){
-				if(test.seen[field]){ return }
-				test.seen[field] = true;
-				delete val._;
-				expect(field).to.be('f' + (test.c += 1));
-				expect(val).to.be(test.c);
-				if(test.c === ctx.length){
-					done();
-				}
-			});
-		});
+    it('get big map val', function (done) {
+      this.timeout(ctx.gen * ctx.extra)
+      var test = {c: 0, seen: {}}
+      g().get('big').map().val(function (val, field) {
+        if (test.seen[field]) { return }
+        test.seen[field] = true
+        delete val._
+        expect(field).to.be('f' + (test.c += 1))
+        expect(val).to.be(test.c)
+        if (test.c === ctx.length) {
+          done()
+        }
+      })
+    })
 
-		it('val emits all data', function(done){ // bug in chat app
-			var chat = Gun().get('example/chat/data').not(function(){
-				this.put({1: {who: 'Welcome', what: "to the chat app!", when: 0}}).key('example/chat/data');
-			});
-			chat.put({random1: {who: 'mark', what: "1", when: 1}});
-			chat.put({random2: {who: 'mark', what: "2", when: 2}});
-			chat.put({random3: {who: 'mark', what: "3", when: 3}});
-			chat.put({random4: {who: 'mark', what: "4", when: 4}});
-			chat.put({random5: {who: 'mark', what: "5", when: 5}});
-			var seen = {1: false, 2: false, 3: false, 4: false, 5: false}
-			setTimeout(function(){
-				chat.map(function(m){ }).val(function(msg, field){
-					var msg = Gun.obj.copy(msg);
-					if(msg.what){
-						expect(msg.what).to.be.ok();
-						seen[msg.when] = true;
-					}
-					if(!Gun.obj.map(seen, function(boo){ if(!boo){ return true } })){
-						done();
-					}
-				});
-			}, 100);
-		});
-	});
-});
+    it('val emits all data', function (done) { // bug in chat app
+      var chat = Gun().get('example/chat/data').not(function () {
+        this.put({1: {who: 'Welcome', what: 'to the chat app!', when: 0}}).key('example/chat/data')
+      })
+      chat.put({random1: {who: 'mark', what: '1', when: 1}})
+      chat.put({random2: {who: 'mark', what: '2', when: 2}})
+      chat.put({random3: {who: 'mark', what: '3', when: 3}})
+      chat.put({random4: {who: 'mark', what: '4', when: 4}})
+      chat.put({random5: {who: 'mark', what: '5', when: 5}})
+      var seen = {1: false, 2: false, 3: false, 4: false, 5: false}
+      setTimeout(function () {
+        chat.map(function (m) { }).val(function (msg, field) {
+          var msg = Gun.obj.copy(msg)
+          if (msg.what) {
+            expect(msg.what).to.be.ok()
+            seen[msg.when] = true
+          }
+          if (!Gun.obj.map(seen, function (boo) { if (!boo) { return true } })) {
+            done()
+          }
+        })
+      }, 100)
+    })
+  })
+})

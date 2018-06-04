@@ -13,14 +13,14 @@ const randomString = length => {
 // Generator
 // generates stream of json {id: "", name: "", description: ""}
 class Generator extends stream.Readable {
-  constructor(n) {
+  constructor (n) {
     super()
 
     this._n = n
     this._i = 0
   }
 
-  _read(size) {
+  _read (size) {
     if (this._i < this._n) {
       this.push(
         JSON.stringify({
@@ -40,12 +40,12 @@ class Generator extends stream.Readable {
 // Line
 // read line by line as stream comes through it
 class Line extends stream.Transform {
-  constructor() {
+  constructor () {
     super()
     this.buff = ''
   }
 
-  trySendLine() {
+  trySendLine () {
     let index = this.buff.indexOf(`\n`)
 
     while (index !== -1) {
@@ -58,7 +58,7 @@ class Line extends stream.Transform {
     }
   }
 
-  _transform(chunk, enc, cb) {
+  _transform (chunk, enc, cb) {
     this.buff += chunk.toString()
 
     this.trySendLine()
@@ -66,7 +66,7 @@ class Line extends stream.Transform {
     cb()
   }
 
-  end() {
+  end () {
     this.trySendLine()
 
     if (this.buff.length > 0) {
@@ -78,17 +78,17 @@ class Line extends stream.Transform {
 // Graph
 // parse the chunk and tries to add it to table
 class Graph extends stream.Transform {
-  constructor() {
+  constructor () {
     super()
 
     this.db = new Gun({
-      //file: 'graph.json'
+      // file: 'graph.json'
       localStorage: false
     })
     this.items = this.db.get('items')
   }
 
-  _transform(chunk, enc, cb) {
+  _transform (chunk, enc, cb) {
     const json = JSON.parse(chunk.toString())
     const item = this.db.get(json.id)
 
@@ -111,12 +111,12 @@ class Graph extends stream.Transform {
 // Report
 // shows how many item has pass through the system
 class Report extends stream.Transform {
-  constructor() {
+  constructor () {
     super()
     this._count = 0
   }
 
-  _transform(chunk, enc, cb) {
+  _transform (chunk, enc, cb) {
     this.push(`count: ${this._count++}\r`)
     cb()
   }
