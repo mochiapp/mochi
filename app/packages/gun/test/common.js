@@ -6890,22 +6890,22 @@ describe('Gun', function () {
 		return;
 		return;
 		return;
-		return;
-		return;
-		return;
-		return;
-		return;
 		
 		
 		
 		
 		
 		
-		return;
-		return;
-		return;
-		return;
-		return;
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		return;
 		return;
 		it("get map path val", function(done){ // Terje's bug
