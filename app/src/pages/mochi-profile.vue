@@ -4,6 +4,8 @@
       <q-card-main>
         <div class="q-subheading q-pb-xs">{{ $t('profile:your_avatar_and_sizes') }}</div>
         <div class="val row items-center">
+          <img ref="test" />
+          ===
           <mochi-avatar-display
             :avatar="avatar"
             :pub="auth.pub"
@@ -77,6 +79,7 @@ import store from '../store/stores/auth'
 import MochiPageContent from '../components/mochi-page-content.vue'
 import MochiAvatarDisplay from '../components/mochi-avatar-display.vue'
 import MochiImagePicker from '../components/mochi-image-picker.vue'
+import ipfs from '../store/helpers/ipfs'
 
 export default {
   components: {
@@ -118,6 +121,18 @@ export default {
           type: 'positive'
         })
       })
+  
+    ipfs.init().then(_ => {
+      console.log('profile ipfs inited')
+      // ipfs.getImage('QmX7mna7G3BLx2UCdAHviaDastbnvLiVmM2pQ5azBa1H7D').then(src => { // cage
+      ipfs.getImage('QmTbhNNgnSzDnQj8mLELcxqZKwUwbzpnHj2iMeqscjpDEF').then(src => { // injustice
+      // ipfs.getImage('QmYqA8GiZ4MCeyJkERReLwGRnjSdQBx5SzjvMgiNwQZfx6').then(src => { // monty
+      // ipfs.getImage('QmVbCbGE39kSpgwX33j3s5XiidgFaY8SdE23VBqtbf8rgc/1436016689637.jpg').then(src => { // anime1
+      // ipfs.getImage('QmVbCbGE39kSpgwX33j3s5XiidgFaY8SdE23VBqtbf8rgc/1436148958562.png').then(src => { // anime2
+      // ipfs.getImage('QmRa2z3zTL2XHtheAjYnsuSDiyDn4sKktWrywg31KdnMmX/0001 - D7rMzsQ.gif').then(src => { // frog
+        that.$refs.test.src = src
+      })
+    })
   },
 
   methods: {
