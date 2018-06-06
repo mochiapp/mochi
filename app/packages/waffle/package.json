@@ -1,6 +1,6 @@
 {
   "name": "waffle",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Mobx adapter for gun.js",
   "main": "index.js",
   "web": "waffle.min.js",
@@ -12,9 +12,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "core-js": "^0.6.0",
     "gun": "0.9.997",
-    "mobx": "4.3.0",
-    "core-js": "^0.6.0"
+    "mobx": "4.3.0"
   },
   "devDependencies": {
     "@babel/cli": "7.0.0-beta.49",
