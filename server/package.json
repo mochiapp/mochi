@@ -8,6 +8,7 @@
     "dev": "node_modules/nodemon/bin/nodemon.js ./index.js"
   },
   "dependencies": {
+    "dotenv": "6.0.0",
     "express": "^4.16.3",
     "gun": "^0.9.98",
     "ipfs": "^0.28.2"

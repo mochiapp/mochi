@@ -5,32 +5,20 @@ console.log('OB super-peer...')
 --------------------------------------------------------------------------
 */
 
-var port = process.env.OPENSHIFT_NODEJS_PORT || process.env.VCAP_APP_PORT || process.env.PORT || process.argv[2] || 8090
+const path = require('path')
+const dotenv = require('dotenv').config({ path: path.join(__dirname, '..', '.env') })
 
-var fs = require('fs')
-var path = require('path')
 var https = require('https')
 var express = require('express')
 var Gun = require('gun')
+
 
 var app = express()
 app.use(Gun.serve)
 // app.use(express.static(__dirname))
 app.use(express.static('static'))
 
-var privateKey = fs.readFileSync('/etc/letsencrypt/live/rh1.breasy.site/privkey.pem')
-var certificate = fs.readFileSync('/etc/letsencrypt/live/rh1.breasy.site/cert.pem')
-
-var options = {
-  key: privateKey,
-  cert: certificate
-}
-
-var server = https.createServer(options, app).listen(port, function () {
-  console.log('============================================================')
-  console.log('Express server listening on port ' + port)
-  console.log('============================================================')
-})
+const server = createServer(app)
 
 app.get('/health-check', (req, res) => res.sendStatus(200))
 
@@ -89,3 +77,43 @@ node.on('ready', () => {
   //   console.log('IPFS stopped')
   // })
 })
+
+function createServer(app) {
+  const serverPort = process.env.OPENSHIFT_NODEJS_PORT || process.env.VCAP_APP_PORT ||
+      process.env.PORT || process.argv[2] || 8090
+  // const { port: serverPort } = app.get('config').server;
+  let server, options;
+
+  if ( process.env.NODE_ENV !== 'production' ){
+    var fs = require('fs');
+    const { PRIVKEY_PATH, CERT_PATH } = process.env
+    try {
+      options = {
+	key:  fs.readFileSync(PRIVKEY_PATH),
+	cert: fs.readFileSync(CERT_PATH)
+      };
+    } catch(error) {
+      console.log({ error })
+      options = {}
+    }
+    // TODO(Frazier): remove asap, security vulnerability
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    server = https.createServer(options, app);
+  } else {
+
+    // Use HTTP in prod for heroku
+    server = http.createServer(app);
+  }
+
+  server.listen(serverPort, function (err) {
+    // const { applicationServer, mediaServer } = app.get('config').uris;
+
+    if (err) throw err;
+    console.log('============================================================')
+    console.log('Express server listening on port ' + serverPort)
+    console.log('============================================================')
+  });
+
+  // Required to connect socket.io
+  // app.setup(server);
+}
