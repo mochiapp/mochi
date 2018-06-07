@@ -56,6 +56,7 @@ app.hooks(appHooks);
 
 // const setup = require('./setup')
 // const config = setup.setConfig(app)
+// console.log({ setup, config })
 
 // const holster = require(config.setupPath('gun'))(app)
 // const node = require(config.setupPath('ipfs'))(app)
