@@ -23,7 +23,7 @@
     "yarn": ">= 0.18.0"
   },
   "scripts": {
-    "dev": "node_modules/nodemon/bin/nodemon.js ./index.js",
+    "dev": "node_modules/nodemon/bin/nodemon.js ./src/index.js",
     "test": "yarn run eslint && yarn run mocha",
     "eslint": "eslint src/. test/. --config .eslintrc.json",
     "start": "node src/",
