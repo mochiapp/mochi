@@ -32,8 +32,12 @@
     "exif-js": "^2.3.0",
     "i18next": "^11.3.2",
     "i18next-xhr-backend": "^1.5.1",
+    "idb-kv-store": "^4.4.0",
+    "indexeddb-chunk-store": "^2.2.1",
     "mobx": "^4.2.1",
     "movue": "^0.3.0",
+    "parse-torrent": "^6.0.1",
+    "pica": "^4.1.1",
     "ucavatar": "^1.0.4"
   },
   "devDependencies": {
