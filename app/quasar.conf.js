@@ -22,6 +22,7 @@ module.exports = function (ctx) {
     build: {
       scopeHoisting: true,
       vueRouterMode: 'history',
+      distDir: path.join(__dirname, '..','server', 'dist'),
       // vueCompiler: true,
       // gzip: true,
       // analyze: true,

@@ -32,10 +32,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
 // Host the public folder
-app.use('/', express.static(app.get('public')));
+// app.use('/', express.static(app.get('public')));
 // app.use(express.static(__dirname))
-// app.use(express.static('static'))
-// app.use(express.static('dist'))
+app.use('/statics', express.static(path.join(__dirname, 'dist', 'statics')))
+app.use(express.static('dist'))
 
 // Set up Plugins and providers
 app.configure(express.rest());
