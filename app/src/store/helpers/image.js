@@ -72,20 +72,49 @@ export function exifRotate (img, canvas) {
   })
 }
 
+export function dataURLtoUint8 (dataurl) {
+  var arr = dataurl.split(',')
+  // var mime = arr[0].match(/:(.*?);/)[1]
+  var bstr = atob(arr[1])
+  var n = bstr.length
+  var u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return u8arr
+}
+
 export function getBlob (canvas, tp, q) {
   return new Promise((resolve, reject) => {
     tp = tp || 'image/jpeg'
     q = q || 0.85 // https://developers.google.com/speed/docs/insights/OptimizeImages
+
     pica.toBlob(
       canvas,
       tp,
       q
     ).then(blob => resolve(blob))
+
     // canvas.toBlob(
     //   blob => resolve(blob),
     //   tp,
     //   q
     // )
+  })
+}
+
+export function getBlobMoz (ary, q) {
+  return new Promise((resolve, reject) => {
+    q = q || 0.85
+
+    loadExternalJs('https://cdn.rawgit.com/li-na/mozjpeg.js/master/demo/js/cjpeg.min.js')
+    waitVarExists('cjpeg').then(async (cjpeg) => {
+      console.log('getBlobMoz', '' + parseInt(q * 100))
+      let output = cjpeg(ary, ['-quality', '' + parseInt(q * 100), '-optimize'])
+      // console.log('out', output)
+      var blob = new Blob([output.data])
+      resolve(blob)
+    })
   })
 }
 
@@ -117,4 +146,107 @@ export function blobToUrl (q) {
   var urlCreator = window.URL || window.webkitURL
   var imageUrl = urlCreator.createObjectURL(q)
   return imageUrl
+}
+
+export function canvasToBmpUrl (canvas) {
+  return canvas.toDataURL('image/bmp')
+}
+
+export function calcSsim (src1, src2) {
+  return new Promise((resolve, reject) => {
+    loadExternalJs('https://unpkg.com/ssim.js@^3.0.0')
+    waitVarExists('ssim').then(async (ssim) => {
+      console.log('ssim loaded')
+      ssim(src1, src2/* , {ssim: 'bezkrovny', downsample: false} */)
+        .then(function (out) {
+          console.log('SSIM:', out.mssim, '(', out.performance, 'ms)')
+          resolve(out)
+        })
+        .catch(function (err) {
+          console.error('Error generating SSIM', err)
+          reject(err)
+        })
+    })
+  })
+}
+
+export function compressOptimalStep (opt) {
+  return new Promise((resolve, reject) => {
+    (async () => {
+      let blob
+      if (opt.algo !== 'mozjpeg') {
+        blob = await getBlob(opt.canvas, 'image/jpeg', opt.qual)
+      } else {
+        blob = await getBlobMoz(opt.ary, opt.qual)
+      }
+
+      let src2 = blobToUrl(blob)
+      let ss = await calcSsim(opt.src1, src2)
+      console.log('qual', opt.qual, 'ssim', ss.mssim, opt.desired)
+      if (Math.abs(opt.desired - ss.mssim) < opt.bestSsimDiff) {
+        console.log('NEW BEST diff', opt.bestSsimDiff, Math.abs(opt.desired - ss.mssim))
+        console.log('New best qual', opt.bestQual, opt.qual)
+        opt.bestSsimDiff = Math.abs(opt.desired - ss.mssim)
+        opt.bestQual = opt.qual
+        opt.bestBlob = blob
+      }
+      opt.stepsDone++
+      if (opt.stepsDone < opt.minSteps && opt.qualStep > 0.01) {
+        console.log('NEXT STEP')
+        let dir = 0
+        if (ss.mssim > opt.desired) {
+          dir = -1
+        } else {
+          dir = 1
+        }
+        console.log('dir', dir)
+        if ((opt.lastDir !== dir && opt.lastDir !== 0) || opt.dirChanging !== 0 || opt.qual + dir * opt.qualStep > 0.999 || opt.qual + dir * opt.qualStep < 0.001) {
+          opt.qualStep /= 2
+          opt.dirChanging = 1
+          console.log('opt.qualStep /= 2', opt.qualStep)
+        }
+        opt.qual += dir * opt.qualStep
+        console.log('new qual', opt.qual)
+        opt.lastDir = dir
+        await compressOptimalStep(opt)
+      }
+      console.log('step done')
+      resolve()
+    })().catch(err => {
+      reject(err)
+    })
+  })
+}
+
+export function compressOptimal (canvas, algo) {
+  return new Promise((resolve, reject) => {
+    (async () => {
+      let opt = {
+        desired: 0.98, // 0.985, (ssim)
+        qualStep: 0.1,
+        stepsDone: 0,
+        minSteps: 10,
+        qual: 0.8,
+        bestQual: 0.85,
+        bestSsimDiff: 1,
+        lastDir: 0,
+        dirChanging: 0,
+        canvas: canvas,
+        src1: canvasToBmpUrl(canvas),
+        algo: algo
+      }
+
+      if (opt.algo === 'mozjpeg') {
+        // opt.ary = dataURLtoUint8(canvasToBmpUrl(canvas))
+        opt.ary = dataURLtoUint8(canvas.toDataURL('image/jpeg'), 1)
+        // opt.ary = dataURLtoUint8(canvas.toDataURL('image/png'))
+      }
+
+      await compressOptimalStep(opt)
+      console.log('DONE... Best qual', opt.bestQual)
+      resolve(opt)
+    })().catch(err => {
+      reject(err)
+    })
+  })
 }

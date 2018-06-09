@@ -19,7 +19,8 @@ export default [
       },
       { path: 'options', name: 'options', component: () => import('pages/mochi-options'), meta: { title: 'Options' } },
       { path: 'profile', name: 'profile', component: () => import('pages/mochi-profile'), meta: { title: 'Profile' } },
-      { path: 'debug', name: 'debug', component: () => import('pages/mochi-debug'), meta: { title: 'Debug' } }
+      { path: 'debug', name: 'debug', component: () => import('pages/mochi-debug'), meta: { title: 'Debug' } },
+      { path: 'test', name: 'test', component: () => import('pages/mochi-test'), meta: { title: 'Test' } }
     ]
   },
 
