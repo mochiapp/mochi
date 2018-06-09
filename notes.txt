@@ -43,3 +43,124 @@ Instagram diverse
 https://petapixel.com/2017/10/28/instagrams-photo-filters-used-top-users/
 
 https://github.com/michael-lynch/instagram-lite
+
+/*
+--------------------------------------------------------------------------
+Run an IPFS server in dev
+--------------------------------------------------------------------------
+*/
+
+wget https://dist.ipfs.io/go-ipfs/v0.4.15/go-ipfs_v0.4.15_linux-amd64.tar.gz 
+tar xvfz go-ipfs_v0.4.15_linux-amd64.tar.gz                                  
+cd go-ipfs/                                                                  
+sudo ./install.sh                                                            
+ipfs init                                                                    
+ipfs cat /ipfs/QmS4ustL54uo8FzR9455qaxZwuMiUhyvMcX9Ba8nUH4uVv/readme         
+ipfs config Addresses.API /ip4/0.0.0.0/tcp/51077                             
+ipfs daemon                                                                  
+
+/*
+--------------------------------------------------------------------------
+Image sizes on the big social networks
+--------------------------------------------------------------------------
+*/
+
+https://blog.hubspot.com/marketing/ultimate-guide-social-media-image-dimensions-infographic
+https://blog.bufferapp.com/ideal-image-sizes-social-media-posts
+https://havecamerawilltravel.com/photographer/images-photos-facebook-sizes-dimensions-types/
+https://postcron.com/en/blog/social-media-image-dimensions-sizes/
+
+/*
+--------------------------------------------------------------------------
+Hosting options
+--------------------------------------------------------------------------
+*/
+
+AT OVH, for $232 p/m you get 6*12Tb (=60Tb raid5?) with 500 Mbps unlimited traffic:
+https://www.ovh.com/world/dedicated-servers/all_servers.xml
+
+Suppose an average user posts 1 images per day.
+Suppose an image size of 1 Mb (jpg 96%; full-hd size)
+That is 30 * 1 * 1 = 30 Mb storage addition per month.
+For 1M users you need to add 30 * 1M = 30,000,000 Mb = 30,000 Gb = 30 Tb.
+That would cost max $232 / 2 = $116 per month for adding storage at OVH.
+Upload is 30,000,000 Mb * 10 bits (?) / 30 days / 24 hrs / 60 mn / 60 sc = 115.7 Mbps (if spread equally over time)
+For viewing by friends in their timeline image size could probably be reduced to 100 Kb (jpeg 90%; 720 px wide)
+So download speed for 1M friends receiving each image once would be 11.57 Mbs.
+If 25 on average receive each image, that would be 25 * 11.57 = 289.25 Mbps download.
+So for traffic you would need 115.7 + 289.25 = 404.95 Mbps.
+That would be 1 of the above servers, or $232 p/m.
+So with 1 OVH server at $232 p/m per 1M users you could cover all image costs.
+I guess an average active user will receive more than 25 pictures per day; depends on how active those 1M users are.
+This is my (Robert's) guestimate on 2018-06-06.
+
+Backblaze B2 cloud storage:
+https://www.backblaze.com/b2/cloud-storage-pricing.html
+
+Storage $0.005 /GB/m and download $0.01 /GB.
+Storage: 30,000 Gb * 0.005 = $150 p/m. Similar to OVH.
+Download: 30,000 / 10 (smaller files) * 25 (viewers) * $0.01 = $750. Considerably more than OVH (if my OVH calculations hold).
+No upload costs.
+
+I did a quick check on Facebook and the images from you friends indeed seem to be around 100k and lower. And the width/height is often 1280px?
+
+/*
+--------------------------------------------------------------------------
+WebRTC
+--------------------------------------------------------------------------
+*/
+
+https://github.com/priologic/easyrtc
+
+https://github.com/webtorrent/webtorrent
+https://github.com/MinEduTDF/idb-chunk-store
+https://github.com/webtorrent/webtorrent/issues/1293
+
+/*
+--------------------------------------------------------------------------
+todo
+--------------------------------------------------------------------------
+*/
+
+Timegraphs are very slow when connected to a super-peer:
+https://github.com/amark/gun/issues/544
+
+Study the Feathersjs service architecture (get, set, create, ...):
+https://docs.feathersjs.com/api/services.html
+
+Use Bit for syncing application parts between our social apps:
+https://bitsrc.io/
+
+Read Mark's article on social networks:
+https://hackernoon.com/a-new-kind-of-social-network-emotional-intelligence-e45dcddb1bdb
+
+Read Amber's (Mark's wife) article about social behaviour:
+https://hackernoon.com/game-of-coins-the-behavioral-economics-of-crypto-ef3add0fa202
+
+Check out Mark's and Mattri's identity system:
+https://identi.fi/#/about
+
+Check out W3C's social web incubator:
+https://www.w3.org/2005/Incubator/socialweb/XGR-socialweb-20101206/
+
+Mark's sample app for group chat:
+https://gist.github.com/amark/44b8110a3c848917d6c738f9c3a36e24
+and
+https://twitter.com/marknadal/status/991357432138874880?ref_src=twsrc%5Etfw&ref_url=https%3A%2F%2Fgitter.im%2Famark%2Fgun%2F~chat%23initial
+and
+https://d.tube/#!/v/marknadal/ut4f0qj1
+and:
+https://gun.eco/docs/Security
+and
+https://gist.github.com/amark/7dceae874a20878fdb9e2a8eed109bb5
+and
+https://github.com/amark/gun/blob/master/examples/contact/index.html
+
+GUN .open:
+https://gun.eco/docs/API#open
+
+Check out FIDO alliance standards for authentication:
+https://fidoalliance.org/about/what-is-fido/
+
+Check out W3C Web Authentication API proposal:
+https://www.w3.org/TR/webauthn/
