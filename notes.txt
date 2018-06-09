@@ -36,6 +36,29 @@ https://trackingjs.com/
 
 /*
 --------------------------------------------------------------------------
+SVG patterns (for avatars)
+--------------------------------------------------------------------------
+*/
+
+http://btmills.github.io/geopattern/
+
+http://www.heropatterns.com/
+https://philiprogers.com/svgpatterns/
+http://iros.github.io/patternfills/
+
+/*
+--------------------------------------------------------------------------
+Avatar builders
+--------------------------------------------------------------------------
+*/
+
+https://codecanyon.net/item/svg-avatars-generator-jquery-integrated-script/6498300
+https://getavataaars.com/?accessoriesType=Kurt&avatarStyle=Circle&clotheColor=PastelGreen&clotheType=BlazerShirt&eyeType=Side&eyebrowType=RaisedExcited&facialHairColor=BrownDark&facialHairType=MoustacheMagnum&graphicType=Bear&hairColor=SilverGray&hatColor=Red&mouthType=Grimace&skinColor=Light&topType=LongHairNotTooLong
+https://ashwinvalento.github.io/cartoon-avatar/
+http://www.hexatar.com/
+
+/*
+--------------------------------------------------------------------------
 Instagram diverse
 --------------------------------------------------------------------------
 */
@@ -164,3 +187,6 @@ https://fidoalliance.org/about/what-is-fido/
 
 Check out W3C Web Authentication API proposal:
 https://www.w3.org/TR/webauthn/
+
+Consider Safe-Data request header:
+https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/save-data/
