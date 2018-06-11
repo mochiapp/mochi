@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const logger = require('winston');
 
+process.env['NODE_CONFIG_DIR'] = path.join(__dirname, '..', 'config/')
 const feathers = require('@feathersjs/feathers');
 const configuration = require('@feathersjs/configuration');
 const express = require('@feathersjs/express');
