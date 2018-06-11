@@ -2,8 +2,9 @@ import { loadExternalJs, waitVarExists } from '../../plugins/load'
 var idb = require('indexeddb-chunk-store')
 var parseTorrent = require('parse-torrent')
 var Idbkv = require('idb-kv-store')
+// var WebTorrent = require('webtorrent')
 
-class WebTorrent {
+class OurWebTorrent {
   client = null
   torrents = null
   maxLiveTorrents = 222
@@ -16,10 +17,13 @@ class WebTorrent {
       loadExternalJs('https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js')
       waitVarExists('WebTorrent').then((WebTorrent) => {
         that.client = new WebTorrent({
+          dht: false,
+          tracker: { rtcConfig: null },
           maxConns: 2
         })
         that.torrents = new Idbkv('mochi_torrents')
         that.resurrectAllTorrents()
+        resolve()
       })
     })
   }
@@ -131,6 +135,12 @@ class WebTorrent {
     let that = this
     if (typeof metadata === 'object' && metadata != null) {
       if (that.client.get(metadata.infoHash)) return
+      metadata.announce = [
+        // 'wss://tracker.btorrent.xyz',
+        'wss://tracker.fastcast.nz?numwant=2',
+        'wss://tracker.openwebtorrent.com?numwant=2'
+      ]
+      console.log('ADD', metadata)
       var torrent = that.client.add(metadata, {'store': idb, maxWebConns: 2})
       torrent.on('metadata', () => {
         console.log(`[${metadata.infoHash}] Resurrecting torrent`)
@@ -140,8 +150,15 @@ class WebTorrent {
       })
     }
   }
+
+  getTorrents () {
+    console.log('getTorrents', this.client.torrents)
+    // console.log('WebTorrent', window.WebTorrent)
+    // console.log('client', this.client)
+    return this.client.torrents
+  }
 }
 
-const webTorrent = new WebTorrent()
+const webTorrent = new OurWebTorrent()
 
 export default webTorrent

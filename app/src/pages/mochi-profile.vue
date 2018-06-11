@@ -4,7 +4,7 @@
       <q-card-main>
         <div class="q-subheading q-pb-xs">{{ $t('profile:your_avatar_and_sizes') }}</div>
         <div class="val row items-center">
-          <img ref="test" />
+          <img ref="test">
           ===
           <mochi-avatar-display
             :avatar="avatar"
@@ -121,22 +121,22 @@ export default {
           type: 'positive'
         })
       })
-  
+
     ipfs.init().then(_ => {
       console.log('profile ipfs inited')
       setTimeout(_ => {
         console.log('getimg')
-      ipfs.getImage('QmX7mna7G3BLx2UCdAHviaDastbnvLiVmM2pQ5azBa1H7D').then(src => { // cage
-      // ipfs.getImage('QmTbhNNgnSzDnQj8mLELcxqZKwUwbzpnHj2iMeqscjpDEF').then(src => { // injustice
-      // ipfs.getImage('QmYqA8GiZ4MCeyJkERReLwGRnjSdQBx5SzjvMgiNwQZfx6').then(src => { // monty
-      // ipfs.getImage('QmVbCbGE39kSpgwX33j3s5XiidgFaY8SdE23VBqtbf8rgc/1436016689637.jpg').then(src => { // anime1
-      // ipfs.getImage('QmVbCbGE39kSpgwX33j3s5XiidgFaY8SdE23VBqtbf8rgc/1436148958562.png').then(src => { // anime2
-      // ipfs.getImage('QmRa2z3zTL2XHtheAjYnsuSDiyDn4sKktWrywg31KdnMmX/0001 - D7rMzsQ.gif').then(src => { // frog
-      // ipfs.getImage('QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ/cat.jpg').then(src => { // cat
-        that.$refs.test.src = src
-      }).catch(function (error) {
-        console.log('gi error', error)
-      })
+        ipfs.getImage('QmX7mna7G3BLx2UCdAHviaDastbnvLiVmM2pQ5azBa1H7D').then(src => { // cage
+          // ipfs.getImage('QmTbhNNgnSzDnQj8mLELcxqZKwUwbzpnHj2iMeqscjpDEF').then(src => { // injustice
+          // ipfs.getImage('QmYqA8GiZ4MCeyJkERReLwGRnjSdQBx5SzjvMgiNwQZfx6').then(src => { // monty
+          // ipfs.getImage('QmVbCbGE39kSpgwX33j3s5XiidgFaY8SdE23VBqtbf8rgc/1436016689637.jpg').then(src => { // anime1
+          // ipfs.getImage('QmVbCbGE39kSpgwX33j3s5XiidgFaY8SdE23VBqtbf8rgc/1436148958562.png').then(src => { // anime2
+          // ipfs.getImage('QmRa2z3zTL2XHtheAjYnsuSDiyDn4sKktWrywg31KdnMmX/0001 - D7rMzsQ.gif').then(src => { // frog
+          // ipfs.getImage('QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ/cat.jpg').then(src => { // cat
+          that.$refs.test.src = src
+        }).catch(function (error) {
+          console.log('gi error', error)
+        })
       }, 31000)
     })
   },

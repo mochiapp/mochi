@@ -16,10 +16,10 @@ class Users {
     store.posts && store.posts.loadPosts(data.data) // Todo Move somewhere else?
   }
 
-  @action.bound friendLoaded (dat) {
+  @action.bound async friendLoaded (dat) {
     let data = dat.data
     if (!data.avatar) {
-      data.avatar = generateAvatar(data['_']['#'])
+      data.avatar = await generateAvatar(data['_']['#'])
     }
     store.upsertArray(this.friends, data)
   }

@@ -54,7 +54,7 @@ class Auth {
     })
   }
 
-  @action.bound setVals (li, userData) {
+  @action.bound async setVals (li, userData) {
     this.loggedIn = li
     this.successText = ''
     this.errorText = ''
@@ -62,7 +62,7 @@ class Auth {
       this.pub = userData.pub
       this.alias = userData.alias
       if (!this.avatar) {
-        this.avatar = generateAvatar(this.pub)
+        this.avatar = await generateAvatar(this.pub)
       }
     } else {
       this.pub = ''

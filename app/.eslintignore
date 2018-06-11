@@ -1,3 +1,6 @@
 /dist
 /packages/gun
 /packages/*/lib
+gun.js
+sea.js
+time.js

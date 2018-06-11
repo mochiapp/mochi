@@ -2,6 +2,24 @@
   <mochi-page-content>
     ###DEBUG###<br>
 
+    <template v-for="torrent in torrents">
+      <q-card :key="torrent.infoHash">
+        <q-card-main>
+          Hash: {{ torrent.infoHash }}<br>
+          Max conns: {{ torrent.maxWebConns }}<br>
+          Num peers: {{ torrent.numPeers }}<br>
+          Length: {{ torrent.length }}<br>
+          Received: {{ torrent.received }}<br>
+          Downloaded: {{ torrent.downloaded }}<br>
+          Uploaded: {{ torrent.uploaded }}<br>
+          Magnet: {{ torrent.magnetURI }}<br>
+          <template v-for="ann in torrent.announce">
+            <span :key="ann">Announce: {{ ann }}<br></span>
+          </template>
+        </q-card-main>
+      </q-card>
+    </template>
+
     <q-btn
       label="Delete all Webtorrent"
       color="primary"
@@ -23,6 +41,7 @@ export default {
 
   data () {
     return {
+      torrents: null
     }
   },
 
@@ -32,7 +51,13 @@ export default {
     // })
 
     webTorrent.init().then(_ => {
+      let that = this
+
       console.log('profile webTorrent inited 222')
+
+      setInterval(_ => {
+        that.torrents = webTorrent.getTorrents()
+      }, 1000)
     })
   },
 

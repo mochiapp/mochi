@@ -2,7 +2,7 @@
   <mochi-page-content>
     ###TEST###<br>
 
-    <img ref="test" />
+    <img ref="test">
     ===
 
     <q-input
@@ -11,7 +11,7 @@
       float-label="New string to store input"
       clearable
     />
-    Hash: {{hashStored}}
+    Hash: {{ hashStored }}
     <q-btn
       label="Store in IPFS"
       color="primary"
@@ -24,7 +24,7 @@
       float-label="Hash input"
       clearable
     />
-    Fetched: {{fetched}}
+    Fetched: {{ fetched }}
     <q-btn
       label="Fetch from IPFS"
       color="primary"
@@ -46,7 +46,7 @@
       float-label="New string to seed input"
       clearable
     />
-    MagnetURI: {{magnetURIStored}}
+    MagnetURI: {{ magnetURIStored }}
     <q-btn
       label="Seed to Webtorrent"
       color="primary"
@@ -59,7 +59,7 @@
       float-label="MagnetURI input"
       clearable
     />
-    Downloaded torrent: {{downloaded}}
+    Downloaded torrent: {{ downloaded }}
     <q-btn
       label="Fetch from Webtorrent"
       color="primary"
@@ -72,7 +72,7 @@
 import MochiPageContent from '../components/mochi-page-content.vue'
 import ipfs from '../store/helpers/ipfs'
 import webTorrent from '../store/helpers/webtorrent'
-import {limitPixelSize, exifRotate, getBlob, compressWithGuetzli, blobToUrl, canvasToBmpUrl, calcSsim, compressOptimal} from '../store/helpers/image'
+import {limitPixelSize, exifRotate, /* getBlob, compressWithGuetzli, */ blobToUrl, /* canvasToBmpUrl, calcSsim, */ compressOptimal} from '../store/helpers/image'
 
 export default {
   components: {
@@ -97,9 +97,9 @@ export default {
     //   console.log('profile ipfs inited 222')
     // })
 
-    // webTorrent.init().then(_ => {
-    //   console.log('profile webTorrent inited 222')
-    // })
+    webTorrent.init().then(_ => {
+      console.log('profile webTorrent inited 222aaa')
+    })
   },
 
   methods: {
@@ -141,12 +141,7 @@ export default {
             let resizedCanvas = await limitPixelSize(img, maxW, maxH)
             let rotatedCanvas = await exifRotate(img, resizedCanvas)
 
-            // let src1 = canvasToBmpUrl(rotatedCanvas)
-
             let opt = await compressOptimal(rotatedCanvas, 'mozjpeg')
-
-            // let optQual = 0.85
-            // let blob = await getBlob(rotatedCanvas, 'image/jpeg', optQual)
 
             console.log('img size', rotatedCanvas.width, rotatedCanvas.height)
             console.log('resized to canvas & created blob!', opt.bestBlob)
@@ -154,13 +149,9 @@ export default {
             let src2 = blobToUrl(opt.bestBlob)
             that.$refs.test.src = src2
 
-            // calcSsim(src1, src2)
-
             // let blob3 = await compressWithGuetzli(rotatedCanvas)
-            // let src3 = blobToUrl(blob3)
-            // calcSsim(src1, src3)
 
-            // that.magnetURIStored = await webTorrent.testStore(opt.bestBlob)
+            that.magnetURIStored = await webTorrent.testStore(opt.bestBlob)
           }
         }
 

@@ -27,25 +27,47 @@ module.exports = function (ctx) {
       // analyze: true,
       // extractCSS: false,
 
-      chainWebpack (chain) {
-	chain.module.rule('babel:waffle').
-	  test(/\.js$/).
-	  pre().
-	  include.add(path.join(__dirname, 'packages', 'waffle')).end().
-	  exclude.add(path.join(__dirname, 'packages', 'waffle', 'node_modules')).end().
-	  use('babel').loader('babel-loader').options({
-	    presets: [ '@babel/preset-env' ],
-	    plugins: [ '@babel/plugin-proposal-class-properties' ]
-	  })
-      },
+      // chainWebpack (chain) {
+      //   chain.module.rule('eslint')
+      //     .test(/\.(js|vue)$/)
+      //     .pre()
+      //     .include.add(path.join(__dirname, 'packages')).end()
+      //     .exclude
+      //     .add(/(node_modules|quasar)/)
+      //     .add(path.join(__dirname, 'packages', 'waffle'))
+      //     .end()
+      //     .use('eslint').loader('eslint-loader')
+      //   chain.module.rule('babel:waffle')
+      //     .test(/\.js$/)
+      //     .pre()
+      //     .include.add(path.join(__dirname, 'packages', 'waffle')).end()
+      //     .exclude.add(path.join(__dirname, 'packages', 'waffle', 'node_modules')).end()
+      //     .use('babel').loader('babel-loader').options({
+      //       presets: [ '@babel/preset-env' ],
+      //       plugins: [ '@babel/plugin-proposal-class-properties' ]
+      //     })
+      // },
       extendWebpack (cfg) {
-        // cfg.module.rules.push({
-        //   enforce: 'pre',
-        //   test: /\.(js|vue)$/,
-        //   loader: 'eslint-loader',
-        //   exclude: /(node_modules|quasar)/,
-        //   include: [ path.join(__dirname, 'packages') ]
-        // })
+        cfg.module.rules.push({
+          enforce: 'pre',
+          test: /\.js$/,
+          loader: 'babel-loader',
+          exclude: [ path.join(__dirname, 'packages', 'waffle', 'node_modules') ],
+          include: [ path.join(__dirname, 'packages', 'waffle') ],
+          options: {
+            presets: [ '@babel/preset-env' ],
+            plugins: [ '@babel/plugin-proposal-class-properties' ]
+          }
+        })
+        cfg.module.rules.push({
+          enforce: 'pre',
+          test: /\.(js|vue)$/,
+          loader: 'eslint-loader',
+          exclude: /(node_modules|quasar)/,
+          include: [ path.join(__dirname), path.join(__dirname, 'packages') ]
+        })
+        cfg.target = 'web' // For WebTorrent
+        cfg.node.fs = 'empty' // For WebTorrent
       },
       rtl: true
     },
