@@ -27,7 +27,10 @@
     "test": "yarn run eslint && yarn run mocha",
     "eslint": "eslint src/. test/. --config .eslintrc.json",
     "start": "node src/",
-    "mocha": "mocha test/ --recursive --exit"
+    "mocha": "mocha test/ --recursive --exit",
+    "restart": "pm2 startOrRestart ../ecosystem.config.js",
+    "deploy:production": "pm2 deploy ../ecosystem.config.js production",
+    "deploy:staging": "pm2 deploy ../ecosystem.config.js staging"
   },
   "dependencies": {
     "@feathersjs/configuration": "1.0.2",
@@ -48,6 +51,7 @@
     "eslint": "4.19.1",
     "mocha": "5.2.0",
     "nodemon": "^1.17.2",
+    "pm2": "2.10.4",
     "request": "2.87.0",
     "request-promise": "4.2.2"
   }

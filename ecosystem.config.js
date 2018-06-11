@@ -11,7 +11,7 @@ module.exports = {
       ref: 'origin/server.setup',
       repo: 'git@github.com:mochiapp/mochi.git',
       path: '/home/ubuntu/projects/mochi',
-      'post-deploy': 'yarn && pm2 startOrRestart ecosystem.config.js'
+      'post-deploy': 'cd app/ && yarn && quasar build && cd ../server/ && yarn && pm2 startOrRestart ../ecosystem.config.js'
     }
   }
 }
