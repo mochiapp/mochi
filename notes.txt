@@ -11,14 +11,6 @@ https://standardjs.com/
 
 /*
 --------------------------------------------------------------------------
-Attributions:
---------------------------------------------------------------------------
-*/
-
-Big thank you to http://www.heropatterns.com/ who provided patterns for the avatars (CC BY 4.0)
-
-/*
---------------------------------------------------------------------------
 Interesting image manipulation libs
 --------------------------------------------------------------------------
 */
@@ -74,30 +66,6 @@ Instagram diverse
 https://petapixel.com/2017/10/28/instagrams-photo-filters-used-top-users/
 
 https://github.com/michael-lynch/instagram-lite
-
-/*
---------------------------------------------------------------------------
-DHT, WebRTC, WebTorrent, IPFS
---------------------------------------------------------------------------
-*/
-
-A good explanation by Ferros about why WebRTC is currently not feasable for more than just a few connections:
-https://lists.w3.org/Archives/Public/public-webrtc/2018May/0082.html
-
-My question on how we could do IPFS, and asnwer that it is not yet possible in Browser:
-https://discuss.ipfs.io/t/requesting-a-file-that-is-not-in-cache-via-websocket-fails/3127/4
-
-/*
---------------------------------------------------------------------------
-WebRTC
---------------------------------------------------------------------------
-*/
-
-https://github.com/priologic/easyrtc
-
-https://github.com/webtorrent/webtorrent
-https://github.com/MinEduTDF/idb-chunk-store
-https://github.com/webtorrent/webtorrent/issues/1293
 
 /*
 --------------------------------------------------------------------------
@@ -161,6 +129,18 @@ I did a quick check on Facebook and the images from you friends indeed seem to b
 
 /*
 --------------------------------------------------------------------------
+WebRTC
+--------------------------------------------------------------------------
+*/
+
+https://github.com/priologic/easyrtc
+
+https://github.com/webtorrent/webtorrent
+https://github.com/MinEduTDF/idb-chunk-store
+https://github.com/webtorrent/webtorrent/issues/1293
+
+/*
+--------------------------------------------------------------------------
 todo
 --------------------------------------------------------------------------
 */
@@ -210,6 +190,3 @@ https://www.w3.org/TR/webauthn/
 
 Consider Safe-Data request header:
 https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/save-data/
-
-Consider using some nice login animation:
-https://codepen.io/dsenneff/pen/2c3e5bc86b372d5424b00edaf4990173/
