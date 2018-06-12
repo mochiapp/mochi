@@ -4,7 +4,12 @@
   "description": "Mochi",
   "productName": "Mochi",
   "cordovaId": "org.cordova.quasar.app",
-  "author": "",
+  "author": "Jonathan Frazier, Robert Heessels",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mochiapp/waffle/issues"
+  },
+  "homepage": "https://github.com/mochiapp/waffle#readme",
   "private": true,
   "//": "Lerna+WebPack from: https://github.com/dmk255/lerna-webpack-example/blob/master/package.json",
   "scripts": {
@@ -30,6 +35,7 @@
     "croppie": "^2.6.2",
     "dotenv": "5.0.1",
     "exif-js": "^2.3.0",
+    "gun": "0.9.997",
     "i18next": "^11.3.2",
     "i18next-xhr-backend": "^1.5.1",
     "idb-kv-store": "^4.4.0",
