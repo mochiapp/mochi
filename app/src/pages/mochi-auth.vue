@@ -151,6 +151,8 @@ export default {
 </script>
 
 <style scoped lang="stylus">
+@import '~variables'
+
 *
   box-sizing content-box
 
@@ -183,7 +185,8 @@ export default {
     /*background linear-gradient(135deg, #9575cd 27%,#673ab7 100%)*/
     /* background linear-gradient(135deg, #9575cd 27%,#7e57c2 100%) */
     /* background linear-gradient(135deg, #64B5F6 27%,#2196F3 100%) */
-    background-color #64B5F6
+    // background-color #64B5F6
+    background-color $primary
     background-size cover
     background-repeat no-repeat
     background-attachment fixed
