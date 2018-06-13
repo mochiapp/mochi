@@ -41,6 +41,8 @@
     "compression": "1.7.2",
     "cors": "2.8.4",
     "dotenv": "6.0.0",
+    "feathers-blob": "2.0.1",
+    "fs-blob-store": "5.2.1",
     "gun": "^0.9.98",
     "helmet": "3.12.1",
     "ipfs": "^0.28.2",
