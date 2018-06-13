@@ -1,8 +1,6 @@
 const path = require('path')
-const https = require('https')
-// const http = require('http')
 
-function getConfig(app) {
+module.exports = (app) => {
   const { SERVER_URL, PORT, NODE_ENV } = process.env
   const { MEDIA_SERVER_URL, DATABASE_URL } = process.env
 
@@ -31,10 +29,6 @@ function getConfig(app) {
       return path.join(config.modulePath('services'), serviceName)
     },
 
-    services: [
-      { name: 'gun' }
-    ],
-
     staticDirPath: path.join(__dirname, '..', 'static')
   }
 
@@ -44,11 +38,4 @@ function getConfig(app) {
     app.set('config', config)
 
   return config
-}
-
-
-
-module.exports = {
-  getConfig,
-  createServer
 }

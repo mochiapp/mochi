@@ -42,6 +42,8 @@ app.use('/', express.static(path.join(__dirname, '..', 'dist')))
 app.configure(express.rest());
 app.configure(socketio());
 
+app.configure(require('./setup/server'))
+
 // Configure other middleware (see `middleware/index.js`)
 app.configure(middleware);
 // Set up our services (see `services/index.js`)
@@ -55,7 +57,7 @@ app.use(express.errorHandler({ logger }));
 
 app.hooks(appHooks);
 
-// const setup = require('./setup')
+
 // const config = setup.setConfig(app)
 // console.log({ setup, config })
 

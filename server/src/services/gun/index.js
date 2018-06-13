@@ -10,8 +10,8 @@ const gunService = (app) => {
 
 module.exports = (app, config) => {
   const endpoint = `api/${config.name}`;
-  app.use(`/${endpoint}`, gunService(app));
   console.log("services.gun", { config, endpoint })
+  app.use(`/${endpoint}`, gunService(app));
 
   // const service = app.service(endpoint);
   // service.mixin(GunMethods(service, app));
