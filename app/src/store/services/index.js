@@ -5,6 +5,8 @@ import socketio from '@feathersjs/socketio-client'
 // import hooks from 'feathers-hooks';
 import io from 'socket.io-client'
 
+import FilesMethods from './files.methods'
+
 const socket = io('https://localhost:3030', { transports: ['websocket'] })
 
 export const client = feathers()
@@ -16,5 +18,6 @@ export const client = feathers()
 // socket.on('reconnect', () => {app.authenticate();});
 
 // repeat this line for every service in our backend
-export const postService = client.service('gun')
-export const userService = client.service('files')
+export const gun = client.service('api/gun')
+export const files = client.service('api/files')
+files.mixin(FilesMethods(files, client))
