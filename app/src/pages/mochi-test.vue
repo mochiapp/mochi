@@ -69,6 +69,7 @@
 </template>
 
 <script>
+import { files } from '../store/services'
 import MochiPageContent from '../components/mochi-page-content.vue'
 import ipfs from '../store/helpers/ipfs'
 import webTorrent from '../store/helpers/webtorrent'
@@ -142,6 +143,8 @@ export default {
             let rotatedCanvas = await exifRotate(img, resizedCanvas)
 
             let opt = await compressOptimal(rotatedCanvas, 'mozjpeg')
+            const saved = await files.saveImageFromBlob(opt.bestBlob, opt)
+            console.log({ saved })
 
             console.log('img size', rotatedCanvas.width, rotatedCanvas.height)
             console.log('resized to canvas & created blob!', opt.bestBlob)
@@ -150,7 +153,6 @@ export default {
             that.$refs.test.src = src2
 
             // let blob3 = await compressWithGuetzli(rotatedCanvas)
-
             that.magnetURIStored = await webTorrent.testStore(opt.bestBlob)
           }
         }

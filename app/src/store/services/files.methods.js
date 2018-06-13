@@ -1,6 +1,9 @@
 module.exports = (service, app) => {
   function saveImageFromBlob (blob, opt) {
-    console.log({ blob, opt })
+    return service.create({ uri: opt.src1 })
+      .then((response) => {
+        return response
+      })
   }
 
   return {

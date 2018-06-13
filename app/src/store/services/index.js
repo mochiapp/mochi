@@ -19,5 +19,6 @@ export const client = feathers()
 
 // repeat this line for every service in our backend
 export const gun = client.service('api/gun')
-export const files = client.service('api/files')
+// export const files = client.service('api/files')
+export const files = client.service('api/files-multi')
 files.mixin(FilesMethods(files, client))
