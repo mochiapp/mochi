@@ -59,6 +59,23 @@ http://www.hexatar.com/
 
 /*
 --------------------------------------------------------------------------
+Colors
+--------------------------------------------------------------------------
+*/
+
+Mochi color palette:
+http://www.colourlovers.com/palette/1473/Ocean_Five
+#00A0B0
+#6A4A3C
+#CC333F
+#EB6841
+#EDC951
+
+http://www.paletton.com/
+http://www.colourlovers.com/
+
+/*
+--------------------------------------------------------------------------
 Instagram diverse
 --------------------------------------------------------------------------
 */
@@ -66,6 +83,44 @@ Instagram diverse
 https://petapixel.com/2017/10/28/instagrams-photo-filters-used-top-users/
 
 https://github.com/michael-lynch/instagram-lite
+
+/*
+--------------------------------------------------------------------------
+DHT, WebRTC, WebTorrent, IPFS
+--------------------------------------------------------------------------
+*/
+
+A good explanation by Ferros about why WebRTC is currently not feasable for more than just a few connections:
+https://lists.w3.org/Archives/Public/public-webrtc/2018May/0082.html
+
+My question on how we could do IPFS, and asnwer that it is not yet possible in Browser:
+https://discuss.ipfs.io/t/requesting-a-file-that-is-not-in-cache-via-websocket-fails/3127/4
+
+Problems with the pulbic IPFS gateways:
+https://github.com/ipfs/js-ipfs/issues/1380
+
+NAT problems explained; ICE STUN TURN:
+https://webrtchacks.com/an-intro-to-webrtcs-natfirewall-problem/
+
+" Servers you’ll need in a WebRTC product:
+1. Signaling server (either as part of your application server or as a separate entity)
+2. STUN/TURN servers (that’s what gets used for NAT traversal
+3. Media servers (optional. Only if your use case calls for it) "
+
+Good WebRTC intro:
+https://bloggeek.me/how-webrtc-works/
+
+/*
+--------------------------------------------------------------------------
+WebRTC
+--------------------------------------------------------------------------
+*/
+
+https://github.com/priologic/easyrtc
+
+https://github.com/webtorrent/webtorrent
+https://github.com/MinEduTDF/idb-chunk-store
+https://github.com/webtorrent/webtorrent/issues/1293
 
 /*
 --------------------------------------------------------------------------

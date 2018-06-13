@@ -59,7 +59,7 @@
           style="height: 100%;"
         >
           <div class="sidemenu-header">
-            <img src="../assets/globe.svg">
+            <img src="../assets/mochi-logo.svg">
             <div>Mochi</div>
           </div>
 
@@ -193,7 +193,8 @@ export default {
   display flex
   align-items center
   padding-left 18px
-  color #2196F3
+  // color #2196F3
+  color $primary
 
   & > div
     height 20px !important
