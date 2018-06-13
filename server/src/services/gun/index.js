@@ -3,18 +3,19 @@
 
 const gunService = (app) => {
   return {
+    get(id) {
+      console.log('gun.service.get', id)
+      return id
+    }
   }
 }
 
 // function BaseService() {}
 
 module.exports = (app, config) => {
-  const endpoint = `api/${config.name}`;
-  console.log("services.gun", { config, endpoint })
-  app.use(`/${endpoint}`, gunService(app));
+  app.use(`/${config.name}`, gunService(app));
 
-  // const service = app.service(endpoint);
+  const service = app.service(config.name);
   // service.mixin(GunMethods(service, app));
-  // service.endpoint = endpoint;
   return service
 }

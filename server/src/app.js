@@ -31,18 +31,18 @@ app.use(cors());
 app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.configure(require('./setup/server'))
 app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
 // Host the public folder
 // app.use('/', express.static(app.get('public')));
 // app.use(express.static(__dirname))
-app.use('/statics', express.static(path.join(__dirname, '..', 'dist', 'statics')))
+app.use('/statics', express.static(app.get('staticDir')))
 app.use('/', express.static(path.join(__dirname, '..', 'dist')))
 
 // Set up Plugins and providers
 app.configure(express.rest());
 app.configure(socketio());
-
-app.configure(require('./setup/server'))
 
 // Configure other middleware (see `middleware/index.js`)
 app.configure(middleware);

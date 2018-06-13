@@ -1,41 +1,19 @@
 const path = require('path')
 
 module.exports = (app) => {
-  const { SERVER_URL, PORT, NODE_ENV } = process.env
-  const { MEDIA_SERVER_URL, DATABASE_URL } = process.env
+  app.set('staticDir', path.join(app.get('root'), '..', 'dist', 'statics'))
 
-  const config = {
-    uris: {
-      applicationServer: ( NODE_ENV !== 'production' ) ?
-	`https://${SERVER_URL}:${PORT}` : `https://${SERVER_URL}`,
-      mediaServer: MEDIA_SERVER_URL, postgresDb: DATABASE_URL
-    },
+  app.getPath = (type, name) => {
+    let requested;
+    switch(type) {
+    case 'services':
+      requested = path.join(app.get('root'), 'services', name)
+      break
 
-    moduleRoot: path.join(__dirname, '..', process.env.MODULE_DIR || 'modules'),
-
-    modulePath(moduleName) {
-      return path.join(config.moduleRoot, moduleName)
-    },
-
-    server: {
-      port: PORT
-    },
-
-    setupPath(resourceName) {
-      return path.join(config.modulePath('setup'), resourceName)
-    },
-
-    servicePath(serviceName) {
-      return path.join(config.modulePath('services'), serviceName)
-    },
-
-    staticDirPath: path.join(__dirname, '..', 'static')
+    case 'setup':
+      requested = path.join(app.get('root'), 'src', 'setup', resourceName)
+      break
+    }
+    return requested
   }
-
-  console.log('before', app.get('config'))
-
-  if (app && !app.get('config'))
-    app.set('config', config)
-
-  return config
 }
