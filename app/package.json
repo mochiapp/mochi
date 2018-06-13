@@ -30,6 +30,8 @@
     "predeploy": "yarn build"
   },
   "dependencies": {
+    "@feathersjs/feathers": "3.1.6",
+    "@feathersjs/socketio-client": "1.1.0",
     "@panter/vue-i18next": "^0.9.1",
     "core-js": "2.5.7",
     "croppie": "^2.6.2",
@@ -42,8 +44,10 @@
     "indexeddb-chunk-store": "^2.2.1",
     "mobx": "^4.2.1",
     "movue": "^0.3.0",
+    "vue": "^2.4.2",
     "parse-torrent": "^6.0.1",
-    "pica": "^4.1.1"
+    "pica": "^4.1.1",
+    "socket.io-client": "2.1.1"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
