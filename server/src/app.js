@@ -39,7 +39,6 @@ app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
 // app.use(express.static(__dirname))
 app.use('/statics', express.static(app.get('statics')))
 app.use('/uploads', express.static(app.get('uploads')))
-app.use('/', express.static(path.join(__dirname, '..', 'dist')))
 
 // Set up Plugins and providers
 app.configure(express.rest());
@@ -51,6 +50,12 @@ app.configure(middleware);
 app.configure(services);
 // Set up event channels (see channels.js)
 app.configure(channels);
+
+app.use('/', express.static(app.get('dist')))
+
+app.all('*', function (req, res) {
+  res.sendFile(path.join(app.get('dist'), '/index.html'))
+})
 
 // Configure a middleware for 404s and the error handler
 app.use(express.notFound());
@@ -76,8 +81,5 @@ app.hooks(appHooks);
 //   res.sendFile(path.join(__dirname + '/dist/index.html'))
 // })
 
-// app.all('*', function (req, res) {
-//   res.sendFile(path.join(__dirname + '/dist/index.html'))
-// })
 
 module.exports = app;

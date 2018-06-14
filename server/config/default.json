@@ -3,6 +3,7 @@
   "port": 3030,
   "public": "../public/",
   "root": "../src/",
+  "dist": "../dist",
   "statics": "../dist/statics/",
   "uploads": "../uploads/",
   "paginate": {
