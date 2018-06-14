@@ -5,10 +5,10 @@ const hooks = require('./files.hooks');
 // Reference: https://github.com/feathersjs/docs/blob/master/guides/advanced/file-uploading.md
 // const multer = require('multer')
 // const multipartMiddleware = multer()
-const blobStorage = require('fs-blob-store')('./uploads')
-const blobService = require('feathers-blob')({ Model: blobStorage })
 
 module.exports = function (app) {
+  const blobStorage = require('fs-blob-store')(app.get('uploads'))
+  const blobService = require('feathers-blob')({ Model: blobStorage })
   
   const paginate = app.get('paginate');
 
