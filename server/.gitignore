@@ -3,6 +3,7 @@ logs
 *.log
 
 keys/
+uploads/
 
 # Runtime data
 pids
