@@ -16,6 +16,9 @@ module.exports = function (app) {
     paginate
   };
 
+  // Add storage type: ipfs/https
+  // Accept file type.
+
   // Initialize our service with any options it requires
   app.use('/api/files', createService(options))
   app.use('/api/uploads', blobService)

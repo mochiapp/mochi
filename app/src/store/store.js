@@ -1,5 +1,5 @@
 // import {GunStore} from 'waffle'
-import * as services from './services'
+import * as services from '../waffle/src/services'
 import {GunStore} from './gun-mobx'
 
 class Store extends GunStore {

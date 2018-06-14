@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import { uploads } from '../store/services'
+import { uploads } from '../waffle/src/services'
 import MochiPageContent from '../components/mochi-page-content.vue'
 import ipfs from '../store/helpers/ipfs'
 import webTorrent from '../store/helpers/webtorrent'
@@ -143,7 +143,7 @@ export default {
             let rotatedCanvas = await exifRotate(img, resizedCanvas)
 
             let opt = await compressOptimal(rotatedCanvas, 'mozjpeg')
-            const saved = await uploads.saveImageFromBlob(opt.bestBlob, opt)
+            const saved = await uploads.createFromBlob(opt.bestBlob)
             console.log({ saved })
 
             console.log('img size', rotatedCanvas.width, rotatedCanvas.height)

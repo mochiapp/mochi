@@ -112,7 +112,7 @@ export function getBlobMoz (ary, q) {
       console.log('getBlobMoz', '' + parseInt(q * 100))
       let output = cjpeg(ary, ['-quality', '' + parseInt(q * 100), '-optimize'])
       // console.log('out', output)
-      var blob = new Blob([output.data])
+      var blob = new Blob([output.data], { type: 'image/jpeg' })
       resolve(blob)
     })
   })
