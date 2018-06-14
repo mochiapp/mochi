@@ -1,8 +1,6 @@
 const path = require('path')
 
 module.exports = (app) => {
-  app.set('staticDir', path.join(app.get('root'), '..', 'dist', 'statics'))
-
   app.getPath = (type, name) => {
     let requested;
     switch(type) {
@@ -11,7 +9,7 @@ module.exports = (app) => {
       break
 
     case 'setup':
-      requested = path.join(app.get('root'), 'src', 'setup', resourceName)
+      requested = path.join(app.get('root'), 'setup', name)
       break
     }
     return requested
