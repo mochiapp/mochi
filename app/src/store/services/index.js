@@ -5,7 +5,7 @@ import socketio from '@feathersjs/socketio-client'
 // import hooks from 'feathers-hooks';
 import io from 'socket.io-client'
 
-import FilesMethods from './files.methods'
+import UploadsMethods from './uploads.methods'
 
 const socket = io('https://localhost:3030', { transports: ['websocket'] })
 
@@ -19,6 +19,6 @@ export const client = feathers()
 
 // repeat this line for every service in our backend
 export const gun = client.service('api/gun')
-// export const files = client.service('api/files')
-export const files = client.service('api/files-multi')
-files.mixin(FilesMethods(files, client))
+export const files = client.service('api/files')
+export const uploads = client.service('api/uploads')
+uploads.mixin(UploadsMethods(uploads, client))
