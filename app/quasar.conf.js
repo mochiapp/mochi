@@ -1,6 +1,7 @@
 // Configuration for your app
-require('dotenv').config()
 const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') })
+const webpack = require('webpack')
 
 module.exports = function (ctx) {
   return {
@@ -67,6 +68,16 @@ module.exports = function (ctx) {
           exclude: /(node_modules|quasar)/,
           include: [ path.join(__dirname), path.join(__dirname, 'packages') ]
         })
+
+        const pluginConfig = {}
+        const envVars = [ 'DEFAULT_ORIGIN', 'NODE_ENV' ]
+        const addFromEnv = (config, key) => {
+          // Stringify data so it can be parsed properly
+          config[`process.env.${key}`] = JSON.stringify(process.env[key])
+        }
+        envVars.forEach((key) => addFromEnv(pluginConfig, key))
+        cfg.plugins.push(new webpack.DefinePlugin(pluginConfig))
+
         cfg.target = 'web' // For WebTorrent
         cfg.node.fs = 'empty' // For WebTorrent
       },
@@ -74,7 +85,7 @@ module.exports = function (ctx) {
     },
     devServer: {
       https: true,
-      port: process.env.PORT || 51075,
+      port: process.env.CLIENT_PORT || 51075,
       open: false // opens browser window automatically
     },
     // framework: 'all' --- includes everything; for dev only!

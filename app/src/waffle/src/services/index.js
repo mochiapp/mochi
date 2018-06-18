@@ -7,9 +7,10 @@ import io from 'socket.io-client'
 
 import UploadsMethods from './uploads.methods'
 
-const { origin } = window.location
-console.log({ origin })
+const origin = (![ 'production', 'staging' ].includes(process.env.NODE_ENV))
+  ? process.env.DEFAULT_ORIGIN : window.location.origin
 const socket = io(origin, { transports: ['websocket'] })
+console.log({ origin })
 
 export const client = feathers()
   .configure(socketio(socket)) // you could use Primus or REST instead

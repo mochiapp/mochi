@@ -7,8 +7,8 @@ export default (service, app) => {
   }
 
   function createUri (blob) {
-    const reader = new FileReader()
     return new Promise((resolve, reject) => {
+      const reader = new FileReader()
       reader.onload = (event) => {
         const value = event.target.result
         resolve(value)
