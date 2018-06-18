@@ -14,6 +14,7 @@ const schema = {
   exclude: [ 'uri' ],
   computed: {
     hash: (upload) => { return upload.id.split('.')[0] },
+    location: (upload) => { return `/uploads/${upload.id}` },
     protocol: (_,hook) => { return hook.service.protocol },
     type: (upload) => { return upload.uri.split(';')[0].split(':')[1] },
   }
