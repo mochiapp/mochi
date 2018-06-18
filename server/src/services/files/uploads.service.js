@@ -9,9 +9,6 @@ module.exports = function (app) {
   const blobStorage = require('fs-blob-store')(app.get('uploads'))
   const blobService = require('feathers-blob')({ Model: blobStorage })
   
-  // Add storage type: ipfs/https
-  // Accept file type.
-
   // Upload Service with multipart support
   app.use('/api/uploads',
 
@@ -29,5 +26,6 @@ module.exports = function (app) {
           blobService)
 
   const uploads = app.service('api/uploads')
+  uploads.protocol = 'https'
   uploads.hooks(hooks)
 }

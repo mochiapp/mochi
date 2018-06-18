@@ -10,8 +10,13 @@ function convertFileToDataURI(context) {
   }
 }
 
-function serializeResponse(context) {
-  console.log({ result: context.result })
+const schema = {
+  exclude: [ 'uri' ],
+  computed: {
+    hash: (upload) => { return upload.id.split('.')[0] },
+    protocol: (_,hook) => { return hook.service.protocol },
+    type: (upload) => { return upload.uri.split(';')[0].split(':')[1] },
+  }
 }
 
 function handleError(context) {
@@ -30,10 +35,10 @@ module.exports = {
   },
 
   after: {
-    all: [],
+    all: [ serialize(schema) ],
     find: [],
     get: [],
-    create: [ serializeResponse ],
+    create: [],
     update: [],
     patch: [],
     remove: []
