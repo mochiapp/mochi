@@ -1,7 +1,8 @@
-import '../../plugins/i18n'
 import {observable, action} from 'mobx'
-import store from '../store'
+import { gun } from '../../waffle/src/services'
 import generateAvatar from '../helpers/avatar'
+import '../../plugins/i18n'
+// import store from '../store'
 
 class Auth {
   @observable loggedIn = false
@@ -12,7 +13,7 @@ class Auth {
   @observable avatar = ''
 
   @action.bound login (data) {
-    store.login(data.u, data.p).then((result) => {
+    gun.login(data.u, data.p).then((result) => {
       this.setVals(true, result)
       this.successText = 'auth:login_suc'
     }).catch((reason) => {
@@ -22,7 +23,7 @@ class Auth {
   }
 
   @action.bound logout (data) {
-    store.logout().then((result) => {
+    gun.logout().then((result) => {
       this.setVals(false, null)
       this.successText = 'auth:logout_suc'
     }).catch((reason) => {
@@ -32,7 +33,7 @@ class Auth {
   }
 
   @action.bound register (data) {
-    store.register(data.u, data.p).then((result) => {
+    gun.register(data.u, data.p).then((result) => {
       this.setVals(false, null)
       this.successText = 'auth:register_suc'
     }).catch((reason) => {
@@ -46,7 +47,7 @@ class Auth {
   }
 
   @action.bound checkSession (data) {
-    store.checkSession().then((result) => {
+    gun.checkSession().then((result) => {
       this.setVals(true, result)
       this.successText = 'auth:auto_logout_suc'
     }).catch((reason) => {
@@ -75,6 +76,4 @@ class Auth {
   }
 }
 
-store.setSubStore('auth', new Auth())
-
-export default store
+export default Auth

@@ -45,6 +45,7 @@ import i18next from 'i18next'
 import {stripTags} from '../plugins/clean'
 import MochiUserDisplay from '../components/mochi-user-display.vue'
 import store from '../store/stores/posts'
+import { auth } from '../store/stores'
 
 export default {
   components: {
@@ -60,7 +61,7 @@ export default {
 
   fromMobx: {
     posts () { return [...store.posts.posts] },
-    alias () { return store.auth.alias },
+    alias () { return auth.alias },
     timelineFiltered () {
       var ar = [...store.posts.posts]
       ar.sort(function (a, b) {

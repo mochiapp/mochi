@@ -117,15 +117,16 @@
 
 <script>
 // import { openURL } from 'quasar'
-import auth from '../pages/mochi-auth.vue'
-import store from '../store/stores/app'
-import '../store/stores/auth'
-import router from '../router'
+import Auth from '../pages/mochi-auth.vue'
 import MochiUserDisplay from '../components/mochi-user-display.vue'
+
+import store from '../store/stores/app'
+import { auth } from '../store/stores'
+import router from '../router'
 
 export default {
   components: {
-    auth,
+    'auth': Auth,
     'mochi-user-display': MochiUserDisplay
   },
 
@@ -137,11 +138,11 @@ export default {
 
   fromMobx: {
     inited () { return store.app.inited },
-    loggedIn () { return store.auth.loggedIn },
+    loggedIn () { return auth.loggedIn },
     menuItems () { return [...store.app.menuItems] },
     langTrick () { return store.app.langTrick },
-    alias () { return store.auth.alias },
-    avatar () { return store.auth.avatar }
+    alias () { return auth.alias },
+    avatar () { return auth.avatar }
   },
 
   computed: {
@@ -158,7 +159,7 @@ export default {
     // openURL,
 
     logout: function (event) {
-      store.auth.logout()
+      auth.logout()
     },
 
     click: function (fn, event) {

@@ -5,12 +5,12 @@ import socketio from '@feathersjs/socketio-client'
 // import hooks from 'feathers-hooks';
 import io from 'socket.io-client'
 
-import UploadsMethods from './uploads.methods'
+import GunMethods from './gun/gun.methods'
+import UploadsMethods from './files/uploads.methods'
 
 const origin = (![ 'production', 'staging' ].includes(process.env.NODE_ENV))
   ? process.env.DEFAULT_ORIGIN : window.location.origin
 const socket = io(origin, { transports: ['websocket'] })
-console.log({ origin })
 
 export const client = feathers()
   .configure(socketio(socket)) // you could use Primus or REST instead
@@ -22,6 +22,9 @@ export const client = feathers()
 
 // repeat this line for every service in our backend
 export const gun = client.service('api/gun')
+gun.mixin(GunMethods(gun, client))
+gun.init()
+
 export const files = client.service('api/files')
 export const uploads = client.service('api/uploads')
 uploads.mixin(UploadsMethods(uploads, client))

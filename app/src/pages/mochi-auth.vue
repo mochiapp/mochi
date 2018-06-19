@@ -94,7 +94,8 @@
 <script>
 import i18next from 'i18next'
 import MochiLanguage from '../components/mochi-language.vue'
-import store from '../store/stores/auth'
+import { auth } from '../store/stores'
+// import store from '../store/stores/auth'
 
 export default {
   components: {
@@ -111,9 +112,9 @@ export default {
   },
 
   fromMobx: {
-    successText () { return i18next.t(store.auth.successText) },
+    successText () { return i18next.t(auth.successText) },
     errorText () {
-      let s = store.auth.errorText
+      let s = auth.errorText
       let as = s.split(', {')
       let o = {}
       if (as.length > 1) {
@@ -124,12 +125,12 @@ export default {
       }
       return i18next.t(s, o)
     },
-    pub () { return store.auth.pub }
+    pub () { return auth.pub }
   },
 
   beforeCreate () {
     i18next.loadNamespaces('auth')
-    store.auth.checkSession()
+    auth.checkSession()
   },
 
   methods: {
@@ -138,12 +139,12 @@ export default {
     },
 
     clickLogin: function (event) {
-      store.auth.login({u: this.$data.username, p: this.$data.password})
+      auth.login({u: this.$data.username, p: this.$data.password})
       this.$data.password = ''
     },
 
     clickRegister: function (event) {
-      store.auth.register({u: this.$data.username, p: this.$data.password})
+      auth.register({u: this.$data.username, p: this.$data.password})
       this.$data.password = ''
     }
   }

@@ -12,8 +12,8 @@ class GunStore {
   */
 
   constructor (options) {
-    this.gun = options.gun || Gun(options.peers)
-    this.user = options.user || this.gun.user()
+    // this.gun = options.gun || Gun(options.peers)
+    // this.user = options.user || this.gun.user()
   }
 
   /*
@@ -103,76 +103,76 @@ class GunStore {
   --------------------------------------------------------------------------
   */
 
-  register (alias, pass) {
-    let that = this
-    return new Promise(function (resolve, reject) {
-      that.user.create(alias, pass, function (ack) {
-        if (ack.err) {
-          reject(ack.err)
-        }
-        if (ack.pub) {
-          resolve({pub: ack.pub, ack})
-        }
-      })
-    })
-  }
+  // register (alias, pass) {
+  //   let that = this
+  //   return new Promise(function (resolve, reject) {
+  //     that.user.create(alias, pass, function (ack) {
+  //       if (ack.err) {
+  //         reject(ack.err)
+  //       }
+  //       if (ack.pub) {
+  //         resolve({pub: ack.pub, ack})
+  //       }
+  //     })
+  //   })
+  // }
 
-  /*
-  --------------------------------------------------------------------------
-  */
+  // /*
+  // --------------------------------------------------------------------------
+  // */
 
-  login (alias, pass) {
-    let that = this
-    return new Promise(function (resolve, reject) {
-      that.user.auth(alias, pass, function (ack) {
-        that.user.recall({sessionStorage: true}) // Todo This should not be needed.
-        if (ack.err) {
-          reject(ack.err)
-        }
-        if (ack.pub) {
-          resolve({pub: ack.pub, ack})
-        }
-      })
-    })
-  }
+  // login (alias, pass) {
+  //   let that = this
+  //   return new Promise(function (resolve, reject) {
+  //     that.user.auth(alias, pass, function (ack) {
+  //       that.user.recall({sessionStorage: true}) // Todo This should not be needed.
+  //       if (ack.err) {
+  //         reject(ack.err)
+  //       }
+  //       if (ack.pub) {
+  //         resolve({pub: ack.pub, ack})
+  //       }
+  //     })
+  //   })
+  // }
 
-  /*
-  --------------------------------------------------------------------------
-  */
+  // /*
+  // --------------------------------------------------------------------------
+  // */
 
-  logout () {
-    let that = this
-    return new Promise(function (resolve, reject) {
-      window.sessionStorage.removeItem('alias') // Todo This should not be needed.
-      window.sessionStorage.removeItem('tmp')
-      that.user.leave(function (ack) { // Todo This has no callback?
-        resolve()
-      }).then(() => {
-        resolve()
-      }) // todo Catch fail?
-    })
-  }
+  // logout () {
+  //   let that = this
+  //   return new Promise(function (resolve, reject) {
+  //     window.sessionStorage.removeItem('alias') // Todo This should not be needed.
+  //     window.sessionStorage.removeItem('tmp')
+  //     that.user.leave(function (ack) { // Todo This has no callback?
+  //       resolve()
+  //     }).then(() => {
+  //       resolve()
+  //     }) // todo Catch fail?
+  //   })
+  // }
 
-  /*
-  --------------------------------------------------------------------------
-  */
+  // /*
+  // --------------------------------------------------------------------------
+  // */
 
-  checkSession () {
-    let that = this
-    return new Promise(function (resolve, reject) {
-      that.login(window.sessionStorage.alias, window.sessionStorage.tmp).then(function (props) { // Todo This should be changed to NOT use sessionStorage.
-      // user.recall(12 * 60) .then(function (props) {
-      // user.recall({sessionStorage:true}).then(function (props) {
-        // const { ok, err = ''} = props
-        const {err = ''} = props
-        if (err) {
-          reject(err)
-        } else if (props.pub) {
-          resolve({pub: props.pub, alias: props.ack.alias, props})
-        }
-      })
-    })
-  }
+  // checkSession () {
+  //   let that = this
+  //   return new Promise(function (resolve, reject) {
+  //     that.login(window.sessionStorage.alias, window.sessionStorage.tmp).then(function (props) { // Todo This should be changed to NOT use sessionStorage.
+  //     // user.recall(12 * 60) .then(function (props) {
+  //     // user.recall({sessionStorage:true}).then(function (props) {
+  //       // const { ok, err = ''} = props
+  //       const {err = ''} = props
+  //       if (err) {
+  //         reject(err)
+  //       } else if (props.pub) {
+  //         resolve({pub: props.pub, alias: props.ack.alias, props})
+  //       }
+  //     })
+  //   })
+  // }
 }
 
 module.exports = GunStore
